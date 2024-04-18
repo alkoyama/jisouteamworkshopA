@@ -31,7 +31,8 @@ CREATE TABLE `customer_management` (
   `Phone` int(12) DEFAULT NULL,
   `Card_info` int(16) DEFAULT NULL,
   `Password` varchar(15) DEFAULT NULL,
-  PRIMARY KEY (`CID`)
+  PRIMARY KEY (`CID`),
+  KEY `CID` (`CID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -58,7 +59,11 @@ CREATE TABLE `order_detail` (
   `SID` varchar(5) DEFAULT NULL,
   `Order_quantity` int(11) DEFAULT NULL,
   `Total_price` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ODID`)
+  PRIMARY KEY (`ODID`),
+  KEY `OID` (`OID`),
+  KEY `SID` (`SID`),
+  CONSTRAINT `fk_order_management` FOREIGN KEY (`OID`) REFERENCES `order_management` (`OID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_product_stock` FOREIGN KEY (`SID`) REFERENCES `product_stock` (`SID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -84,7 +89,9 @@ CREATE TABLE `order_management` (
   `Date_time` datetime NOT NULL,
   `CID` varchar(5) NOT NULL,
   `Grand_total_price` int(11) NOT NULL,
-  PRIMARY KEY (`OID`)
+  PRIMARY KEY (`OID`),
+  KEY `CID` (`CID`),
+  CONSTRAINT `fk_customer_management` FOREIGN KEY (`CID`) REFERENCES `customer_management` (`CID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -136,7 +143,13 @@ CREATE TABLE `poke_info` (
   `Type2` varchar(10) DEFAULT NULL,
   `Price` int(10) NOT NULL,
   `GID` varchar(5) NOT NULL,
-  PRIMARY KEY (`PID`)
+  PRIMARY KEY (`PID`),
+  KEY `Type1` (`Type1`),
+  KEY `Type2` (`Type2`),
+  KEY `GID` (`GID`),
+  CONSTRAINT `fk_poke_graphics` FOREIGN KEY (`GID`) REFERENCES `poke_graphics` (`GID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_poke_type1` FOREIGN KEY (`Type1`) REFERENCES `poke_type` (`TID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_poke_type2` FOREIGN KEY (`Type2`) REFERENCES `poke_type` (`TID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -160,7 +173,8 @@ DROP TABLE IF EXISTS `poke_type`;
 CREATE TABLE `poke_type` (
   `TID` varchar(10) NOT NULL,
   `type_name` varchar(10) NOT NULL,
-  PRIMARY KEY (`TID`)
+  PRIMARY KEY (`TID`),
+  KEY `TID` (`TID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -186,7 +200,9 @@ CREATE TABLE `product_stock` (
   `PID` varchar(5) NOT NULL,
   `Gender` varchar(1) NOT NULL,
   `Inventory` int(11) NOT NULL,
-  PRIMARY KEY (`SID`)
+  PRIMARY KEY (`SID`),
+  KEY `PID` (`PID`),
+  CONSTRAINT `fk_poke_info` FOREIGN KEY (`PID`) REFERENCES `poke_info` (`PID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -209,4 +225,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-04-18 14:09:42
+-- Dump completed on 2024-04-18 15:15:22
