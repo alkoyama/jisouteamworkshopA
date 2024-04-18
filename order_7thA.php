@@ -1,8 +1,7 @@
-
 <?php
 // データベースに接続する
 $host = 'localhost';
-$dbname = 'cooking';
+$dbname = 'teamworkshop_7tha';
 $username = 'root';
 $password = '';
 
@@ -16,19 +15,32 @@ try {
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // 全体の件数を取得
-    $total_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM orders");
+    $total_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM customer_management");
     $total_stmt->execute();
     $total_result = $total_stmt->fetch(PDO::FETCH_ASSOC);
     $total_items = $total_result['total'];
 
     // ページに表示する注文情報を取得
-    $stmt = $conn->prepare("SELECT * FROM orders LIMIT :offset, :items_per_page");
+    $stmt = $conn->prepare("SELECT * FROM customer_management LIMIT :offset, :items_per_page");
     $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
     $stmt->bindParam(':items_per_page', $items_per_page, PDO::PARAM_INT);
     $stmt->execute();
-    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $customer_management = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
+}
+// 削除処理
+if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['CID'])) {
+    $id = $_GET['CID']; // ここでCIDを取得する
+    try {
+        $delete_stmt = $conn->prepare("DELETE FROM customer_management WHERE CID = :CID");
+        $delete_stmt->bindParam(':CID', $id, PDO::PARAM_INT); // ここで$idをバインドする
+        $delete_stmt->execute();
+        header("Location: order_7thA.php"); // 削除後に再読み込み
+        exit();
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
 }
 
 ?>
@@ -84,6 +96,27 @@ try {
             background-color: #ccc;
         }
     </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function confirmDelete(CID) {
+            if (confirm('本当に削除しますか？')) {
+                $.ajax({
+                    url: 'order_7thA.php',
+                    type: 'GET',
+                    data: {
+                        action: 'delete',
+                        CID: CID
+                    },
+                    success: function(response) {
+                        // 削除成功時にテーブルの行を削除
+                        $('#row_' + CID).remove();
+                    },
+                    error: function(xhr, status, error) {
+                    }
+                });
+            }
+        }
+    </script>
 </head>
 
 <body>
@@ -92,30 +125,31 @@ try {
         <table border="1">
             <tr>
                 <th>ID</th>
-                <th>注文日時</th>
-                <th>注文商品</th>
+                <!-- <th>注文日時</th> -->
+                <!-- <th>注文商品</th> -->
                 <th>名前</th>
                 <th>住所</th>
                 <th>電話番号</th>
                 <th>カード情報</th>
                 <th>パスワード</th>
-                <th>注文数</th>
-                <th>合計金額</th>
+                <!-- <th>注文数</th> -->
+                <!-- <th>合計金額</th> -->
                 <th>削除</th>
             </tr>
-            <?php foreach ($orders as $order) : ?>
-                <tr>
-                    <td><?php echo $order['id']; ?></td>
-                    <td><?php echo $order['order_date']; ?></td>
-                    <td><?php echo $order['order_item']; ?></td>
-                    <td><?php echo $order['name']; ?></td>
-                    <td><?php echo $order['address']; ?></td>
-                    <td><?php echo $order['phone_number']; ?></td>
-                    <td><?php echo $order['card_info']; ?></td>
-                    <td><?php echo $order['password']; ?></td>
-                    <td><?php echo $order['order_quantity']; ?></td>
-                    <td><?php echo $order['total_amount']; ?></td>
-                    <td><button onclick="confirmDelete(<?php echo $order['id']; ?>)">削除</button></td>
+            <?php foreach ($customer_management as $order) : ?>
+
+                <tr id="row_<?php echo $order['CID']; ?>">
+                    <td><?php echo $order['CID']; ?></td>
+                    <!-- <td><?php echo $order['order_date']; ?></td> -->
+                    <!-- <td><?php echo $order['order_item']; ?></td> -->
+                    <td><?php echo $order['Name']; ?></td>
+                    <td><?php echo $order['Address']; ?></td>
+                    <td><?php echo $order['Phone']; ?></td>
+                    <td><?php echo $order['Card_info']; ?></td>
+                    <td><?php echo $order['Password']; ?></td>
+                    <!-- <td><?php echo $order['order_quantity']; ?></td> -->
+                    <!-- <td><?php echo $order['Total_amount']; ?></td> -->
+                    <td><button onclick="confirmDelete(<?php echo intval($order['CID']); ?>)">削除</button></td>
                 </tr>
             <?php endforeach; ?>
         </table>
@@ -126,19 +160,13 @@ try {
         $total_pages = ceil($total_items / $items_per_page); // 総ページ数
         for ($i = 1; $i <= $total_pages; $i++) {
             $active_class = ($i == $current_page) ? 'active' : '';
-            echo "<a class='$active_class' href='admin.php?page=$i'>$i</a>";
+            // echo "<a class='$active_class' href='admin.php?page=$i'>$i</a>";
+            echo "<a class='$active_class' href='order_7thA.php?page=$i'>$i</a>";
         }
+
         ?>
     </div>
-    <script>
-        function confirmDelete(id) {
-            if (confirm('本当に削除しますか？')) {
-                window.location = 'delete.php?id=' + id;
-            }
-        }
-    </script>
+
 </body>
 
 </html>
-=======
-
