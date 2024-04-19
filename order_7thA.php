@@ -29,21 +29,34 @@ try {
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
+
 // 削除処理
 if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['CID'])) {
-    $id = $_GET['CID']; // ここでCIDを取得する
+    $CID = $_GET['CID']; // CIDを取得する
+    echo "削除対象のCID: " . $CID;
+
     try {
         $delete_stmt = $conn->prepare("DELETE FROM customer_management WHERE CID = :CID");
-        $delete_stmt->bindParam(':CID', $id, PDO::PARAM_INT); // ここで$idをバインドする
+        $delete_stmt->bindParam(':CID', $CID, PDO::PARAM_STR); // $CIDを文字列としてバインドする
         $delete_stmt->execute();
-        header("Location: order_7thA.php"); // 削除後に再読み込み
+
+        // 削除が成功したかどうかを確認
+        if ($delete_stmt->rowCount() > 0) {
+            echo "削除が成功しました。";
+        } else {
+            echo "削除に失敗しました。";
+        }
+
+        header("Location: http://localhost/jisouteamworkshopA/order_7thA.php"); // 削除後に再読み込み
         exit();
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
 }
-
 ?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="ja">
