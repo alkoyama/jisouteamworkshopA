@@ -63,7 +63,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['CID'])
 
 <head>
     <meta charset="UTF-8">
-    <title>管理画面</title>
+    <title>受注管理画面</title>
     <style>
         body {
             justify-content: center;
