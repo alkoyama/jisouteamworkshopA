@@ -50,25 +50,7 @@
 
 
      <div class="main">
-       <div id="column" class="column05">
-         <ul>
-          <li><a href=""><img src="./images/pokemon/pokemon_001_nuckrar.jpg" /><p>ナックラー</p><span>＄2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_002_eleson.jpg" /><p>エレズン</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_003_groudon.jpg" /><p>グラードン</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_004_wanaider.jpg" /><p>ワナイダー</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_005_yukihami.jpg" /><p>ユキハミ</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_006_kuwagannon.jpg" /><p>クワガノン</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_007_tairetsu.jpg" /><p>タイレーツ</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_008_koraidon.jpg" /><p>コライドン</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_009_wanriky.jpg" /><p>ワンリキー</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_010_konoyozaru.jpg" /><p>コノヨザル</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_011_mimikkyu.jpg" /><p>ミミッキュ</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_012_gangar.jpg" /><p>ゲンガー</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_013_irukaman.jpg" /><p>イルカマン</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_014_nuoh.jpg" /><p>ヌオー</p><span>$2,600</span></a></li>
-          <li><a href=""><img src="./images/pokemon/pokemon_015_hagigishiri.jpg" /><p>ハギギシリ</p><span>$2,600</span></a></li>
-         </ul>
-       </div>
+     <?php include 'poke_card.php'; ?>
      </div>
 
 
