@@ -1,0 +1,16 @@
+function replaceDollarSymbols() {
+    // Get all text nodes on the page
+    var textNodes = document.querySelectorAll("*"); 
+  
+    for (var i = 0; i < textNodes.length; i++) {
+      var node = textNodes[i];
+  
+      // Check if the node contains text
+      if (node.nodeType === Node.TEXT_NODE) {
+        // Replace all occurrences of $ with your image
+        var replacedText = node.textContent.replace(/\$/g, "<img src='images/pokedollar.png' alt='Custom Symbol'>");
+        node.textContent = replacedText;
+      }
+    }
+  }
+  
