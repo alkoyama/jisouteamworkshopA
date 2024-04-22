@@ -6,6 +6,19 @@
     <title>Order Confirmation</title>
 </head>
 <body>
+
+<?php
+
+session_start();
+
+if (isset($_SESSION["user_id"])) {
+  // User is logged in, display content or functionalities specific to logged-in users
+} else {
+  // User is not logged in, redirect to login page or display a login prompt
+}
+
+?>
+
     <h1>Order Confirmation</h1>
 
     <h2>Shopping Cart</h2>
@@ -32,34 +45,25 @@
             //  This part will pre-populate user data (replace with your logic)
             session_start();  //  Start session if using sessions
 
-            if (isset($_SESSION["user"])) {
-                $user = $_SESSION["user"];
+            if (isset($_SESSION["customer_management"])) {
+                $customer_management = $_SESSION["customer_management"];
                 $prefill_address = true;  //  Flag to control pre-filling
             } else {
                 $prefill_address = false;
             }
         ?>
 
-        <label for="name">Name:</label>
-        <input type="text" name="name" id="name" required <?php if ($prefill_address) echo "value='$user[name]'"; ?>><br>
+        <label for="name">名前:</label>
+        <input type="text" name="name" id="name" required <?php if ($prefill_address) echo "value='$customer_management[name]'"; ?>><br>
 
         <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required <?php if ($prefill_address) echo "value='$user[email]'"; ?>><br>
+        <input type="email" name="email" id="email" required <?php if ($prefill_address) echo "value='$customer_management[email]'"; ?>><br>
 
-        <label for="address">Address:</label>
-        <input type="text" name="address" id="address" required <?php if ($prefill_address) echo "value='$user[address]'"; ?>><br>
+        <label for="address">住所:</label>
+        <input type="text" name="address" id="address" required <?php if ($prefill_address) echo "value='$customer_management[address]'"; ?>><br>
 
-        <label for="city">City:</label>
-        <input type="text" name="city" id="city" required <?php if ($prefill_address) echo "value='$user[city]'"; ?>><br>
-
-        <label for="state">State:</label>
-        <input type="text" name="state" id="state" required <?php if ($prefill_address) echo "value='$user[state]'"; ?>><br>
-
-        <label for="zip">Zip Code:</label>
-        <input type="text" name="zip" id="zip" required <?php if ($prefill_address) echo "value='$user[zip]'"; ?>><br>
-
-        <label for="phone">Phone Number:</label>
-        <input type="tel" name="phone" id="phone" required <?php if ($prefill_address) echo "value='$user[phone]'"; ?>><br>
+        <label for="phone">電話番号:</label>
+        <input type="tel" name="phone" id="phone" required <?php if ($prefill_address) echo "value='$customer_management[phone]'"; ?>><br>
 
         <input type="submit" value="Confirm Order">
     </form>
@@ -70,9 +74,6 @@
             $name = $_POST["name"];
             $email = $_POST["email"];
             $address = $_POST["address"];
-            $city = $_POST["city"];
-            $state = $_POST["state"];
-            $zip = $_POST["zip"];
             $phone = $_POST["phone"];
 
             //  Order processing logic (connect to database, process payment, etc.)
