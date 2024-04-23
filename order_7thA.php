@@ -171,7 +171,9 @@ $offset = ($current_page - 1) * $items_per_page;
             <?php foreach ($customer_management as $order) : ?>
 
                 <tr id="row_<?php echo $order['OID']; ?>">
-                    <td><?php echo $order['OID']; ?></td>
+                    <!-- <td><?php echo $order['OID']; ?></td> -->
+                    <td><a href="order_detail_7thA.php?OID=<?php echo $order['OID']; ?>"><?php echo $order['OID']; ?></a></td>
+                   
                     <td><?php echo $order['Date_time']; ?></td>
                     <!-- <td><?php echo $order['OID']; ?></td> -->
                     <td><?php echo $order['Name']; ?></td>
