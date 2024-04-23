@@ -52,7 +52,7 @@
                 //  Prepare and execute SQL statement (learn about prepared statements to prevent SQL injection)
                 $sql = "INSERT INTO  customer_management(name, address, phone, card_info, password) VALUES (?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("sss", $username, $email, password_hash($password, PASSWORD_DEFAULT));
+                $stmt->bind_param("sssss", $name, $address, $phone, $card_info, $password);
                 $stmt->execute();
 
                 // Close connection (remember to close connections!)
