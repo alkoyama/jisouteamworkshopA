@@ -5,7 +5,8 @@
         "Type1": "じめん",
         "Type2": null,
         "Price": 100,
-        "Image_path": "./images/pokemon/pokemon_001_nuckrar.jpg"
+        "Image_path": "./images/pokemon/pokemon_001_nuckrar.jpg",
+	"Inventory": "1"
     },
     {
         "PID": "P002",
@@ -13,7 +14,8 @@
         "Type1": "でんき",
         "Type2": "どく",
         "Price": 200,
-        "Image_path": "./images/pokemon/pokemon_002_eleson.jpg"
+        "Image_path": "./images/pokemon/pokemon_002_eleson.jpg",
+	"Inventory": "5"
     },
     {
         "PID": "P003",
@@ -21,7 +23,8 @@
         "Type1": "じめん",
         "Type2": "ほのお",
         "Price": 300,
-        "Image_path": "./images/pokemon/pokemon_003_groudon.jpg"
+        "Image_path": "./images/pokemon/pokemon_003_groudon.jpg",
+	"Inventory": "3"
     },
     {
         "PID": "P004",
@@ -29,7 +32,8 @@
         "Type1": "むし",
         "Type2": null,
         "Price": 400,
-        "Image_path": "./images/pokemon/pokemon_004_wanaider.jpg"
+        "Image_path": "./images/pokemon/pokemon_004_wanaider.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P005",
@@ -37,7 +41,8 @@
         "Type1": "こおり",
         "Type2": "むし",
         "Price": 500,
-        "Image_path": "./images/pokemon/pokemon_005_yukihami.jpg"
+        "Image_path": "./images/pokemon/pokemon_005_yukihami.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P006",
@@ -45,7 +50,8 @@
         "Type1": "むし",
         "Type2": "でんき",
         "Price": 600,
-        "Image_path": "./images/pokemon/pokemon_006_kuwagannon.jpg"
+        "Image_path": "./images/pokemon/pokemon_006_kuwagannon.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P007",
@@ -53,7 +59,8 @@
         "Type1": "かくとう",
         "Type2": null,
         "Price": 700,
-        "Image_path": "./images/pokemon/pokemon_007_tairetsu.jpg"
+        "Image_path": "./images/pokemon/pokemon_007_tairetsu.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P008",
@@ -61,7 +68,8 @@
         "Type1": "かくとう",
         "Type2": "ドラゴン",
         "Price": 800,
-        "Image_path": "./images/pokemon/pokemon_008_koraidon.jpg"
+        "Image_path": "./images/pokemon/pokemon_008_koraidon.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P009",
@@ -69,7 +77,8 @@
         "Type1": "かくとう",
         "Type2": null,
         "Price": 900,
-        "Image_path": "./images/pokemon/pokemon_009_wanriky.jpg"
+        "Image_path": "./images/pokemon/pokemon_009_wanriky.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P010",
@@ -77,7 +86,8 @@
         "Type1": "かくとう",
         "Type2": "ゴースト",
         "Price": 1000,
-        "Image_path": "./images/pokemon/pokemon_010_konoyozaru.jpg"
+        "Image_path": "./images/pokemon/pokemon_010_konoyozaru.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P011",
@@ -85,7 +95,8 @@
         "Type1": "ゴースト",
         "Type2": "フェアリー",
         "Price": 1100,
-        "Image_path": "./images/pokemon/pokemon_011_mimikkyu.jpg"
+        "Image_path": "./images/pokemon/pokemon_011_mimikkyu.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P012",
@@ -93,7 +104,8 @@
         "Type1": "ゴースト",
         "Type2": "どく",
         "Price": 1200,
-        "Image_path": "./images/pokemon/pokemon_012_gangar.jpg"
+        "Image_path": "./images/pokemon/pokemon_012_gangar.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P013",
@@ -101,7 +113,8 @@
         "Type1": "みず",
         "Type2": null,
         "Price": 1300,
-        "Image_path": "./images/pokemon/pokemon_013_irukaman.jpg"
+        "Image_path": "./images/pokemon/pokemon_013_irukaman.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P014",
@@ -109,7 +122,8 @@
         "Type1": "みず",
         "Type2": "じめん",
         "Price": 1400,
-        "Image_path": "./images/pokemon/pokemon_014_nuoh.jpg"
+        "Image_path": "./images/pokemon/pokemon_014_nuoh.jpg",
+	"Inventory": "10"
     },
     {
         "PID": "P015",
@@ -117,6 +131,7 @@
         "Type1": "みず",
         "Type2": "エスパー",
         "Price": 1500,
-        "Image_path": "./images/pokemon/pokemon_015_hagigishiri.jpg"
+        "Image_path": "./images/pokemon/pokemon_015_hagigishiri.jpg",
+	"Inventory": "10"
     }
 ]
