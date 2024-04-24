@@ -32,6 +32,23 @@
 
     <?php
         //  This part will process the form submission (replace with your logic)
+
+//↓ここからIDを生成するファンクションです
+        function generateUniqueCID($conn) {
+        $sql = "SELECT CID FROM customer_management ORDER BY CID DESC LIMIT 1";
+        $result = $conn->query($sql);
+        $lastCID = $result->fetch_assoc()["CID"];  
+
+        if ($lastCID) {
+            $lastNumber = (int)substr($lastCID, 1);  // 一番大きい数字から　"C"　を一旦外す
+            return "C" . str_pad(++$lastNumber, 3, "0", STR_PAD_LEFT);  // autoincrementして、桁数に合うように０を追加する。Cを戻す
+        } else {
+            return "C001";  // カラムがからの場合 C001　にする
+        }
+        }
+//↑ここまで
+
+
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $name = $_POST["name"];
             $address = $_POST["address"];
@@ -48,18 +65,23 @@
             } else {
                 //  Connect to database (replace with your database connection logic)
                 $conn = new mysqli("localhost", "root", "", "teamworkshop_7tha");
-                
-                //  Prepare and execute SQL statement (learn about prepared statements to prevent SQL injection)
-                $sql = "INSERT INTO  customer_management(name, address, phone, card_info, password) VALUES (?, ?, ?, ?, ?)";
+
+//↓ここで生成使ってます
+                $CID = generateUniqueCID($conn);  // Generate unique CID
+
+                // Prepare and execute SQL statement
+                $sql = "INSERT INTO customer_management (CID, name, address, phone, card_info, password) VALUES (?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("sssss", $name, $address, $phone, $card_info, $password);
+                $stmt->bind_param("ssssss", $CID, $name, $address, $phone, $card_info, $password);
                 $stmt->execute();
+
 
                 // Close connection (remember to close connections!)
                 $conn->close();
 
-                echo "アカウント登録が完了しました。";
-            }
+                $message = "アカウント登録が完了しました。 CID: " . $CID;
+                echo $message;
+              }
         }
     ?>
 </body>
