@@ -32,6 +32,21 @@
 
     <?php
         //  This part will process the form submission (replace with your logic)
+
+function generateUniqueCID($conn) {
+  $sql = "SELECT CID FROM customer_management ORDER BY CID DESC LIMIT 1";
+  $result = $conn->query($sql);
+  $lastCID = $result->fetch_assoc()["CID"];  // Assuming CID is the column name
+
+  if ($lastCID) {
+    $lastNumber = (int)substr($lastCID, 1);  // Extract number after "C"
+    return "C" . str_pad(++$lastNumber, 3, "0", STR_PAD_LEFT);  // Increment and pad with zeros
+  } else {
+    return "C001";  // If no IDs exist, start with C001
+  }
+}
+
+
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $name = $_POST["name"];
             $address = $_POST["address"];
@@ -47,13 +62,16 @@
                 echo "パスワードが一致しません。";
             } else {
                 //  Connect to database (replace with your database connection logic)
-                $conn = new mysqli("localhost", "root", "", "teamworkshop_7tha");
-                
-                //  Prepare and execute SQL statement (learn about prepared statements to prevent SQL injection)
-                $sql = "INSERT INTO  customer_management(name, address, phone, card_info, password) VALUES (?, ?, ?, ?, ?)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("sssss", $name, $address, $phone, $card_info, $password);
-                $stmt->execute();
+  $conn = new mysqli("localhost", "root", "", "teamworkshop_7tha");
+
+  $CID = generateUniqueCID($conn);  // Generate unique CID
+
+  // Prepare and execute SQL statement
+  $sql = "INSERT INTO customer_management (CID, name, address, phone, card_info, password) VALUES (?, ?, ?, ?, ?, ?)";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("ssssss", $CID, $name, $address, $phone, $card_info, $password);
+  $stmt->execute();
+
 
                 // Close connection (remember to close connections!)
                 $conn->close();
