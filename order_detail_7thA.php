@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>注文詳細</title>
+    <title>受注明細画面</title>
 </head>
 <body>
     <?php
@@ -38,7 +38,7 @@
         $order_details = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // 取得した注文詳細を表示する
-        echo "<h1>注文詳細</h1>";
+        echo "<h1>受注明細画面</h1>";
         echo "<table border='1'>";
         echo "<tr><th>受注詳細ID</th><th>受注ID</th><th>商品名</th><th>注文個数</th><th>合計金額</th></tr>";
         foreach ($order_details as $detail) {

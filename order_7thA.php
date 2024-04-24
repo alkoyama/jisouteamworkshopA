@@ -9,64 +9,72 @@ $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
 $offset = ($current_page - 1) * $items_per_page;
 
 
-    try {
-        // データベースに接続する
-        $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-        // データベースから全体の件数を取得する
-        $total_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM order_management");
-        $total_stmt->execute();
-        $total_result = $total_stmt->fetch(PDO::FETCH_ASSOC);
-        $total_items = $total_result['total'];
-    
-        // ページに表示する注文情報を取得する
-        $stmt = $conn->prepare("SELECT DISTINCT o.*, (SELECT c.CID FROM customer_management c WHERE c.CID = o.CID) as CID, (SELECT c.Name FROM customer_management c WHERE c.CID = o.CID) as Name, (SELECT c.Address FROM customer_management c WHERE c.CID = o.CID) as Address, (SELECT c.Phone FROM customer_management c WHERE c.CID = o.CID) as Phone, (SELECT c.Card_info FROM customer_management c WHERE c.CID = o.CID) as Card_info, (SELECT c.Password FROM customer_management c WHERE c.CID = o.CID) as Password
-                            FROM order_management o
-                            JOIN order_detail od ON o.OID = od.OID
-                            LIMIT :offset, :items_per_page");
+try {
+    // データベースに接続する
+    $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-        $stmt->bindParam(':items_per_page', $items_per_page, PDO::PARAM_INT);
-        $stmt->execute();
-        $customer_management = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-    
-    } catch (PDOException $e) {
-        // エラーメッセージを出力する
-        echo "Error: " . $e->getMessage();
+    // データベースから全体の件数を取得する
+    $total_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM order_management");
+    $total_stmt->execute();
+    $total_result = $total_stmt->fetch(PDO::FETCH_ASSOC);
+    $total_items = $total_result['total'];
+
+    // ページに表示する注文情報を取得する
+    $stmt = $conn->prepare("SELECT DISTINCT o.*, (SELECT c.CID FROM customer_management c WHERE c.CID = o.CID) as CID, (SELECT c.Name FROM customer_management c WHERE c.CID = o.CID) as Name, (SELECT c.Address FROM customer_management c WHERE c.CID = o.CID) as Address, (SELECT c.Phone FROM customer_management c WHERE c.CID = o.CID) as Phone, (SELECT c.Card_info FROM customer_management c WHERE c.CID = o.CID) as Card_info, (SELECT c.Password FROM customer_management c WHERE c.CID = o.CID) as Password
+                        FROM order_management o
+                        JOIN order_detail od ON o.OID = od.OID
+                        LIMIT :offset, :items_per_page");
+
+    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+    $stmt->bindParam(':items_per_page', $items_per_page, PDO::PARAM_INT);
+    $stmt->execute();
+    $customer_management = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    // エラーメッセージを出力する
+    echo "Error: " . $e->getMessage();
+}
+
+// データ削除処理
+if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])) {
+    $OID = $_GET['OID'];
+
+    // 指定されたOIDの注文データと関連する注文詳細データを削除する
+try {
+    // まずorder_detailから関連するレコードを削除
+    $delete_detail_stmt = $conn->prepare("DELETE FROM order_detail WHERE OID = :OID");
+    $delete_detail_stmt->bindParam(':OID', $OID, PDO::PARAM_STR);
+    $delete_detail_stmt->execute();
+
+    // 次にorder_managementから関連するレコードを削除
+    $delete_management_stmt = $conn->prepare("DELETE FROM order_management WHERE OID = :OID");
+    $delete_management_stmt->bindParam(':OID', $OID, PDO::PARAM_STR);
+    $delete_management_stmt->execute();
+
+    // 削除が成功したかどうかを確認
+    $deleted_rows_detail = $delete_detail_stmt->rowCount();
+    $deleted_rows_management = $delete_management_stmt->rowCount();
+
+    if ($deleted_rows_detail > 0 || $deleted_rows_management > 0) {
+        // 削除成功メッセージを出力する
+        echo "削除が成功しました。";
+    } else {
+        // 削除失敗メッセージを出力する
+        echo "削除に失敗しました。";
     }
-    
-    if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])) {
-        $OID = $_GET['OID'];
-    
-        try {
-            // 指定されたOIDの顧客データと関連する注文データ・受注明細データを削除する
-            $delete_stmt = $conn->prepare("DELETE c, o, od 
-                                           FROM customer_management c
-                                           JOIN order_management o ON c.CID = o.CID
-                                           JOIN order_detail od ON o.OID = od.OID
-                                           WHERE od.OID = :OID");
-            $delete_stmt->bindParam(':OID', $OID, PDO::PARAM_STR, 5); // OIDはvarchar(5)型なので、長さを指定してバインドします
-            $delete_stmt->execute();
-    
-            if ($delete_stmt->rowCount() > 0) {
-                // 削除成功メッセージを出力する
-                echo "削除が成功しました。";
-            } else {
-                // 削除失敗メッセージを出力する
-                echo "削除に失敗しました。";
-            }
-            // 削除後、現在のページにリダイレクトする
-            header("Location: order_7thA.php?page=$current_page");
-            exit();
-        } catch (PDOException $e) {
-            // エラーメッセージを出力する
-            echo "削除エラー: " . $e->getMessage();
-        }
-    }
-    ?>
-    
+
+    // 削除後、現在のページにリダイレクトする
+    header("Location: order_7thA.php?page=$current_page");
+    exit();
+} catch (PDOException $e) {
+    // エラーメッセージを出力する
+    echo "削除エラー: " . $e->getMessage();
+}
+
+}
+
+?>
+
 
 
 <!DOCTYPE html>
@@ -122,20 +130,21 @@ $offset = ($current_page - 1) * $items_per_page;
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        function confirmDelete(CID) {
+        function confirmDelete(OID) {
             if (confirm('本当に削除しますか？')) {
                 var startTime = performance.now(); // 開始時間を記録
+
 
                 $.ajax({
                     url: 'http://localhost/jisouteamworkshopA/order_7thA.php',
                     type: 'GET',
                     data: {
                         action: 'delete',
-                        CID: CID
+                        OID: OID
                     },
                     success: function(response) {
                         // 削除成功時にテーブルの行を削除
-                        $('#row_' + CID).remove();
+                        $('#row_' + OID).remove();
 
                         var endTime = performance.now(); // 終了時間を記録
                         var duration = endTime - startTime; // 処理時間を計算
@@ -171,20 +180,16 @@ $offset = ($current_page - 1) * $items_per_page;
             <?php foreach ($customer_management as $order) : ?>
 
                 <tr id="row_<?php echo $order['OID']; ?>">
-                    <!-- <td><?php echo $order['OID']; ?></td> -->
+
                     <td><a href="order_detail_7thA.php?OID=<?php echo $order['OID']; ?>"><?php echo $order['OID']; ?></a></td>
-                   
                     <td><?php echo $order['Date_time']; ?></td>
-                    <!-- <td><?php echo $order['OID']; ?></td> -->
                     <td><?php echo $order['Name']; ?></td>
                     <td><?php echo $order['Address']; ?></td>
                     <td><?php echo $order['Phone']; ?></td>
                     <td><?php echo $order['Card_info']; ?></td>
                     <td><?php echo $order['Password']; ?></td>
-                    <!-- <td><?php echo $order['order_quantity']; ?></td> -->
                     <td><?php echo $order['Grand_total_price']; ?></td>
-                    <!-- <td><button onclick="confirmDelete(<?php echo intval($order['CID']); ?>)">削除</button></td> -->
-                    <td><button onclick="confirmDelete('<?php echo $order['CID']; ?>')">削除</button></td>
+                    <td><button onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
 
                 </tr>
             <?php endforeach; ?>
