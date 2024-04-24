@@ -15,7 +15,7 @@
             width: calc(15% - 20px);
             margin: 10px;
             padding: 10px;
-            border: 1px固体 #ccc;
+            border: 1px solid #ccc;
             text-align: center;
             display: inline-block;
         }
@@ -31,7 +31,7 @@
             width: 200px;
             background-color: #f8f9fa;
             padding: 10px;
-            border: 1px固体 #ccc;
+            border: 1px solid #ccc;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             z-index: 1000;
@@ -45,6 +45,17 @@
             padding: 0;
             margin: 0;
         }
+        #type-filters label {
+    display: inline-block;
+    width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    #type-filters label {
+        width: calc(50% - 10px); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
+    }
+}
     </style>
 </head>
 <body>
@@ -52,10 +63,36 @@
 <div class="container">
     <h1 class="text-center">Pokemon Information</h1>
     
-    <!-- ソート用のボタン -->
+    <!-- タイプフィルタリング用チェックボックス -->
+    <div class="mt-3" id="type-filters">
+        <label><input type="checkbox" value="ノーマル"> ノーマル</label>
+        <label><input type="checkbox" value="ほのお"> ほのお</label>
+        <label><input type="checkbox" value="みず"> みず</label>
+        <label><input type="checkbox" value="でんき"> でんき</label>
+        <label><input type="checkbox" value="くさ"> くさ</label>
+        <label><input type="checkbox" value="こおり"> こおり</label>
+        <label><input type="checkbox" value="かくとう"> かくとう</label>
+        <label><input type="checkbox" value="どく"> どく</label>
+        <label><input type="checkbox" value="じめん"> じめん</label>
+        <label><input type="checkbox" value="ひこう"> ひこう</label>
+        <label><input type="checkbox" value="エスパー"> エスパー</label>
+        <label><input type="checkbox" value="むし"> むし</label>
+        <label><input type="checkbox" value="いわ"> いわ</label>
+        <label><input type="checkbox" value="ゴースト"> ゴースト</label>
+        <label><input type="checkbox" value="ドラゴン"> ドラゴン</label>
+        <label><input type="checkbox" value="あく"> あく</label>
+        <label><input type="checkbox" value="はがね"> はがね</label>
+        <label><input type="checkbox" value="フェアリー"> フェアリー</label>
+    </div>
+    
     <div class="text-center mt-3">
-        <button class="btn btn-primary" id="sort-asc">あいうえお昇順</button>
-        <button class="btn btn-primary" id="sort-desc">あいうえお降順</button>
+        <!-- 名前の昇順・降順ボタン -->
+        <button class="btn btn-primary" id="sort-name-asc">名前の昇順</button>
+        <button class="btn btn-primary" id="sort-name-desc">名前の降順</button>
+    
+        <!-- 価格の昇順・降順ボタンを追加 -->
+        <button class="btn btn-secondary" id="sort-price-asc">価格の昇順</button>
+        <button class="btn btn-secondary" id="sort-price-desc">価格の降順</button>
     </div>
 
     <div class="row" id="pokemon-container">
@@ -76,57 +113,106 @@
 <!-- jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-    var pokemonData = <?php 
-        // JSON ファイルを読み込む
-        $json_data = file_get_contents('pokemon_data.json');
-        $pokemon_data = json_decode($json_data, true);
-        echo json_encode($pokemon_data); 
-    ?>; // JSON データを JavaScript に取り込む
-    
-    var offset = 5; // 最初の5個を表示
-    var cartItems = []; // カートに追加された商品の情報を保持する配列
+var pokemonData = <?php 
+    $json_data = file_get_contents('pokemon_data.json');
+    $pokemon_data = json_decode($json_data, true);
+    echo json_encode($pokemon_data); 
+?>; // JSON データを JavaScript に取り込む
 
-    $(document).ready(function() {
-        // 最初に5個のポケモンを表示
-        displayPokemon(pokemonData.slice(0, offset));
+var offset = 5; // 最初の5個を表示
+var cartItems = []; // カートに追加された商品の情報を保持する配列
+var filteredPokemon = pokemonData; // フィルターされたポケモンのリスト
 
-        // さらに読み込むボタンがクリックされたときの処理
-        $('#load-more').on('click', function() {
-            if (offset < pokemonData.length) {
-                var nextPokemon = pokemonData.slice(offset, offset + 5); // 次の5個を取得
-                displayPokemon(nextPokemon); // 追加表示
-                offset += 5; // オフセットを更新
-            } else {
-                alert('すべてのポケモンを読み込みました。');
-            }
-        });
+function sortPokemon(type, order) {
+    if (type === 'name') {
+        if (order === 'asc') {
+            filteredPokemon.sort((a, b) => a.Name.localeCompare(b.Name, 'ja'));
+        } else if (order === 'desc') {
+            filteredPokemon.sort((a, b) => b.Name.localeCompare(a.Name, 'ja'));
+        }
+    } else if (type === 'price') {
+        if (order === 'asc') {
+            filteredPokemon.sort((a, b) => a.Price - b.Price); // 価格の昇順
+        } else if (order === 'desc') {
+            filteredPokemon.sort((a, b) => b.Price - a.Price); // 価格の降順
+        }
+    }
 
-        // 昇順ボタンがクリックされたときの処理
-        $('#sort-asc').on('click', function() {
-            var container = $('#pokemon-container');
-            container.empty(); // 既存の表示をクリア
+    var container = $('#pokemon-container');
+    container.empty(); // 既存の表示をクリア
+    offset = 5; // オフセットをリセット
+    displayPokemon(filteredPokemon.slice(0, offset)); // ソート後のポケモンを再表示
+}
 
-            pokemonData.sort(function(a, b) {
-                return a.Name.localeCompare(b.Name, 'ja'); // 昇順ソート
-            });
+$(document).ready(function() {
+    // 最初の5個のポケモンを表示
+    displayPokemon(filteredPokemon.slice(0, offset));
 
-            offset = 5; // リセット
-            displayPokemon(pokemonData.slice(0, offset)); // 再表示
-        });
-
-        // 降順ボタンがクリックされたときの処理
-        $('#sort-desc').on('click', function() {
-            var container = $('#pokemon-container');
-            container.empty(); // 既存の表示をクリア
-
-            pokemonData.sort(function(a, b) {
-                return b.Name.localeCompare(a.Name, 'ja'); // 降順ソート
-            });
-
-            offset = 5; // リセット
-            displayPokemon(pokemonData.slice(0, offset)); // 再表示
-        });
+    // "さらに読み込む" ボタンがクリックされたときの処理
+    $('#load-more').on('click', function() {
+        if (offset < filteredPokemon.length) {
+            var nextPokemon = filteredPokemon.slice(offset, offset + 5);
+            displayPokemon(nextPokemon);
+            offset += 5;
+        } else {
+            alert('すべてのポケモンを読み込みました。');
+        }
     });
+
+    // 名前の昇順・降順ボタンのクリックイベント
+    $('#sort-name-asc').on('click', function() {
+        sortPokemon('name', 'asc'); // 名前の昇順
+    });
+
+    $('#sort-name-desc').on('click', function() {
+        sortPokemon('name', 'desc'); // 名前の降順
+    });
+
+    // 価格の昇順・降順ボタンのクリックイベント
+    $('#sort-price-asc').on('click', function() {
+        sortPokemon('price', 'asc'); // 価格の昇順
+    });
+
+    $('#sort-price-desc').on('click', function() {
+        sortPokemon('price', 'desc'); // 価格の降順
+    });
+
+    // タイプフィルターの変更処理
+    $('#type-filters input').on('change', function() {
+        applyFilters();
+    });
+});
+
+
+function applyFilters() {
+    var selectedTypes = [];
+    $('#type-filters input:checked').each(function() {
+        selectedTypes.push($(this).val());
+    });
+
+    // フィルターが何も選択されていない場合は、すべてのポケモンを表示
+    if (selectedTypes.length === 0) {
+        filteredPokemon = pokemonData;
+    } else {
+        filteredPokemon = pokemonData.filter(function(pokemon) {
+            // ポケモンが選択されたすべてのタイプを持っているかをチェック
+            var pokemonTypes = [pokemon.Type1];
+            if (pokemon.Type2) {
+                pokemonTypes.push(pokemon.Type2);
+            }
+            // ポケモンのタイプにすべての選択されたタイプが含まれるかを確認
+            return selectedTypes.every(function(type) {
+                return pokemonTypes.includes(type);
+            });
+        });
+    }
+
+    var container = $('#pokemon-container');
+    container.empty(); // 既存の表示をクリア
+    offset = 5; // リセット
+    displayPokemon(filteredPokemon.slice(0, offset)); // フィルター後のポケモンを表示
+}
+
 
     function displayPokemon(pokemonArray) {
         var container = $('#pokemon-container');
@@ -147,28 +233,61 @@
         });
     }
 
-    function addToCart(pid, name) {
-        var quantity = $('#quantity-' + pid).val();
-        if (quantity <= 0) {
-            alert('正しい個数を入力してください。');
-            return;
-        }
-        // カートに商品を追加し、配列に保存
-        cartItems.push({ pid, name, quantity });
-        // カートの内容を更新
-        updateCartDisplay();
-        // アラート表示
-        alert(name + ' を ' + quantity + ' 個カートに追加しました。');
+// カートに商品を追加する関数
+function addToCart(pid, name) {
+    var quantity = parseInt($('#quantity-' + pid).val()); // 文字列を整数に変換
+    if (quantity <= 0) {
+        alert('正しい個数を入力してください。');
+        return;
     }
 
-    function updateCartDisplay() {
-        var cartList = $('#cart-items');
-        cartList.empty(); // カートの内容を一旦空にする
-        // カートに追加された商品を表示
-        cartItems.forEach(function(item) {
-            cartList.append('<li>' + item.name + ' x ' + item.quantity + '</li>');
-        });
+    // カート内に同じ商品があるかをチェック
+    var existingItem = cartItems.find(item => item.pid === pid);
+
+    if (existingItem) {
+        // 既存の商品がある場合、個数を追加
+        existingItem.quantity += quantity;
+    } else {
+        // 新しい商品を追加
+        cartItems.push({ pid, name, quantity });
     }
+
+    updateCartDisplay(); // カートの表示を更新
+    alert(name + ' を ' + quantity + ' 個カートに追加しました。');
+}
+
+// カートの表示を更新する関数
+function updateCartDisplay() {
+    var cartList = $('#cart-items');
+    cartList.empty(); // カートの内容を一旦クリア
+    cartItems.forEach(item => {
+        cartList.append(`
+            <li>
+                ${item.name} 
+                <input type="number" min="1" value="${item.quantity}" 
+                       data-pid="${item.pid}" class="cart-quantity-input">
+            </li>
+        `);
+    });
+
+    // カート内の個数変更用のイベントリスナーを追加
+    $('.cart-quantity-input').on('input', function() {
+        var pid = $(this).data('pid');
+        var newQuantity = parseInt($(this).val());
+
+        if (isNaN(newQuantity) || newQuantity < 1) {
+            alert('個数は1以上にしてください。');
+            return;
+        }
+
+        var item = cartItems.find(i => i.pid === pid);
+        if (item) {
+            item.quantity = newQuantity; // カート内の個数を更新
+        }
+
+        updateCartDisplay(); // カートの表示を再更新
+    });
+}
 </script>
 
 </body>
