@@ -46,7 +46,6 @@
             echo "<td>{$detail['ODID']}</td>";
             echo "<td>{$detail['OID']}</td>";
             echo "<td>{$detail['Name']}</td>";
-            // echo "<td>{$detail['Order_quantity']}</td>";
             echo "<td class='qty'>" . $detail['Order_quantity'] . "</td>"; // 修正点
             echo "<td class='price'>" . number_format($detail['Total_price']) . "</td>"; // 修正点
             echo "</tr>";
