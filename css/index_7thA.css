@@ -1,16 +1,7 @@
 @charset "UTF-8";
 body {
-    background-image: url(../images/background/index_7thA_BG.mp4);
-    color: #060606;
-    font-size: 16px;
-    font-family: sans-serif;
-    letter-spacing: 0.06em;
-  }
-  a{
-    text-decoration: none;
-    color: #060606;
-  }
-
+  
+}
 /******************************
  header
 ******************************/
@@ -26,14 +17,11 @@ header {
   padding-left: 10px;
   padding-right: 10px;
 }
-
 a {
   text-decoration: none;
 }
-
 .head_A img {
-  width: 70%;
-  
+  width: 70%; 
 }
 
 .head_B ul {
@@ -41,7 +29,6 @@ a {
   padding: 0;
   list-style: none;
 }
-
 .head_B a {
   display: block;
   padding: 8px;
@@ -50,7 +37,6 @@ a {
   text-decoration: none;
   border-bottom: 3px solid none;
 }
-
 .head_B a:hover {
   margin-top: -3px;
   border-bottom: 3px solid #000;
@@ -65,16 +51,12 @@ a {
       margin-left: auto;
       margin-right: auto;
   }
-
   .head_B ul {
       display: flex
   }
-
   .head_C {
       display: none;
-
   }
-
   .head_B {
       display: block !important;
   }
@@ -86,7 +68,6 @@ a {
       align-items: center;
       justify-content: space-between;
   }
-
   .head_C {
       margin-right: 10px;
       padding: 0;
@@ -98,12 +79,9 @@ a {
       cursor: pointer;
       color: #000;
   }
-
   .head_C:hover {
       opacity: 0.3;
-
   }
-
   .head_B {
       display: none;
   }
@@ -128,7 +106,6 @@ a {
   margin-right: 8px;
   margin-left: 8px;
 }
-
 .sale_slick_img img {
   height: auto;
   width: 100%;
@@ -150,19 +127,42 @@ a {
 /**********************************
   footer
 **********************************/
-.footer {
-    padding: 90px 0 70px;
-    /*add*/
-    border-top: 1px solid #e8ecee;
-  }
-  .footer_logo {
-    width: 100px;
-    margin: 0 auto;
-  }
-  .footer_copyright {
-    margin-top: 30px;
-    text-align: center;
-    /*add*/
-    color: #b5b5b5;
-    font-size: 11px;
-  }
+footer{
+  width: 100%;
+  background-color:rgba(255,255,255,0.5);
+  z-index: 1000;
+  padding: 0;
+  box-shadow: 2px 2px 4px gray;
+}
+.foot_A {
+  margin-left:auto;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.foot_A img {
+  
+  width: 50%; 
+}
+.footer_menu{
+  text-align: center;
+}
+.foot_B{
+  text-align: center;
+}
+.foot_B ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.foot_B a {
+  display: block;
+  padding: 8px;
+  color: #000000;
+  font-size: 17px;
+  text-decoration: none;
+  border-bottom: 3px solid none;
+}
+.foot_B a:hover {
+  margin-top: -3px;
+  border-bottom: 3px solid #000;
+}
