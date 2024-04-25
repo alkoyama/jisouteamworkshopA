@@ -7,7 +7,7 @@ body {
   /* ビューポートの高さを100%に設定 */
   margin: 0;
   /* デフォルトのマージンを削除 */
-  background-color: white;
+  background-image: url("@Terrajin05.mp4");
 }
 
 .container {

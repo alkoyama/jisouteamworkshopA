@@ -26,13 +26,22 @@
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // 注文詳細を取得するクエリを準備する
+        // $stmt = $conn->prepare("
+        //     SELECT od.ODID, od.OID, ps.SID, pi.Name, od.Order_quantity, od.Total_price
+        //     FROM order_detail od
+        //     INNER JOIN product_stock ps ON od.SID = ps.SID
+        //     INNER JOIN poke_info pi ON ps.PID = pi.PID
+        //     WHERE od.OID = :OID
+        // ");
         $stmt = $conn->prepare("
-            SELECT od.ODID, od.OID, ps.SID, pi.Name, od.Order_quantity, od.Total_price
-            FROM order_detail od
-            INNER JOIN product_stock ps ON od.SID = ps.SID
-            INNER JOIN poke_info pi ON ps.PID = pi.PID
-            WHERE od.OID = :OID
-        ");
+    SELECT od.ODID, od.OID, ps.SID, pi.Name, od.Order_quantity, pi.Price * od.Order_quantity AS Total_price
+    FROM order_detail od
+    INNER JOIN product_stock ps ON od.SID = ps.SID
+    INNER JOIN poke_info pi ON ps.PID = pi.PID
+    WHERE od.OID = :OID
+");
+
+
         $stmt->bindParam(':OID', $OID, PDO::PARAM_STR);
         $stmt->execute();
         $order_details = $stmt->fetchAll(PDO::FETCH_ASSOC);
