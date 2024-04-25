@@ -46,8 +46,8 @@
             echo "<td>{$detail['ODID']}</td>";
             echo "<td>{$detail['OID']}</td>";
             echo "<td>{$detail['Name']}</td>";
-            echo "<td>{$detail['Order_quantity']}</td>";
-            echo "<td>{$detail['Total_price']}</td>";
+            echo "<td class='qty'>" . $detail['Order_quantity'] . "</td>"; // 修正点
+            echo "<td class='price'>" . number_format($detail['Total_price']) . "</td>"; // 修正点
             echo "</tr>";
         }
         echo "</table>";
@@ -56,9 +56,6 @@
         echo "Error: " . $e->getMessage();
     }
     ?>
-    <!-- 戻るボタン -->
-    <form action="order_7thA.php" method="get">
-        <input type="submit" value="戻る">
-    </form>
+    
 </body>
 </html>

@@ -1,0 +1,151 @@
+body {
+  justify-content: center;
+  /* コンテンツを水平中央揃え */
+  align-items: center;
+  /* コンテンツを垂直中央揃え */
+  height: 100vh;
+  /* ビューポートの高さを100%に設定 */
+  margin: 0;
+  /* デフォルトのマージンを削除 */
+  background-color: white;
+}
+
+.container {
+  width: 90%;
+  /* 必要に応じて幅を調整 */
+  max-width: 1800px;
+  /* 最大幅を設定 */
+  padding: 20px;
+  /* 余白を追加 */
+  /* border: 1px solid #ccc; */
+  /* 可視化のための境界線を追加 */
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+}
+/* 表の装飾 */
+
+/* 受注ID、合計金額、削除、注文詳細のセルを小さくする */
+table th:nth-child(1), /* 受注ID */
+table th:nth-child(8), /* 合計金額 */
+table th:nth-child(9), /* 削除 */
+table th:nth-child(10), /* 注文詳細 */
+table td:nth-child(1), /* 受注ID */
+table td:nth-child(8), /* 合計金額 */
+table td:nth-child(9), /* 削除 */
+table td:nth-child(10) { /* 注文詳細 */
+    width: 90px; /* 例：80px */
+}
+
+/* 住所のセルを大きくする */
+table th.address,
+table td.address {
+    width: 350px; /* 住所のセルの幅 */
+}
+
+
+.price {
+    text-align: right;
+    width: 50px; /* 幅を指定 */
+  }
+  
+  .qty {
+    text-align: right; /* テキストを右寄せに */
+    width: 30px; /* 幅を指定 */
+}
+
+table {
+  table-layout: fixed; /* テーブルのレイアウトを固定する */
+  width: 100%; /* テーブルの幅を100%に設定 */
+}
+
+table th,
+table td {
+  word-wrap: break-word; /* テキストの折り返しを設定 */
+  max-width: 350px; /* セルの最大幅を設定 */
+  padding: 5px;
+  text-align: center;
+  font-size: 20px;
+}
+/* テーブルの行がホバーされたときの背景色 */
+table tbody tr:hover td {
+  background-color: #fffae9;
+}
+
+/* ボタンの共通スタイル */
+.button {
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background-color: hsl(243, 92%, 64%); /* ボタンの背景色 */
+  color: white; /* ボタンのテキスト色 */
+  text-align: center;
+  text-decoration: none;
+}
+
+/* ボタンのホバースタイル */
+.button:hover {
+  background-color: lightskyblue; /* マウスホバー時の背景色 */
+  color: blue;
+}
+
+/* モーダルのスタイル */
+.modal {
+  display: none; /* 初期状態では非表示 */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4); /* 背景を半透明にする */
+}
+
+/* モーダルの内容のスタイル */
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto 10% auto; /* 上部のマージンを調整 */
+  padding: 50px;
+  border: 1px solid #888;
+  width: 50%;
+  border-radius: 10px; /* 丸みを付ける */
+}
+
+/* モーダルのクローズボタンのスタイル */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* モーダルのクローズボタンのスタイル（ホバー時） */
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+  /* ページネーション（ページ番号のリンク）をスタイリング */
+  .pagination {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .pagination a {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 5px;
+    border: 1px solid #ccc;
+    text-decoration: none;
+  }
+  
+  .pagination a.active {
+    background-color: #ccc;
+  }

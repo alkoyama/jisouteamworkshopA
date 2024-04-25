@@ -40,100 +40,53 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
     $OID = $_GET['OID'];
 
     // 指定されたOIDの注文データと関連する注文詳細データを削除する
-try {
-    // まずorder_detailから関連するレコードを削除
-    $delete_detail_stmt = $conn->prepare("DELETE FROM order_detail WHERE OID = :OID");
-    $delete_detail_stmt->bindParam(':OID', $OID, PDO::PARAM_STR);
-    $delete_detail_stmt->execute();
+    try {
+        // まずorder_detailから関連するレコードを削除
+        $delete_detail_stmt = $conn->prepare("DELETE FROM order_detail WHERE OID = :OID");
+        $delete_detail_stmt->bindParam(':OID', $OID, PDO::PARAM_STR);
+        $delete_detail_stmt->execute();
 
-    // 次にorder_managementから関連するレコードを削除
-    $delete_management_stmt = $conn->prepare("DELETE FROM order_management WHERE OID = :OID");
-    $delete_management_stmt->bindParam(':OID', $OID, PDO::PARAM_STR);
-    $delete_management_stmt->execute();
+        // 次にorder_managementから関連するレコードを削除
+        $delete_management_stmt = $conn->prepare("DELETE FROM order_management WHERE OID = :OID");
+        $delete_management_stmt->bindParam(':OID', $OID, PDO::PARAM_STR);
+        $delete_management_stmt->execute();
 
-    // 削除が成功したかどうかを確認
-    $deleted_rows_detail = $delete_detail_stmt->rowCount();
-    $deleted_rows_management = $delete_management_stmt->rowCount();
+        // 削除が成功したかどうかを確認
+        $deleted_rows_detail = $delete_detail_stmt->rowCount();
+        $deleted_rows_management = $delete_management_stmt->rowCount();
 
-    if ($deleted_rows_detail > 0 || $deleted_rows_management > 0) {
-        // 削除成功メッセージを出力する
-        echo "削除が成功しました。";
-    } else {
-        // 削除失敗メッセージを出力する
-        echo "削除に失敗しました。";
+        if ($deleted_rows_detail > 0 || $deleted_rows_management > 0) {
+            // 削除成功メッセージを出力する
+            echo "削除が成功しました。";
+        } else {
+            // 削除失敗メッセージを出力する
+            echo "削除に失敗しました。";
+        }
+
+        // 削除後、現在のページにリダイレクトする
+        header("Location: order_7thA.php?page=$current_page");
+        exit();
+    } catch (PDOException $e) {
+        // エラーメッセージを出力する
+        echo "削除エラー: " . $e->getMessage();
     }
-
-    // 削除後、現在のページにリダイレクトする
-    header("Location: order_7thA.php?page=$current_page");
-    exit();
-} catch (PDOException $e) {
-    // エラーメッセージを出力する
-    echo "削除エラー: " . $e->getMessage();
-}
-
 }
 
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="ja">
 
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/order_7thA.css">
     <title>受注管理画面</title>
-    <style>
-        body {
-            justify-content: center;
-            /* コンテンツを水平中央揃え */
-            align-items: center;
-            /* コンテンツを垂直中央揃え */
-            height: 100vh;
-            /* ビューポートの高さを100%に設定 */
-            margin: 0;
-            /* デフォルトのマージンを削除 */
-        }
 
-        .container {
-            width: 80%;
-            /* 必要に応じて幅を調整 */
-            max-width: 800px;
-            /* 最大幅を設定 */
-            padding: 20px;
-            /* 余白を追加 */
-            border: 1px solid #ccc;
-            /* 可視化のための境界線を追加 */
-            margin: auto;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        .pagination {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .pagination a {
-            display: inline-block;
-            padding: 5px 10px;
-            margin: 0 5px;
-            border: 1px solid #ccc;
-            text-decoration: none;
-        }
-
-        .pagination a.active {
-            background-color: #ccc;
-        }
-    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         function confirmDelete(OID) {
             if (confirm('本当に削除しますか？')) {
                 var startTime = performance.now(); // 開始時間を記録
-
 
                 $.ajax({
                     url: 'http://localhost/jisouteamworkshopA/order_7thA.php',
@@ -165,36 +118,76 @@ try {
     <div class="container">
         <table border="1">
             <tr>
-                <th>ID</th>
-                <th>注文日時</th>
-                <!-- <th>受注詳細ID</th> -->
-                <th>名前</th>
-                <th>住所</th>
-                <th>電話番号</th>
+                <th>受注ID</th>
+                <th>注 文 日 時</th>
+                <th>名 前</th>
+                <th class="address">住 所</th>
+                <th>電 話 番 号</th>
                 <th>カード情報</th>
                 <th>パスワード</th>
-                <!-- <th>注文数</th> -->
                 <th>合計金額</th>
-                <th>削除</th>
+                <th>削 除</th>
+                <th>注文詳細</th>
             </tr>
             <?php foreach ($customer_management as $order) : ?>
 
                 <tr id="row_<?php echo $order['OID']; ?>">
-
-                    <td><a href="order_detail_7thA.php?OID=<?php echo $order['OID']; ?>"><?php echo $order['OID']; ?></a></td>
+                    <td><?php echo $order['OID']; ?></a></td>
                     <td><?php echo $order['Date_time']; ?></td>
                     <td><?php echo $order['Name']; ?></td>
-                    <td><?php echo $order['Address']; ?></td>
+                    <td class="address"><?php echo $order['Address']; ?></td>
                     <td><?php echo $order['Phone']; ?></td>
                     <td><?php echo $order['Card_info']; ?></td>
                     <td><?php echo $order['Password']; ?></td>
-                    <td><?php echo $order['Grand_total_price']; ?></td>
-                    <td><button onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
+                    <!-- <td><?php echo $order['Grand_total_price']; ?></td> -->
+                    <td class="price"><?php echo number_format($order['Grand_total_price']); ?></td>
+                    <!-- <td><button onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
+                    <td><button onclick="openModal('<?php echo $order['OID']; ?>')">詳細を表示</button></td> -->
+                    <td><button class="button" onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
+                    <td><button class="button" onclick="openModal('<?php echo $order['OID']; ?>')">詳細を表示</button></td>
 
                 </tr>
             <?php endforeach; ?>
         </table>
     </div>
+
+    <!-- 注文詳細を表示するモーダル -->
+    <div id="orderDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="orderDetailsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // モーダルを開く関数
+        function openModal(OID) {
+            // 注文IDを使用してサーバーから注文詳細を取得する
+            $.ajax({
+                url: 'order_detail_7thA.php',
+                type: 'GET',
+                data: {
+                    OID: OID
+                },
+                success: function(response) {
+                    // 取得した注文詳細をモーダル内のコンテナに表示する
+                    $('#orderDetailsContainer').html(response);
+                    // モーダルを表示する
+                    $('#orderDetailsModal').css('display', 'block');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error occurred:", error);
+                    alert("注文詳細の取得に失敗しました。エラーが発生しました。");
+                }
+            });
+        }
+
+        // モーダルを閉じる関数
+        function closeModal() {
+            // モーダルを非表示にする
+            $('#orderDetailsModal').css('display', 'none');
+        }
+    </script>
     <div class="pagination">
         <?php
         // ページングリンクを表示
