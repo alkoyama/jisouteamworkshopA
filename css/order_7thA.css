@@ -40,18 +40,21 @@ table td:nth-child(10) { /* 注文詳細 */
 }
 
 /* 住所のセルを大きくする */
-table th:nth-child(4), /* 住所 */
-table td:nth-child(4) { /* 住所 */
-    width: 350px; /* 例：200px */
+table th.address,
+table td.address {
+    width: 350px; /* 住所のセルの幅 */
 }
+
 
 .price {
     text-align: right;
+    width: 50px; /* 幅を指定 */
   }
   
   .qty {
-    text-align: right;
-  }
+    text-align: right; /* テキストを右寄せに */
+    width: 30px; /* 幅を指定 */
+}
 
 table {
   table-layout: fixed; /* テーブルのレイアウトを固定する */
@@ -61,7 +64,7 @@ table {
 table th,
 table td {
   word-wrap: break-word; /* テキストの折り返しを設定 */
-  max-width: 300px; /* セルの最大幅を設定 */
+  max-width: 350px; /* セルの最大幅を設定 */
   padding: 5px;
   text-align: center;
   font-size: 20px;
@@ -87,7 +90,8 @@ table tbody tr:hover td {
 
 /* ボタンのホバースタイル */
 .button:hover {
-  background-color: hwb(200 9% 1%); /* マウスホバー時の背景色 */
+  background-color: lightskyblue; /* マウスホバー時の背景色 */
+  color: blue;
 }
 
 /* モーダルのスタイル */
@@ -107,7 +111,7 @@ table tbody tr:hover td {
 .modal-content {
   background-color: #fefefe;
   margin: 10% auto 10% auto; /* 上部のマージンを調整 */
-  padding: 20px;
+  padding: 50px;
   border: 1px solid #888;
   width: 50%;
   border-radius: 10px; /* 丸みを付ける */

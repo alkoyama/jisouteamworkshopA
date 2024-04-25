@@ -121,7 +121,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
                 <th>受注ID</th>
                 <th>注 文 日 時</th>
                 <th>名 前</th>
-                <th>住 所</th>
+                <th class="address">住 所</th>
                 <th>電 話 番 号</th>
                 <th>カード情報</th>
                 <th>パスワード</th>
@@ -135,7 +135,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
                     <td><?php echo $order['OID']; ?></a></td>
                     <td><?php echo $order['Date_time']; ?></td>
                     <td><?php echo $order['Name']; ?></td>
-                    <td><?php echo $order['Address']; ?></td>
+                    <td class="address"><?php echo $order['Address']; ?></td>
                     <td><?php echo $order['Phone']; ?></td>
                     <td><?php echo $order['Card_info']; ?></td>
                     <td><?php echo $order['Password']; ?></td>
