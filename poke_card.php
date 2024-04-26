@@ -28,7 +28,7 @@
     position: fixed;
     top: 0;
     right: 20px;
-    width: 250px; /* 横幅を拡大 */
+    width: 300px; /* 横幅を拡大 */
     background-color: #f8f9fa;
     padding: 10px;
     border: 1px solid #ccc;
@@ -109,11 +109,16 @@
     </div>
 </div>
 
-<!-- カートの領域 -->
+<!-- カート -->
 <div id="cart">
     <h2 class="text-center">カート</h2>
     <ul id="cart-items"></ul>
-    <button id="update-cart-quantities" class="btn btn-primary btn-sm">個数更新</button> <!-- 個数更新ボタン -->
+
+    <!-- 個数更新ボタン -->
+    <button class="btn btn-primary" id="update-cart-quantities">個数更新</button>
+
+    <!-- 決済へ進むボタン -->
+    <button class="btn btn-success" id="proceed-to-payment">決済へ進む</button>
 </div>
 
 <!-- jQuery -->
@@ -154,6 +159,56 @@ function sortPokemon(type, order) {
     container.empty(); // 既存の表示をクリア
     offset = 5; // オフセットをリセット
     displayPokemon(filteredPokemon.slice(0, offset)); // ソート後のポケモンを再表示
+}
+
+function applyFilters() {
+    var selectedTypes = [];
+    $('#type-filters input:checked').each(function() {
+        selectedTypes.push($(this).val());
+    });
+
+    // フィルターが何も選択されていない場合は、すべてのポケモンを表示
+    if (selectedTypes.length === 0) {
+        filteredPokemon = pokemonData;
+    } else {
+        filteredPokemon = pokemonData.filter(function(pokemon) {
+            // ポケモンが選択されたすべてのタイプを持っているかをチェック
+            var pokemonTypes = [pokemon.Type1];
+            if (pokemon.Type2) {
+                pokemonTypes.push(pokemon.Type2);
+            }
+            // ポケモンのタイプにすべての選択されたタイプが含まれるかを確認
+            return selectedTypes.every(function(type) {
+                return pokemonTypes.includes(type);
+            });
+        });
+    }
+
+    var container = $('#pokemon-container');
+    container.empty(); // 既存の表示をクリア
+    offset = 5; // リセット
+    displayPokemon(filteredPokemon.slice(0, offset)); // フィルター後のポケモンを表示
+}
+
+
+function displayPokemon(pokemonArray) {
+    var container = $('#pokemon-container');
+    pokemonArray.forEach(function(pokemon) {
+        container.append(`
+            <div class="pokemon-card">
+                <img class="pokemon-image" src="${pokemon.Image_path}" alt="${pokemon.Name}">
+                <p>${pokemon.Name}</p>
+                <p>タイプ1: ${pokemon.Type1}</p>
+                <p>タイプ2: ${(pokemon.Type2 || '-')}</p>
+                <p>ねだん: ${pokemon.Price}</p>
+                <p id="inventory-${pokemon.SID}">在庫: ${pokemon.Inventory}</p> <!-- 在庫表示に ID を追加 -->
+                <div class="input-group mb-3">
+                    <input type="number" class="form-control" style="width: 50px;" placeholder="個数" aria-label="個数" aria-describedby="basic-addon2" id="quantity-${pokemon.SID}" value="0" min="0">
+                    <button class="btn btn-primary" type="button" onclick="addToCart('${pokemon.SID}', '${pokemon.Name}')">カートに追加</button>
+                </div>
+            </div>
+        `);
+    });
 }
 
 $(document).ready(function() {
@@ -211,7 +266,7 @@ $(document).ready(function() {
 
         cartItems.forEach(function(item, index) {
             var newQuantity = parseInt($(`#cart-quantity-${index}`).val());
-            var pokemon = pokemonData.find(p => p.PID === item.pid);
+            var pokemon = pokemonData.find(p => p.SID === item.sid);
 
             if (newQuantity <= 0) { // 個数が1未満の場合
                 alert('個数は1以上である必要があります。');
@@ -235,7 +290,7 @@ $(document).ready(function() {
                 pokemon.Inventory -= quantityDifference; // 在庫調整
 
                 // 在庫表示を更新
-                $(`#inventory-${pokemon.PID}`).text(`在庫: ${pokemon.Inventory}`);
+                $(`#inventory-${pokemon.SID}`).text(`在庫: ${pokemon.Inventory}`);
 
                 // カートアイテムの個数を更新
                 item.quantity = newQuantity;
@@ -259,60 +314,9 @@ $(document).ready(function() {
 });
 
 
-
-function applyFilters() {
-    var selectedTypes = [];
-    $('#type-filters input:checked').each(function() {
-        selectedTypes.push($(this).val());
-    });
-
-    // フィルターが何も選択されていない場合は、すべてのポケモンを表示
-    if (selectedTypes.length === 0) {
-        filteredPokemon = pokemonData;
-    } else {
-        filteredPokemon = pokemonData.filter(function(pokemon) {
-            // ポケモンが選択されたすべてのタイプを持っているかをチェック
-            var pokemonTypes = [pokemon.Type1];
-            if (pokemon.Type2) {
-                pokemonTypes.push(pokemon.Type2);
-            }
-            // ポケモンのタイプにすべての選択されたタイプが含まれるかを確認
-            return selectedTypes.every(function(type) {
-                return pokemonTypes.includes(type);
-            });
-        });
-    }
-
-    var container = $('#pokemon-container');
-    container.empty(); // 既存の表示をクリア
-    offset = 5; // リセット
-    displayPokemon(filteredPokemon.slice(0, offset)); // フィルター後のポケモンを表示
-}
-
-
-function displayPokemon(pokemonArray) {
-    var container = $('#pokemon-container');
-    pokemonArray.forEach(function(pokemon) {
-        container.append(`
-            <div class="pokemon-card">
-                <img class="pokemon-image" src="${pokemon.Image_path}" alt="${pokemon.Name}">
-                <p>${pokemon.Name}</p>
-                <p>タイプ1: ${pokemon.Type1}</p>
-                <p>タイプ2: ${(pokemon.Type2 || '-')}</p>
-                <p>ねだん: ${pokemon.Price}</p>
-                <p id="inventory-${pokemon.PID}">在庫: ${pokemon.Inventory}</p> <!-- 在庫表示に ID を追加 -->
-                <div class="input-group mb-3">
-                    <input type="number" class="form-control" style="width: 50px;" placeholder="個数" aria-label="個数" aria-describedby="basic-addon2" id="quantity-${pokemon.PID}" value="0" min="0">
-                    <button class="btn btn-primary" type="button" onclick="addToCart('${pokemon.PID}', '${pokemon.Name}')">カートに追加</button>
-                </div>
-            </div>
-        `);
-    });
-}
-
-function addToCart(pid, name) {
-    var quantity = parseInt($('#quantity-' + pid).val());
-    var pokemon = pokemonData.find(p => p.PID === pid);
+function addToCart(sid, name) {
+    var quantity = parseInt($('#quantity-' + sid).val());
+    var pokemon = pokemonData.find(p => p.SID === sid);
 
     if (quantity <= 0) {
         alert('正しい個数を入力してください。');
@@ -320,48 +324,63 @@ function addToCart(pid, name) {
     }
 
     if (quantity > pokemon.Inventory) {
-        alert('在庫不足です。');
+        alert(`${name} の在庫を超える個数は追加できません。`);
         return;
     }
 
     // カートに商品を追加
-    cartItems.push({ pid, name, quantity });
+    cartItems.push({ sid, name, quantity, price: pokemon.Price, inventory: pokemon.Inventory });
 
     // 在庫を減少
     pokemon.Inventory -= quantity;
 
-    // HTML 上の在庫表示を更新
-    $(`#inventory-${pokemon.PID}`).text(`在庫: ${pokemon.Inventory}`);
+    // HTML上の在庫表示を更新
+    $(`#inventory-${pokemon.SID}`).text(`在庫: ${pokemon.Inventory}`);
 
     // カートの内容を更新
     updateCartDisplay();
+
     alert(`${name} を ${quantity} 個カートに追加しました。`);
 }
+
+var grandTotalPrice = 0; // 合計金額の変数を宣言
 
 function updateCartDisplay() {
     var cartList = $('#cart-items');
     cartList.empty(); // カートをクリア
 
+    grandTotalPrice = 0; // 合計金額をリセット
+
     cartItems.forEach(function(item, index) {
+        var totalPrice = item.price * item.quantity; // 小計
+        grandTotalPrice += totalPrice; // 合計金額に加算
+
         cartList.append(`
             <li>
                 ${item.name} 
-                <input type="number" class="form-control" style="width: 50px; display: inline-block;" min="1" value="${item.quantity}" id="cart-quantity-${index}"/> 
+                <input type="number" class="form-control" style="width: 50px; display: inline-block;" min="1" value="${item.quantity}" id="cart-quantity-${index}"/>
+                ¥${totalPrice.toLocaleString()}
                 <button class="btn btn-danger btn-sm remove-from-cart" data-index="${index}">削除</button>
             </li>
         `);
     });
 
+    cartList.append(`
+        <li>
+            <strong>合計金額: ¥${grandTotalPrice.toLocaleString()}</strong>
+        </li>
+    `);
+
+    // 削除ボタンのイベントリスナー
     $('.remove-from-cart').on('click', function() {
         var index = $(this).data('index'); // 削除するアイテムのインデックス
-        var removedItem = cartItems.splice(index, 1)[0]; // カートからアイテムを削除
-        var pokemon = pokemonData.find(p => p.PID === removedItem.pid);
+        var removedItem = cartItems.splice(index, 1)[0]; // カートから削除されたアイテム
+        var pokemon = pokemonData.find(p => p.SID === removedItem.sid);
 
-        // 在庫を加算
-        pokemon.Inventory += parseInt(removedItem.quantity);
+        pokemon.Inventory += removedItem.quantity; // 在庫を戻す
 
         // HTML 上の在庫表示を更新
-        $(`#inventory-${pokemon.PID}`).text(`在庫: ${pokemon.Inventory}`);
+        $(`#inventory-${pokemon.SID}`).text(`在庫: ${pokemon.Inventory}`);
 
         // カートの内容を更新
         updateCartDisplay();
@@ -369,6 +388,33 @@ function updateCartDisplay() {
         alert(`${removedItem.name} をカートから削除しました。`);
     });
 }
+
+// JavaScript: カート内の商品と合計金額を Payment_7thA.php へ送信
+$('#proceed-to-payment').on('click', function() {
+    var form = $('<form></form>'); // 新しいフォームを作成
+    form.attr('method', 'POST'); // POST メソッド
+    form.attr('action', 'Payment_7thA.php'); // 送信先
+
+    cartItems.forEach(function(item) {
+        // アイテムの情報を JSON 形式で送信
+        form.append($('<input>').attr({
+            type: 'hidden',
+            name: 'cartItems[]',
+            value: JSON.stringify(item) // JSON データとして送信
+        }));
+    });
+
+    // 合計金額も追加
+    form.append($('<input>').attr({
+        type: 'hidden',
+        name: 'grand_total_price',
+        value: grandTotalPrice
+    }));
+
+    $('body').append(form); // フォームをボディに追加
+    form.submit(); // フォームを送信
+});
+
 
 
 </script>
