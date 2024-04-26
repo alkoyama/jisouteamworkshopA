@@ -35,25 +35,25 @@ table th:nth-child(10), /* 注文詳細 */
 table td:nth-child(1), /* 受注ID */
 table td:nth-child(8), /* 合計金額 */
 table td:nth-child(9), /* 削除 */
-table td:nth-child(10) { /* 注文詳細 */
-    width: 90px; /* 例：80px */
+table td:nth-child(10) {
+  /* 注文詳細 */
+  width: 90px; /* 例：80px */
 }
 
 /* 住所のセルを大きくする */
 table th.address,
 table td.address {
-    width: 350px; /* 住所のセルの幅 */
+  width: 350px; /* 住所のセルの幅 */
 }
 
-
 .price {
-    text-align: right;
-    width: 50px; /* 幅を指定 */
-  }
-  
-  .qty {
-    text-align: right; /* テキストを右寄せに */
-    width: 30px; /* 幅を指定 */
+  text-align: right;
+  width: 50px; /* 幅を指定 */
+}
+
+.qty {
+  text-align: right; /* テキストを右寄せに */
+  width: 30px; /* 幅を指定 */
 }
 
 table {
@@ -132,20 +132,26 @@ table tbody tr:hover td {
   text-decoration: none;
   cursor: pointer;
 }
-  /* ページネーション（ページ番号のリンク）をスタイリング */
-  .pagination {
-    margin-top: 20px;
-    text-align: center;
-  }
-  
-  .pagination a {
-    display: inline-block;
-    padding: 5px 10px;
-    margin: 0 5px;
-    border: 1px solid #ccc;
-    text-decoration: none;
-  }
-  
-  .pagination a.active {
-    background-color: #ccc;
-  }
+/* ページネーション（ページ番号のリンク）をスタイリング */
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pagination a {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 0 5px;
+  border: 1px solid #ccc;
+  text-decoration: none;
+}
+
+.pagination a.active {
+  background-color: #ccc;
+}
+
+/* stock_managment_7thAのCSS */
+.container_st{
+  width: 70%; /* ページの幅の90%を占める */
+  margin: 0 auto; /* 左右の余白を自動的に調整して中央に配置 */
+}
