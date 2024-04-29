@@ -71,7 +71,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
         echo "削除エラー: " . $e->getMessage();
     }
 }
-
 ?>
 
 <!DOCTYPE html>
