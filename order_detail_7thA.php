@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>受注明細画面</title>
 </head>
+
 <body>
     <?php
     // データベース接続情報
@@ -26,13 +28,22 @@
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // 注文詳細を取得するクエリを準備する
+        // $stmt = $conn->prepare("
+        //     SELECT od.ODID, od.OID, ps.SID, pi.Name, od.Order_quantity, od.Total_price
+        //     FROM order_detail od
+        //     INNER JOIN product_stock ps ON od.SID = ps.SID
+        //     INNER JOIN poke_info pi ON ps.PID = pi.PID
+        //     WHERE od.OID = :OID
+        // ");
         $stmt = $conn->prepare("
-            SELECT od.ODID, od.OID, ps.SID, pi.Name, od.Order_quantity, od.Total_price
+            SELECT od.ODID, od.OID, ps.SID, pi.Name, od.Order_quantity, Price * od.Order_quantity AS Total_price
             FROM order_detail od
             INNER JOIN product_stock ps ON od.SID = ps.SID
             INNER JOIN poke_info pi ON ps.PID = pi.PID
             WHERE od.OID = :OID
         ");
+
+
         $stmt->bindParam(':OID', $OID, PDO::PARAM_STR);
         $stmt->execute();
         $order_details = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -46,8 +57,8 @@
             echo "<td>{$detail['ODID']}</td>";
             echo "<td>{$detail['OID']}</td>";
             echo "<td>{$detail['Name']}</td>";
-            echo "<td>{$detail['Order_quantity']}</td>";
-            echo "<td>{$detail['Total_price']}</td>";
+            echo "<td class='qty'>" . $detail['Order_quantity'] . "</td>"; // 修正点
+            echo "<td class='price'>" . number_format($detail['Total_price']) . "</td>"; // 修正点
             echo "</tr>";
         }
         echo "</table>";
@@ -56,9 +67,6 @@
         echo "Error: " . $e->getMessage();
     }
     ?>
-    <!-- 戻るボタン -->
-    <form action="order_7thA.php" method="get">
-        <input type="submit" value="戻る">
-    </form>
+
 </body>
 </html>
