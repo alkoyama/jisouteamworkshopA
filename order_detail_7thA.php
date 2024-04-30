@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>受注明細画面</title>
 </head>
+
 <body>
     <?php
     // データベース接続情報
@@ -34,12 +36,14 @@
         //     WHERE od.OID = :OID
         // ");
         $stmt = $conn->prepare("
-    SELECT od.ODID, od.OID, ps.SID, pi.Name, od.Order_quantity, Price * od.Order_quantity AS Total_price
-    FROM order_detail od
-    INNER JOIN product_stock ps ON od.SID = ps.SID
-    INNER JOIN poke_info pi ON ps.PID = pi.PID
-    WHERE od.OID = :OID
-");
+
+            SELECT od.ODID, od.OID, ps.SID, pi.Name, od.Order_quantity, Price * od.Order_quantity AS Total_price
+            FROM order_detail od
+            INNER JOIN product_stock ps ON od.SID = ps.SID
+            INNER JOIN poke_info pi ON ps.PID = pi.PID
+            WHERE od.OID = :OID
+        ");
+
 
 
         $stmt->bindParam(':OID', $OID, PDO::PARAM_STR);
@@ -65,6 +69,6 @@
         echo "Error: " . $e->getMessage();
     }
     ?>
-    
+
 </body>
 </html>
