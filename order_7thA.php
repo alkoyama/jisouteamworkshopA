@@ -138,12 +138,9 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
                     <td><?php echo $order['Phone']; ?></td>
                     <td><?php echo $order['Card_info']; ?></td>
                     <td><?php echo $order['Password']; ?></td>
-                    <!-- <td><?php echo $order['Grand_total_price']; ?></td> -->
                     <td class="price"><?php echo number_format($order['Grand_total_price']); ?></td>
-                    <!-- <td><button onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
-                    <td><button onclick="openModal('<?php echo $order['OID']; ?>')">詳細を表示</button></td> -->
-                    <td><button class="button" onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
-                    <td><button class="button" onclick="openModal('<?php echo $order['OID']; ?>')">詳細を表示</button></td>
+                    <td><button class="button delete-button" onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
+                    <td><button class="button detail-button" onclick="openModal('<?php echo $order['OID']; ?>')">詳細を表示</button></td>
 
                 </tr>
             <?php endforeach; ?>
@@ -199,10 +196,10 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
 
         ?>
     </div>
-    <video autoplay loop muted playsinline style="width: 100%; height: 100%; position: fixed; top: 0; left: 0; z-index: -1;">
-    <source src="./images/background/@Terrajin05 .mp4" type="video/mp4">
-    Your browser does not support the video tag.
-</video>
+    <!-- <video id="myVideo" autoplay loop muted playsinline style="width: 50%; height: 30%; position: fixed; top:680px; bottom: 0; left: 0; z-index: -1;">
+        <source src="./images/background/@Terrajin05 .mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video> -->
 
 </body>
 
