@@ -8,6 +8,8 @@ body {
   margin: 0;
   /* デフォルトのマージンを削除 */
   background-image: url("@Terrajin05.mp4");
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .container {
@@ -24,16 +26,15 @@ body {
 
 h1 {
   text-align: center;
+  margin-bottom: 0;
 }
 /* 表の装飾 */
 
 /* 受注ID、合計金額、削除、注文詳細のセルを小さくする */
 table th:nth-child(1), /* 受注ID */
-table th:nth-child(8), /* 合計金額 */
 table th:nth-child(9), /* 削除 */
 table th:nth-child(10), /* 注文詳細 */
 table td:nth-child(1), /* 受注ID */
-table td:nth-child(8), /* 合計金額 */
 table td:nth-child(9), /* 削除 */
 table td:nth-child(10) {
   /* 注文詳細 */
@@ -45,7 +46,11 @@ table th.address,
 table td.address {
   width: 350px; /* 住所のセルの幅 */
 }
-
+/* 合計金額のセルを大きくする */
+table th:nth-child(8), /* 合計金額 */
+table td:nth-child(8) { /* 合計金額 */
+  width: 100px;
+}
 .price {
   text-align: right;
   width: 50px; /* 幅を指定 */
@@ -67,12 +72,19 @@ table td {
   max-width: 350px; /* セルの最大幅を設定 */
   padding: 5px;
   text-align: center;
-  font-size: 20px;
+  /* font-size: 20px; */
 }
 /* テーブルの行がホバーされたときの背景色 */
 table tbody tr:hover td {
   background-color: #fffae9;
 }
+th {
+  font-size: 23px; /* タイトルの文字の大きさを24pxに設定 */
+}
+td {
+  font-size: 20px;
+}
+
 
 /* ボタンの共通スタイル */
 .button {
@@ -82,17 +94,31 @@ table tbody tr:hover td {
   cursor: pointer;
   border: none;
   border-radius: 4px;
-  background-color: hsl(243, 92%, 64%); /* ボタンの背景色 */
+  /* background-color: hsl(243, 92%, 64%); ボタンの背景色 */
   color: white; /* ボタンのテキスト色 */
   text-align: center;
   text-decoration: none;
 }
 
 /* ボタンのホバースタイル */
-.button:hover {
+.delete-button:hover {
+  background-color: rgb(245, 157, 242); /* マウスホバー時の背景色 */
+  color: red;
+}
+.detail-button:hover {
   background-color: lightskyblue; /* マウスホバー時の背景色 */
   color: blue;
 }
+/* 削除ボタンのスタイル */
+.delete-button {
+  background-color: #e74c3c; /* 赤色 */
+}
+
+/* 詳細表示ボタンのスタイル */
+.detail-button {
+  background-color: #3498db; /* 青色 */
+}
+
 
 /* モーダルのスタイル */
 .modal {
