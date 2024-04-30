@@ -66,7 +66,7 @@ CREATE TABLE `order_detail` (
 
 LOCK TABLES `order_detail` WRITE;
 /*!40000 ALTER TABLE `order_detail` DISABLE KEYS */;
-INSERT INTO `order_detail` VALUES ('OD001','O001','S001',1,100),('OD002','O001','S002',5,1000),('OD003','O001','S003',3,900),('OD004','O002','S004',7,2800),('OD005','O002','S005',9,4500),('OD006','O002','S006',5,3000),('OD007','O002','S007',4,2800),('OD008','O002','S008',4,3200),('OD009','O003','S004',7,2800),('OD010','O003','S005',9,4500),('OD011','O003','S006',5,3000),('OD012','O003','S007',4,2800),('OD013','O003','S008',4,3200),('OD014','O004','S001',1,100),('OD015','O005','S001',1,100),('OD016','O006','S015',10,15000),('OD017','O007','S001',8,800),('OD018','O007','S002',10,2000),('OD019','O007','S003',10,3000),('OD020','O007','S004',3,1200),('OD021','O007','S005',1,500),('OD022','O007','S006',5,3000),('OD023','O007','S007',6,4200),('OD024','O007','S008',6,4800),('OD025','O007','S009',10,9000),('OD026','O007','S010',10,10000),('OD027','O007','S011',10,11000),('OD028','O007','S012',10,12000),('OD029','O007','S013',10,13000),('OD030','O007','S014',10,14000),('OD031','O008','S001',4,400),('OD032','O009','S001',12,1200),('OD033','O010','S001',10,1000),('OD034','O011','S001',1,100),('OD035','O012','S001',12,1200),('OD036','O013','S001',32,3200),('OD037','O014','S002',3,600),('OD038','O015','S002',3,600),('OD039','O016','S002',3,600),('OD040','O017','S002',3,600),('OD041','O018','S002',3,600),('OD042','O019','S001',1,100),('OD043','O020','S002',4,3200),('OD044','O021','S003',11,3300),('OD045','O022','S002',3,600),('OD046','O023','S003',13,3900),('OD047','O024','S003',13,3900),('OD048','O025','S002',13,2600),('OD049','O026','S002',13,2600),('OD050','O027','S002',13,2600),('OD051','O028','S002',13,2600),('OD052','O029','S002',11,2200),('OD053','O029','S003',15,4500);
+INSERT INTO `order_detail` VALUES ('OD001','O001','S001',1,100),('OD002','O001','S002',5,1000),('OD003','O001','S003',3,900),('OD004','O002','S004',7,2800),('OD005','O002','S005',9,4500),('OD006','O002','S006',5,3000),('OD007','O002','S007',4,2800),('OD008','O002','S008',4,3200),('OD009','O003','S004',7,2800),('OD010','O003','S005',9,4500),('OD011','O003','S006',5,3000),('OD012','O003','S007',4,2800),('OD013','O003','S008',4,3200);
 /*!40000 ALTER TABLE `order_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -92,7 +92,7 @@ CREATE TABLE `order_management` (
 
 LOCK TABLES `order_management` WRITE;
 /*!40000 ALTER TABLE `order_management` DISABLE KEYS */;
-INSERT INTO `order_management` VALUES ('O001','2024-04-27 16:09:05','C001',2000),('O002','2024-04-27 16:10:29','C001',16300),('O003','2024-04-27 16:27:54','C001',16300),('O004','2024-04-27 16:33:59','C001',100),('O005','2024-04-27 16:34:46','C001',100),('O006','2024-04-27 17:23:04','C001',15000),('O007','2024-04-27 17:26:43','C001',88500),('O008','2024-04-28 03:07:29','C001',400),('O009','2024-04-28 12:01:46','C001',1200),('O010','2024-04-28 12:12:15','C001',1000),('O011','2024-04-28 12:28:22','C001',100),('O012','2024-04-28 12:44:22','C001',1200),('O013','2024-04-28 12:46:54','C001',3200),('O014','2024-04-28 13:26:26','C001',600),('O015','2024-04-28 13:27:07','C001',600),('O016','2024-04-28 13:28:46','C001',600),('O017','2024-04-28 13:29:55','C001',600),('O018','2024-04-28 13:30:52','C001',600),('O019','2024-04-28 13:34:43','C001',100),('O020','2024-04-28 13:36:35','C001',3200),('O021','2024-04-28 13:39:02','C001',3300),('O022','2024-04-28 13:40:12','C001',600),('O023','2024-04-28 14:33:42','C001',3900),('O024','2024-04-28 14:37:12','C001',3900),('O025','2024-04-28 14:37:36','C001',2600),('O026','2024-04-28 14:39:23','C001',2600),('O027','2024-04-28 14:42:49','C001',2600),('O028','2024-04-28 14:42:52','C001',2600),('O029','2024-04-28 14:43:36','C001',6700);
+INSERT INTO `order_management` VALUES ('O001','2024-04-27 16:09:05','C001',2000),('O002','2024-04-27 16:10:29','C001',16300),('O003','2024-04-27 16:27:54','C001',16300);
 /*!40000 ALTER TABLE `order_management` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -116,7 +116,7 @@ CREATE TABLE `poke_graphics` (
 
 LOCK TABLES `poke_graphics` WRITE;
 /*!40000 ALTER TABLE `poke_graphics` DISABLE KEYS */;
-INSERT INTO `poke_graphics` VALUES ('G001','./images/pokemon/pokemon_001_nuckrar.jpg'),('G002','./images/pokemon/pokemon_002_eleson.jpg'),('G003','./images/pokemon/pokemon_003_groudon.jpg'),('G004','./images/pokemon/pokemon_004_wanaider.jpg'),('G005','./images/pokemon/pokemon_005_yukihami.jpg'),('G006','./images/pokemon/pokemon_006_kuwagannon.jpg'),('G007','./images/pokemon/pokemon_007_tairetsu.jpg'),('G008','./images/pokemon/pokemon_008_koraidon.jpg'),('G009','./images/pokemon/pokemon_009_wanriky.jpg'),('G010','./images/pokemon/pokemon_010_konoyozaru.jpg'),('G011','./images/pokemon/pokemon_011_mimikkyu.jpg'),('G012','./images/pokemon/pokemon_012_gangar.jpg'),('G013','./images/pokemon/pokemon_013_irukaman.jpg'),('G014','./images/pokemon/pokemon_014_nuoh.jpg'),('G015','./images/pokemon/pokemon_015_hagigishiri.jpg');
+INSERT INTO `poke_graphics` VALUES ('G001','./images/pokemon/pokemon_001_nuckrar.jpg'),('G002','./images/pokemon/pokemon_002_eleson.jpg'),('G003','./images/pokemon/pokemon_003_groudon.jpg'),('G004','./images/pokemon/pokemon_004_wanaider.jpg'),('G005','./images/pokemon/pokemon_005_yukihami.jpg'),('G006','./images/pokemon/pokemon_006_kuwagannon.jpg'),('G007','./images/pokemon/pokemon_007_tairetsu.jpg'),('G008','./images/pokemon/pokemon_008_koraidon.jpg'),('G009','./images/pokemon/pokemon_009_wanriky.jpg'),('G010','./images/pokemon/pokemon_010_konoyozaru.jpg'),('G011','./images/pokemon/pokemon_011_mimikkyu.jpg'),('G012','./images/pokemon/pokemon_012_gangar.jpg'),('G013','./images/pokemon/pokemon_013_irukaman.jpg'),('G014','./images/pokemon/pokemon_014_nuoh.jpg'),('G015','./images/pokemon/pokemon_015_hagigishiri.jpg'),('G016','./images/pokemon/pokemon_016_absol.jpg'),('G017','./images/pokemon/pokemon_017_armorga.jpg'),('G018','./images/pokemon/pokemon_018_bangiras.jpg'),('G019','./images/pokemon/pokemon_019_batafurii.jpg'),('G027','./images/pokemon/pokemon_027_eievui.jpg'),('G029','./images/pokemon/pokemon_029_fushigidane.jpg');
 /*!40000 ALTER TABLE `poke_graphics` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -143,7 +143,7 @@ CREATE TABLE `poke_info` (
 
 LOCK TABLES `poke_info` WRITE;
 /*!40000 ALTER TABLE `poke_info` DISABLE KEYS */;
-INSERT INTO `poke_info` VALUES ('P001','ナックラー','T09ZMN',NULL,'G001'),('P002','エレズン','T04DNK','T08DOK','G002'),('P003','グラードン','T09ZMN','T02HNO','G003'),('P004','ワナイダー','T12MUS',NULL,'G004'),('P005','ユキハミ','T06KOR','T12MUS','G005'),('P006','クワガノン','T12MUS','T04DNK','G006'),('P007','タイレーツ','T07KKT',NULL,'G007'),('P008','コライドン','T07KKT','T15DGN','G008'),('P009','ワンリキー','T07KKT',NULL,'G009'),('P010','コノヨザル','T07KKT','T14GST','G010'),('P011','ミミッキュ','T14GST','T18FRY','G011'),('P012','ゲンガー','T14GST','T08DOK','G012'),('P013','イルカマン','T03MIZ',NULL,'G013'),('P014','ヌオー','T03MIZ','T09ZMN','G014'),('P015','ハギギシリ','T03MIZ','T11ESP','G015');
+INSERT INTO `poke_info` VALUES ('P001','ナックラー','T09ZMN',NULL,'G001'),('P002','エレズン','T04DNK','T08DOK','G002'),('P003','グラードン','T09ZMN','T02HNO','G003'),('P004','ワナイダー','T12MUS',NULL,'G004'),('P005','ユキハミ','T06KOR','T12MUS','G005'),('P006','クワガノン','T12MUS','T04DNK','G006'),('P007','タイレーツ','T07KKT',NULL,'G007'),('P008','コライドン','T07KKT','T15DGN','G008'),('P009','ワンリキー','T07KKT',NULL,'G009'),('P010','コノヨザル','T07KKT','T14GST','G010'),('P011','ミミッキュ','T14GST','T18FRY','G011'),('P012','ゲンガー','T14GST','T08DOK','G012'),('P013','イルカマン','T03MIZ',NULL,'G013'),('P014','ヌオー','T03MIZ','T09ZMN','G014'),('P015','ハギギシリ','T03MIZ','T11ESP','G015'),('P016','アブソル','T16AKU',NULL,'G016'),('P017','アーマーガア','T10HKU','T17HGN','G017'),('P018','バンギラス','T13IWA','T16AKU','G018'),('P019','バタフリー','T12MUS','T10HKU','G019'),('P027','イーブイ','T01NML',NULL,'G027'),('P029','フシギダネ','T05KUS','T08DOK','G029');
 /*!40000 ALTER TABLE `poke_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -194,7 +194,7 @@ CREATE TABLE `product_stock` (
 
 LOCK TABLES `product_stock` WRITE;
 /*!40000 ALTER TABLE `product_stock` DISABLE KEYS */;
-INSERT INTO `product_stock` VALUES ('S001','P001','M',100,0),('S002','P002','M',200,15),('S003','P003','M',300,48),('S004','P004','M',400,0),('S005','P005','M',500,0),('S006','P006','M',600,0),('S007','P007','M',700,0),('S008','P008','M',800,0),('S009','P009','M',900,0),('S010','P010','M',1000,0),('S011','P011','M',1100,0),('S012','P012','M',1200,0),('S013','P013','M',1300,0),('S014','P014','M',1400,0),('S015','P015','M',1500,0);
+INSERT INTO `product_stock` VALUES ('S001','P001','M',100,0),('S002','P002','M',200,15),('S003','P003','M',300,48),('S004','P004','M',400,88),('S005','P005','M',500,46),('S006','P006','M',600,65),('S007','P007','M',700,52),('S008','P008','M',800,66),('S009','P009','M',900,33),('S010','P010','M',1000,0),('S011','P011','M',1100,25),('S012','P012','M',1200,52),('S013','P013','M',1300,7),('S014','P014','M',1400,0),('S015','P015','M',1500,20),('S016','P016','M',1600,10),('S017','P017','M',1700,10),('S018','P018','M',1800,10),('S019','P019','M',1900,10),('S027','P027','M',2700,10),('S029','P029','M',2900,10);
 /*!40000 ALTER TABLE `product_stock` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -207,4 +207,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-04-30 11:07:48
+-- Dump completed on 2024-04-30 15:27:39
