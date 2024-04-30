@@ -133,14 +133,16 @@ try {
             /* // 上マージン */
             margin-bottom: 20px; 
             /* // 下マージン */
-        }// 初期状態では非表示
+        }
+        /* // 初期状態では非表示 */
         .no-more-data {
             display: none; 
             justify-content: center;
             text-align: center; 
             margin-top: 20px; 
             margin-bottom: 20px; 
-            color: #777; // グレーで表示
+            color: #777; 
+            /* // グレーで表示 */
         }
         /* 画面最下部の隙間 */
         .bottom-margin {
