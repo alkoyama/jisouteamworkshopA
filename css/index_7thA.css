@@ -1,13 +1,13 @@
 @charset "UTF-8";
 body {
-  
+  background-image: url(../images/background/index_bg_02.png);
 }
 /******************************
  header
 ******************************/
 header {
   width: 100%;
-  background-color:rgba(255,255,255,0.5);
+  background-color:rgba(255,255,255,0.7);
   z-index: 1000;
   padding: 0;
   box-shadow: 2px 2px 4px gray;
@@ -129,7 +129,7 @@ a {
 **********************************/
 footer{
   width: 100%;
-  background-color:rgba(255,255,255,0.5);
+  background-color:rgba(255,255,255,0.7);
   z-index: 1000;
   padding: 0;
   box-shadow: 2px 2px 4px gray;
