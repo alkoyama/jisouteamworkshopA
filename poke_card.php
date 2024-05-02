@@ -11,30 +11,53 @@
             width: 60%;
             margin: 0 auto;
         }
+
+        /* カードのアニメーション */
+        @keyframes flipIn {
+            0% {
+                transform: rotateY(90deg); /* 90度回転 */
+                opacity: 0; /* 不透明度を0に */
+            }
+            100% {
+                transform: rotateY(0); /* 回転を0に戻す */
+                opacity: 1; /* 不透明度を1に */
+            }
+        }
+
+        /* カードのスタイル */
         .pokemon-card {
-            width: calc(15% - 20px);
+            width: calc(20% - 20px);
             margin: 10px;
             padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
             border: 1px solid #ccc;
+            border-radius: 10px;
             text-align: center;
             display: inline-block;
+            opacity: 0; /* 初期状態で不透明度を0に */
+            animation: flipIn 0.5s ease-in-out; /* アニメーションの設定 */
+            animation-fill-mode: forwards; /* アニメーション後に最終状態を維持 */
+            transform-origin: center; /* 回転の基準を中心に */
+            white-space: nowrap; /* テキストを折り返さない */
+            font-size: 0.9vw;
         }
         .pokemon-image {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto;
+            max-width: 90%;
+            height: auto;
+            margin: 0 20;
         }
+        
         #cart {
-            position: fixed;
-            top: 0;
-            right: 20px;
-            width: 300px; /* 横幅を拡大 */
-            background-color: #f8f9fa;
+            position: fixed; /* 固定位置 */
+            bottom: 200px; /* 下からの距離 */
+            right: 20px; /* 右からの距離 */
+            width: 300px; /* 横幅 */
+            background-color: rgba(255, 255, 255, 0.7);
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            z-index: 1000; /* 重なり順の設定 */
         }
 
         #cart h2 {
@@ -50,13 +73,32 @@
         display: inline-block;
         width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
         margin-bottom: 10px;
-    }
-
-    @media (max-width: 768px) {
-        #type-filters label {
-            width: calc(50% - 10px); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
         }
-    }
+        .text-center {
+            display: flex;
+            justify-content: space-around; /* 中央寄せ */
+            margin-left: 10px;
+            margin-right: 10px;
+            font-size: 1vw;
+        }   
+        @media (max-width: 768px) {
+            #type-filters label {
+                width: calc(50% - 10px); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
+            }
+        }
+        /* 画面幅が小さい場合のフォントサイズ調整 */
+        @media (max-width: 768px) {
+            .pokemon-card {
+                font-size: 0.875rem; /* 小さい画面ではフォントサイズを少し小さくする */
+            }
+        }
+
+        /* 画面幅が非常に小さい場合のフォントサイズ調整 */
+        @media (max-width: 480px) {
+            .pokemon-card {
+                font-size: 0.75rem; /* スマートフォンの画面に適したサイズ */
+            }
+        }
     </style>
 </head>
 <body>
@@ -104,6 +146,7 @@
         <!-- 最初の5個を表示 -->
     </div>
     
+        <!-- "さらに読み込む" ボタンの配置を修正 -->
     <div class="text-center mt-3">
         <button class="btn btn-primary" id="load-more">さらに読み込む</button>
     </div>
@@ -235,23 +278,38 @@ function applyFilters() {
 
 function displayPokemon(pokemonArray) {
     var container = $('#pokemon-container');
+    var delay = 0; // アニメーションの遅延を設定するための変数
+    
     pokemonArray.forEach(function(pokemon) {
-        container.append(`
-            <div class="pokemon-card">
-                <img class="pokemon-image" src="${pokemon.Image_path}" alt="${pokemon.Name}">
-                <p>${pokemon.Name}</p>
-                <p>タイプ1: ${pokemon.Type1}</p>
-                <p>タイプ2: ${(pokemon.Type2 || '-')}</p>
-                <p>ねだん: ${pokemon.Price}</p>
-                <p id="inventory-${pokemon.SID}">在庫: ${pokemon.Inventory}</p> <!-- 在庫表示に ID を追加 -->
-                <div class="input-group mb-3">
-                    <input type="number" class="form-control" style="width: 50px;" placeholder="個数" aria-label="個数" aria-describedby="basic-addon2" id="quantity-${pokemon.SID}" value="0" min="0">
+        var card = `
+            <div class="pokemon-card" style="animation-delay: ${delay}s; line-height: 1.0;"> <!-- 遅延を追加 -->
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <img class="pokemon-image" src="${pokemon.Image_path}" alt="${pokemon.Name}" style="margin-top: 40px;">
+                        <p><strong>${pokemon.Name}</strong></p>
+                    </div>
+                    <div>
+                        <p><strong>タイプ1</strong></p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type1}</p>
+                        <p><strong>タイプ2</strong></p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type2 || '-'} </p>
+                        <p><strong>ねだん</strong></p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Price}</p>
+                        <p><strong>在庫:</strong> <span id="inventory-${pokemon.SID}">${pokemon.Inventory}</span></p>
+                    </div>
+                </div>
+                ${pokemon.Inventory === 0 ? `<img src="index_soldout.png" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; opacity: 0.7;">` : ''}
+                <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
+                    <input type="number" class="form-control" style="width: 60px; margin-right: 10px;" placeholder="個数" aria-label="個数" aria-describedby="basic-addon2" id="quantity-${pokemon.SID}" value="0" min="0">
                     <button class="btn btn-primary" type="button" onclick="addToCart('${pokemon.SID}', '${pokemon.Name}')">カートに追加</button>
                 </div>
             </div>
-        `);
+        `;
+        container.append(card);
+        delay += 0.1; // 遅延を少しずつ増やして、順番に表示されるようにする
     });
 }
+
 
 $(document).ready(function() {
     // 最初にカートの内容を更新してボタンの状態をチェック
