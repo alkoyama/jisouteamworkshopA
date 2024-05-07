@@ -71,88 +71,84 @@ try {
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <title>在庫商品一覧</title>
     <link rel="stylesheet" href="./css/order_7thA.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        let currentPage = 0; // 0から開始、初回ロード後にインクリメント
-
-        function loadMoreProducts() {
-            currentPage++; // ページ数をインクリメント
-
-            $.ajax({
-                url: `?ajax=1&page=${currentPage}`, // ページ数を指定してAJAXリクエスト
-                type: 'GET',
-                success: function(response) {
-                    if (response.error) {
-                        alert(response.error);
-                        return;
-                    }
-
-                    // データを追加
-                    response.products.forEach(product => {
-                        const type2 = product.Type2 ? product.Type2 : '';
-                        const row = `<tr>
-                            <td>${product.SID}</td>
-                            <td>${product.PID}</td>
-                            <td>${product.Name}</td>
-                            <td><img src="${product.Image_path}" alt="商品画像" width="100" height="100"></td>
-                            <td>${product.Type1}</td>
-                            <td>${type2}</td>
-                            <td>${product.Gender}</td>
-                            <td>${product.Price}</td>
-                            <td>${product.Inventory}</td>
-                        </tr>`;
-                        $('#product-table tbody').append(row);
-                    });
-
-                    // 最後のページならメッセージを表示
-                    if (response.current_page >= response.total_pages) {
-                        $('#load-more').hide(); // ボタンを非表示
-                        $('.no-more-data').show(); // メッセージを表示
-                    }
-                },
-                error: function() {
-                    alert('Error loading products.');
-                }
-            });
-        }
-
-        $(document).ready(function() {
-            loadMoreProducts(); // 初回読み込み
-        });
-    </script>
     <style>
         .button-center {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px; 
-            /* // 上マージン */
-            margin-bottom: 20px; 
-            /* // 下マージン */
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
-        /* // 初期状態では非表示 */
+
         .no-more-data {
-            display: none; 
+            display: none;
             justify-content: center;
-            text-align: center; 
-            margin-top: 20px; 
-            margin-bottom: 20px; 
-            color: #777; 
-            /* // グレーで表示 */
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            color: #777;
         }
-        /* 画面最下部の隙間 */
+
         .bottom-margin {
-            height: 20px; /* 適切なマージンを設定してください */
+            height: 20px;
         }
+        /* 追加 */
+        .container_st {
+    /* 他のスタイル */
+}
+
+.row {
+    display: flex;
+    justify-content: space-between; /* 左右の間にスペースを作成 */
+    align-items: center;
+    margin-bottom: 10px; /* 下部の余白を追加 */
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+}
+
+.search-container > * {
+    margin-right: 10px; /* 要素間の右側の余白を追加 */
+}
+
+.update-container {
+    display: flex;
+    align-items: center;
+}
+
+.update-container > * {
+    margin-left: 10px;
+}
+#search-input {
+    width: 250px; /* サイズを調整 */
+}
+
     </style>
 </head>
+
 <body>
     <h1>商品一覧</h1>
+
     <div class="container_st">
+    <div class="row">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="SIDまたは商品名を入力してください">
+            <button id="search-button">検索</button>
+            <button id="reset-button">リセット</button>
+        </div>
+        <div class="update-container">
+            <div id="last-updated"></div>
+            <button id="refresh" type="button">更新する</button>
+        </div>
+    </div>
         <table border="1" id="product-table">
             <thead>
                 <tr>
@@ -162,7 +158,7 @@ try {
                     <th>画像</th>
                     <th>タイプ1</th>
                     <th>タイプ2</th>
-                    <th>性別</th>
+                    <th>販売</th>
                     <th>価格</th>
                     <th>在庫数</th>
                 </tr>
@@ -173,11 +169,138 @@ try {
         </table>
     </div>
     <div class="button-center">
-        <button id="load-more" onclick="loadMoreProducts()">さらに読み込む</button> <!-- ボタン -->
+        <button id="load-more" onclick="loadMoreProducts()">さらに読み込む</button>
     </div>
-    <div class="no-more-data">これ以上データはありません</div> <!-- 最後のページに到達したときに表示 -->
-
+    <div class="no-more-data">これ以上のデータはありません</div> <!-- 最後のページに到着したときに表示 -->
     <!-- 画面最下部の隙間 -->
-    <div class="bottom-margin"></div>
+    <div class="bottom-margin">
+    </div>
+
+    <script>
+        // 初期のページ番号を定義
+        let currentPage = 0;
+
+        // 商品を追加する関数
+        function loadMoreProducts() {
+            // ページ番号をインクリメント
+            currentPage++;
+
+            // AJAXリクエストを送信
+            $.ajax({
+                url: `?ajax=1&page=${currentPage}`, // ページ番号を含むURL
+                type: 'GET', // GETリクエスト
+                success: function(response) { // リクエスト成功時の処理
+                    if (response.error) { // エラーチェック
+                        alert(response.error); // エラーメッセージを表示
+                        return; // 関数を終了
+                    }
+                    appendProducts(response.products, currentPage, response.total_pages); // 商品を追加する関数を呼び出す
+                },
+                error: function() { // リクエスト失敗時の処理
+                    alert('製品の読み込みエラー。'); // エラーメッセージを表示
+                }
+            });
+        }
+
+        // 商品を追加する関数
+        function appendProducts(products, currentPage, total_pages) {
+            // 取得した商品リストを反復処理
+            products.forEach(product => {
+                // 商品情報をHTMLテーブルの行に変換
+                const type2 = product.Type2 ? product.Type2 : ''; // タイプ2があるかどうかの条件付き代入
+                const row = `<tr>
+            <td>${product.SID}</td>
+            <td>${product.PID}</td>
+            <td>${product.Name}</td>
+            <td><img src="${product.Image_path}" alt="商品画像" width="100" height="100"></td>
+            <td>${product.Type1}</td>
+            <td>${type2}</td>
+            <td>${product.Gender}</td>
+            <td>${product.Price}</td>
+            <td>${product.Inventory}</td>
+        </tr>`;
+                // テーブルのtbody要素に行を追加
+                $('#product-table tbody').append(row);
+            });
+
+            // 最後のページならメッセージを表示
+            if (currentPage >= total_pages) {
+                console.log("最後のページ");
+                $('#load-more').hide(); // ボタンを非表示
+                $('.no-more-data').show(); // メッセージを表示
+            }
+        }
+
+        // 更新ボタンをクリックしたときの処理
+        $('#refresh').click(function() {
+            // 現在の日時を取得
+            const currentTime = new Date();
+            const formattedTime = currentTime.toLocaleString(); // 日時を文字列に変換
+
+            // 最終更新時刻を表示
+            $('#last-updated').text('最終更新: ' + formattedTime);
+
+            currentPage = 0; // ページ番号をリセット
+            $('#product-table tbody').empty(); // テーブルの内容をクリア
+            $('#load-more').show(); // 読み込むボタンを表示
+            $('.no-more-data').hide(); // メッセージを非表示
+            loadMoreProducts(); // 商品情報を再読み込み
+        });
+
+        // ページが読み込まれたときの処理
+        $(document).ready(function() {
+            // 現在の日時を取得
+            const currentTime = new Date();
+            const formattedTime = currentTime.toLocaleString(); // 日時を文字列に変換
+
+            // 最終更新時刻を表示
+            $('#last-updated').text('最終更新: ' + formattedTime);
+        });
+
+        // ドキュメントのロード完了時の処理
+        $(document).ready(function() {
+            loadMoreProducts(); // 商品情報を読み込み
+        });
+    </script>
+    <!-- // 検索関数 -->
+    <script>
+        function searchTable() {
+            const searchKeyword = $('#search-input').val().toUpperCase(); // 大文字に変換
+            if (searchKeyword.trim() === '') {
+                // 検索キーワードが空の場合は全ての行を表示
+                $('#product-table tbody tr').show();
+            } else {
+                // 検索キーワードでフィルタリング
+                $('#product-table tbody tr').each(function() {
+                    const sid = $(this).find('td:eq(0)').text().toUpperCase(); // 大文字に変換
+                    const name = $(this).find('td:eq(2)').text().toUpperCase(); // 大文字に変換
+                    if (sid.includes(searchKeyword) || name.includes(searchKeyword)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+        }
+
+        // 検索ボタンのクリックイベントリスナーを設定
+        $('#search-button').click(function() {
+            searchTable();
+        });
+
+        // リセットボタンのクリックイベントリスナーを設定
+        $('#reset-button').click(function() {
+            $('#search-input').val('');
+            searchTable();
+        });
+
+        // Enterキーで検索実行
+        $('#search-input').keypress(function(event) {
+            if (event.which === 13) {
+                searchTable();
+            }
+        });
+    </script>
 </body>
+
 </html>
