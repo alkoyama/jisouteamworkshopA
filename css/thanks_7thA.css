@@ -1,0 +1,29 @@
+body {
+    background-image: url(../images/background/index_background.png);    
+}
+
+.fade-in {
+    margin-top: 100px; /* 上部の余白を追加 */
+    margin-bottom: 100px; /* 下部の余白を追加 */
+    margin-right: auto; /* 右側の余白を自動調整 */
+    margin-left: auto; /* 左側の余白を自動調整 */
+    opacity: 0;
+    animation-name: fadein-bottom;
+    animation-duration: 0.9s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+    max-width: 1000px;
+}
+.fade-in img{
+     width: 60%;
+}
+ @keyframes fadein-bottom {
+    0% {
+       opacity: 0;
+       transform: translateY(40px);
+    }
+    100% {
+       opacity: 1;
+       transform: translateY(0);
+    }
+ }
