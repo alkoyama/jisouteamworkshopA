@@ -26,7 +26,8 @@
 
         /* カードのスタイル */
         .pokemon-card {
-            width: calc(20% - 20px);
+            width: calc(22% - 20px);
+            height: 300px; /* 固定の高さを設定 */
             margin: 10px;
             padding: 10px;
             background-color: rgba(255, 255, 255, 0.9);
@@ -40,11 +41,26 @@
             transform-origin: center; /* 回転の基準を中心に */
             white-space: nowrap; /* テキストを折り返さない */
             font-size: 0.9vw;
+            overflow: hidden; /* コンテンツがカードの高さを超えないようにする */
         }
+
+        /* カード内のテキストコンテンツのスタイル */
+
+
+        /* 画像のサイズを調整して、カード内に収まるようにする */
         .pokemon-image {
             max-width: 90%;
             height: auto;
             margin: 0 20;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 在庫や価格の表示のスタイルを調整 */
+        .pokemon-details {
+            text-align: left; /* テキストを左揃え */
+            padding-top: 10px; /* 上部にパディングを追加 */
         }
         
         #cart {
@@ -70,9 +86,9 @@
             margin: 0;
         }
         #type-filters label {
-        display: inline-block;
-        width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
-        margin-bottom: 10px;
+            display: inline-block;
+            width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
+            margin-bottom: 10px;
         }
         .text-center {
             display: flex;
@@ -81,6 +97,10 @@
             margin-right: 10px;
             font-size: 1vw;
         }   
+        /* ライトグレーのテキスト用のクラス */
+        .light-gray {
+            color: lightgray; /* ライトグレーに設定 */
+        }
         @media (max-width: 768px) {
             #type-filters label {
                 width: calc(50% - 10px); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
@@ -186,8 +206,9 @@ $sql = 'SELECT
             product_stock.SID,
             product_stock.PID,
             poke_info.Name,
-            poke_type.type_name AS Type1,
-            (SELECT type_name FROM poke_type WHERE poke_type.TID = poke_info.Type2) AS Type2,
+            poke_type1.type_name AS Type1,  -- poke_type1を参照
+            poke_type2.type_name AS Type2,  -- poke_type2を参照
+            product_stock.Gender,
             product_stock.Price,
             product_stock.Inventory,
             poke_graphics.path AS Image_path
@@ -195,10 +216,12 @@ $sql = 'SELECT
             product_stock
         JOIN 
             poke_info ON product_stock.PID = poke_info.PID
-        JOIN 
+        LEFT JOIN 
             poke_graphics ON poke_info.GID = poke_graphics.GID
-        JOIN 
-            poke_type ON poke_type.TID = poke_info.Type1';
+        LEFT JOIN 
+            poke_type AS poke_type1 ON poke_type1.TID = poke_info.Type1
+        LEFT JOIN 
+            poke_type AS poke_type2 ON poke_type2.TID = poke_info.Type2';
 
         // クエリを実行
         $statement = $pdo->prepare($sql);
@@ -275,24 +298,91 @@ function applyFilters() {
     displayPokemon(filteredPokemon.slice(0, offset)); // フィルター後のポケモンを表示
 }
 
+function getGenderIconPath(gender) {
+    switch (gender) {
+        case 'male':
+            return './images/assets/male.png';
+        case 'female':
+            return './images/assets/female.png';
+        default:
+            return '';
+    }
+}
+
+function getClassIconPath(gender) {
+    switch (gender) {
+        case 'unknown':
+            return './images/assets/unknown.png';
+        case 'egg':
+            return './images/assets/egg.png';
+        case 'item':
+            return './images/assets/item.png';
+        case 'ball':
+            return './images/assets/ball.png';
+        default:
+            return '';
+    }
+}
+
+function getClassLabel(gender) {
+    switch (gender) {
+        case 'unknown':
+            return 'せいべつふめい';
+        case 'egg':
+            return 'タマゴ';
+        case 'item':
+            return 'どうぐ';
+        case 'ball':
+            return 'ボール';
+        default:
+            return '';
+    }
+}
 
 function displayPokemon(pokemonArray) {
     var container = $('#pokemon-container');
     var delay = 0; // アニメーションの遅延を設定するための変数
-    
+
     pokemonArray.forEach(function(pokemon) {
+        var type1Label = pokemon.Type2 ? 'タイプ1' : 'タイプ';
+        var type1Display = pokemon.Type1 ? `<p><strong>${type1Label}</strong></p><p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type1}</p>` : `<div style="height: 50px;"></div>`;
+        var type2Display = pokemon.Type2 ? `<p><strong>タイプ2</strong></p><p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type2}</p>` : `<div style="height: 50px;"></div>`;
+
+        var genderIconPath = getGenderIconPath(pokemon.Gender);
+        var classIconPath = getClassIconPath(pokemon.Gender);
+        var classLabel = getClassLabel(pokemon.Gender);
+
+        var genderIconDisplay = ''; // 性別アイコンを表示するためのHTML
+        if (pokemon.Gender === 'male' || pokemon.Gender === 'female') {
+            genderIconDisplay = `<img src="${genderIconPath}" alt="${pokemon.Gender}" style="height: 20px; width: 20px; margin-left: 5px; vertical-align: middle;">`; // 名前の横にアイコン
+        }
+
+        var classIconDisplay = ''; // クラスアイコンとラベルを表示するためのHTML
+        if (classIconPath && classLabel) {
+            if (classLabel === 'せいべつふめい') { // 特定のテキストの場合
+                classIconDisplay = `<div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
+                    <img src="${classIconPath}" style="height: 20px; width: 20px; vertical-align: middle;">
+                    <span style="color: lightgray;">&nbsp;${classLabel}</span> <!-- ライトグレーに設定 -->
+                </div>`;
+            } else {
+                classIconDisplay = `<div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
+                    <img src="${classIconPath}" style="height: 20px; width: 20px; vertical-align: middle;">
+                    &nbsp;${classLabel}
+                </div>`;
+            }
+        }
+
         var card = `
-            <div class="pokemon-card" style="animation-delay: ${delay}s; line-height: 1.0;"> <!-- 遅延を追加 -->
+            <div class="pokemon-card" style="animation-delay: ${delay}s; line-height: 1.0;">
                 <div style="display: flex; justify-content: space-between;">
                     <div>
                         <img class="pokemon-image" src="${pokemon.Image_path}" alt="${pokemon.Name}" style="margin-top: 40px;">
-                        <p><strong>${pokemon.Name}</strong></p>
+                        <p><strong>${pokemon.Name}</strong>${genderIconDisplay}</p> <!-- 名前の横にアイコン -->
+                        ${classIconDisplay} <!-- クラスアイコンとラベル -->
                     </div>
                     <div>
-                        <p><strong>タイプ1</strong></p>
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type1}</p>
-                        <p><strong>タイプ2</strong></p>
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type2 || '-'} </p>
+                        ${type1Display}
+                        ${type2Display}
                         <p><strong>ねだん</strong></p>
                         <p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Price}</p>
                         <p><strong>在庫:</strong> <span id="inventory-${pokemon.SID}">${pokemon.Inventory}</span></p>
@@ -306,9 +396,10 @@ function displayPokemon(pokemonArray) {
             </div>
         `;
         container.append(card);
-        delay += 0.1; // 遅延を少しずつ増やして、順番に表示されるようにする
+        delay += 0.1; // アニメーションの遅延を徐々に増やす
     });
 }
+
 
 
 $(document).ready(function() {
