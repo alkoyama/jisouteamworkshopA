@@ -1,7 +1,7 @@
 @charset "UTF-8";
 body {
-  font-family: "New Tegomin", serif;
-  font-weight: bold;
+  font-family: "Aoboshi One", serif;
+  font-weight: 400;	
   font-style: normal;
   background-image: url(../images/background/index_background.png);
 }
