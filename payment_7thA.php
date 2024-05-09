@@ -55,32 +55,99 @@ try {
     <div class="container">
         <h1>決済情報</h1>
 
-        <form method="POST" action="payment_confirmation_7thA.php" id="checkout-form">
-            <!-- お客様情報 -->
+        <div class="container">
+            <h1>ユーザー情報</h1>
+
             <div class="mb-3">
-                <label for="cid" class="form-label">CID:</label>
-                <input type="text" name="cid" class="form-control" id="cid" required>
+            <label for="viewOption">表示オプション:</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="viewOption" id="viewOptionView" value="view" checked>
+                <label class="form-check-label" for="viewOptionView">
+                情報を確認する
+
+                <?php
+                // Start a session if not already started
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+
+                // Replace with your database connection details
+                $servername = "localhost";
+                $username = "root";
+                $password = "";
+                $dbname = "teamworkshop_7thA";
+
+                try {
+                    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                    $cid = $_SESSION["CID"]; // Assuming CID is stored in the session
+
+                    $sql = "SELECT * FROM customer_management WHERE CID = :cid";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bindParam(':cid', $cid);
+                    $stmt->execute();
+
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch data as an associative array
+
+                    if ($result) {
+                    echo "<table>";
+                    echo "<tr>";
+                    echo "</tr>";
+                    echo "<tr>";
+                    echo "<td>" . $result["CID"] . "</td>"; // Replace with actual column names
+                    echo "<td>" . $result["Name"] . "</td>";
+                    echo "<td>" . $result["Address"] . "</td>";
+                    echo "<td>" . $result["Phone"] . "</td>";
+                    echo "<td>" . $result["Card_info"] . "</td>";
+                    echo "</tr>";
+                    echo "</table>";
+                    } else {
+                    echo "No user found for CID: " . $cid;
+                    }
+                } catch(PDOException $e) {
+                    echo "Error: " . $e->getMessage();
+                }
+
+                $conn = null;
+                ?>
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="viewOption" id="viewOptionEdit" value="edit">
+                <label class="form-check-label" for="viewOptionEdit">
+                情報編集
+                </label>
+            </div>
             </div>
 
+            <div id="user-info-view" class="mb-3">
+            </div>
+
+            <form id="user-info-edit" method="post" action="update_user_info.php">
+            <div class="mb-3">
+                <label for="sid" class="form-label">SID:</label>
+                <input type="text" class="form-control" id="sid" name="sid" readonly>
+            </div>
             <div class="mb-3">
                 <label for="name" class="form-label">名前:</label>
-                <input type="text" name="name" class="form-control" id="name" required>
+                <input type="text" class="form-control" id="name" name="name" required>
             </div>
-
             <div class="mb-3">
                 <label for="address" class="form-label">住所:</label>
-                <input type="text" name="address" class="form-control" id="address" required>
+                <input type="text" class="form-control" id="address" name="address" required>
             </div>
-
             <div class="mb-3">
                 <label for="phone" class="form-label">電話番号:</label>
-                <input type="text" name="phone" class="form-control" required>
+                <input type="text" class="form-control" id="phone" name="phone" required>
             </div>
-
             <div class="mb-3">
-                <label for="card-info" class="form-label">カード情報:</label>
-                <input type="text" name="card_info" class="form-control" required>
+                <label for="card_info" class="form-label">カード情報:</label>
+                <input type="text" class="form-control" id="card_info" name="card_info" required>
             </div>
+            <button type="submit" class="btn btn-primary">情報を更新</button>
+            </form>
+        </div>
 
             <!-- カート内容 -->
             <?php
