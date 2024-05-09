@@ -1,0 +1,49 @@
+
+        .button-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .no-more-data {
+            display: none;
+            justify-content: center;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            color: #777;
+        }
+
+        .bottom-margin {
+            height: 20px;
+        }
+       
+.row {
+    display: flex;
+    justify-content: space-between; /* 左右の間にスペースを作成 */
+    align-items: center;
+    margin-bottom: 10px; /* 下部の余白を追加 */
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+}
+
+.search-container > * {
+    margin-right: 10px; /* 要素間の右側の余白を追加 */
+}
+
+.update-container {
+    display: flex;
+    align-items: center;
+}
+
+.update-container > * {
+    margin-left: 10px;
+}
+#search-input {
+    width: 250px; /* サイズを調整 */
+}

@@ -7,7 +7,7 @@ body {
   /* ビューポートの高さを100%に設定 */
   margin: 0;
   /* デフォルトのマージンを削除 */
-  background-image: url("@Terrajin05.mp4");
+  /* background-image: url("@Terrajin05.mp4"); */
   margin-top: 50px;
   margin-bottom: 50px;
 }
@@ -33,11 +33,9 @@ h1 {
 /* 受注ID、合計金額、削除、注文詳細のセルを小さくする */
 table th:nth-child(1), /* 受注ID */
 table th:nth-child(9), /* 削除 */
-table th:nth-child(10), /* 注文詳細 */
 table td:nth-child(1), /* 受注ID */
-table td:nth-child(9), /* 削除 */
-table td:nth-child(10) {
-  /* 注文詳細 */
+table td:nth-child(9)/* 削除 */
+{
   width: 90px; /* 例：80px */
 }
 
@@ -48,8 +46,11 @@ table td.address {
 }
 /* 合計金額のセルを大きくする */
 table th:nth-child(8), /* 合計金額 */
-table td:nth-child(8) { /* 合計金額 */
-  width: 100px;
+table th:nth-child(10), /* 注文詳細 */
+table td:nth-child(8), /* 合計金額 */
+table td:nth-child(10)  /* 注文詳細 */
+{ 
+  width: 130px;
 }
 .price {
   text-align: right;
