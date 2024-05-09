@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-HmfI2l18e9VjmbK3Qt1wbPHL5Lvfzq7oFy98GYnLggSbG6X7I5k2wAp/3MhiZdTO" crossorigin="anonymous">
     <style>
         body {
-            width: 60%;
+            width: 95%;
             margin: 0 auto;
         }
 
@@ -27,7 +27,7 @@
         /* カードのスタイル */
         .pokemon-card {
             width: calc(22% - 20px);
-            height: 300px; /* 固定の高さを設定 */
+            height: 250px; /* 固定の高さを設定 */
             margin: 10px;
             padding: 10px;
             background-color: rgba(255, 255, 255, 0.9);
@@ -40,7 +40,7 @@
             animation-fill-mode: forwards; /* アニメーション後に最終状態を維持 */
             transform-origin: center; /* 回転の基準を中心に */
             white-space: nowrap; /* テキストを折り返さない */
-            font-size: 0.9vw;
+            font-size: 1.2vw;
             overflow: hidden; /* コンテンツがカードの高さを超えないようにする */
         }
 
@@ -63,28 +63,6 @@
             padding-top: 10px; /* 上部にパディングを追加 */
         }
         
-        #cart {
-            position: fixed; /* 固定位置 */
-            bottom: 200px; /* 下からの距離 */
-            right: 20px; /* 右からの距離 */
-            width: 300px; /* 横幅 */
-            background-color: rgba(255, 255, 255, 0.7);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            z-index: 1000; /* 重なり順の設定 */
-        }
-
-        #cart h2 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-        #cart-items {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
         #type-filters label {
             display: inline-block;
             width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
@@ -106,24 +84,6 @@
                 width: calc(50% - 10px); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
             }
         }
-
-        #gender-filters {
-            display: flex; /* ラベルをフレックスボックスで均等配置 */
-            flex-wrap: wrap; /* ラベルを折り返す */
-            justify-content: space-between; /* 均等に配置 */
-        }
-
-        #gender-filters label {
-            width: calc(16.66% - 10px); /* タイプフィルターと同様の幅 */
-            margin-bottom: 10px; /* ラベルの間隔を確保 */
-        }
-
-        @media (max-width: 768px) {
-            #gender-filters label {
-                width: calc(50% - 10px); /* レスポンシブ対応：狭い画面では2つずつ配置 */
-            }
-        }
-
         /* 画面幅が小さい場合のフォントサイズ調整 */
         @media (max-width: 768px) {
             .pokemon-card {
@@ -143,17 +103,7 @@
 
 <div class="container">
     <h1 class="text-center">商品一覧</h1>
-
-    <div class="mt-3" id="gender-filters">
-        <label><input type="checkbox" value="male"> オスポケモン</label>
-        <label><input type="checkbox" value="female"> メスポケモン</label>
-        <label><input type="checkbox" value="unknown"> せいべつふめい</label>
-        <label><input type="checkbox" value="egg"> タマゴ</label>
-        <label><input type="checkbox" value="item"> どうぐ</label>
-        <label><input type="checkbox" value="ball"> ボール</label>
-    </div>
-    <hr> <!-- タイプフィルターとの間に横線を追加 -->
-
+    
     <!-- タイプフィルタリング用チェックボックス -->
     <div class="mt-3" id="type-filters">
         <label><input type="checkbox" value="ノーマル"> ノーマル</label>
@@ -198,18 +148,6 @@
     <div class="text-center mt-3">
         <button class="btn btn-primary" id="load-more">さらに読み込む</button>
     </div>
-</div>
-
-<!-- カート -->
-<div id="cart">
-    <h2 class="text-center">カート</h2>
-    <ul id="cart-items"></ul>
-
-    <!-- 個数更新ボタン -->
-    <button class="btn btn-primary" id="update-cart-quantities">個数更新</button>
-
-    <!-- 決済へ進むボタン -->
-    <button class="btn btn-success" id="proceed-to-payment">決済へ進む</button>
 </div>
 
 <!-- jQuery -->
@@ -267,7 +205,6 @@ $sql = 'SELECT
 
 
 var offset = 8; // 最初の5個を表示
-var cartItems = []; // カートに追加された商品の情報を保持する配列
 var filteredPokemon = pokemonData; // フィルターされたポケモンのリスト
 
 function sortPokemon(type, order) {
@@ -303,39 +240,28 @@ function applyFilters() {
         selectedTypes.push($(this).val());
     });
 
-    var selectedGenders = [];
-    $('#gender-filters input:checked').each(function() {
-        selectedGenders.push($(this).val());
-    });
-
-    filteredPokemon = pokemonData.filter(function(pokemon) {
-        var pokemonTypes = [pokemon.Type1];
-        if (pokemon.Type2) {
-            pokemonTypes.push(pokemon.Type2);
-        }
-
-        // タイプフィルターの適用
-        var typeMatch = selectedTypes.length === 0 || selectedTypes.every(function(type) {
-            return pokemonTypes.includes(type);
+    // フィルターが何も選択されていない場合は、すべてのポケモンを表示
+    if (selectedTypes.length === 0) {
+        filteredPokemon = pokemonData;
+    } else {
+        filteredPokemon = pokemonData.filter(function(pokemon) {
+            // ポケモンが選択されたすべてのタイプを持っているかをチェック
+            var pokemonTypes = [pokemon.Type1];
+            if (pokemon.Type2) {
+                pokemonTypes.push(pokemon.Type2);
+            }
+            // ポケモンのタイプにすべての選択されたタイプが含まれるかを確認
+            return selectedTypes.every(function(type) {
+                return pokemonTypes.includes(type);
+            });
         });
-
-        // ジェンダーフィルターの適用
-        var genderMatch = selectedGenders.length === 0 || selectedGenders.includes(pokemon.Gender);
-
-        return typeMatch && genderMatch;
-    });
+    }
 
     var container = $('#pokemon-container');
-    container.empty();
-    offset = 8;
-    displayPokemon(filteredPokemon.slice(0, offset));
+    container.empty(); // 既存の表示をクリア
+    offset = 8; // リセット
+    displayPokemon(filteredPokemon.slice(0, offset)); // フィルター後のポケモンを表示
 }
-
-// ジェンダーフィルターの変更イベントを追加
-$('#gender-filters input').on('change', function() {
-    applyFilters(); // フィルターを適用
-});
-
 
 function getGenderIconPath(gender) {
     switch (gender) {
@@ -413,6 +339,10 @@ function displayPokemon(pokemonArray) {
 
         var card = `
             <div class="pokemon-card" style="animation-delay: ${delay}s; line-height: 1.0;">
+                    <!-- ラジオボタン -->
+                    <div style="position: absolute; top: 10px; left: 10px;">
+                        <input type="radio" name="product_select" value="${pokemon.SID}"> <!-- 商品選択用のラジオボタン -->
+                    </div>
                 <div style="display: flex; justify-content: space-between;">
                     <div>
                         <img class="pokemon-image" src="${pokemon.Image_path}" alt="${pokemon.Name}" style="margin-top: 40px;">
@@ -427,11 +357,6 @@ function displayPokemon(pokemonArray) {
                         <p><strong>在庫:</strong> <span id="inventory-${pokemon.SID}">${pokemon.Inventory}</span></p>
                     </div>
                 </div>
-                ${pokemon.Inventory === 0 ? `<img src="index_soldout.png" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; opacity: 0.7;">` : ''}
-                <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
-                    <input type="number" class="form-control" style="width: 60px; margin-right: 10px;" placeholder="個数" aria-label="個数" aria-describedby="basic-addon2" id="quantity-${pokemon.SID}" value="0" min="0">
-                    <button class="btn btn-primary" type="button" onclick="addToCart('${pokemon.SID}', '${pokemon.Name}')">カートに追加</button>
-                </div>
             </div>
         `;
         container.append(card);
@@ -442,12 +367,71 @@ function displayPokemon(pokemonArray) {
 
 
 $(document).ready(function() {
-    // 最初にカートの内容を更新してボタンの状態をチェック
-    updateCartDisplay();
 
     // 最初に5個のポケモンを表示
     displayPokemon(filteredPokemon.slice(0, offset));
 
+    // ポケモンタイプの名前と `value` の対応表を作成
+    var typeMapping = {
+        "ノーマル": "T01NML",
+        "ほのお": "T02HNO",
+        "みず": "T03MIZ",
+        "でんき": "T04DNK",
+        "くさ": "T05KUS",
+        "こおり": "T06KOR",
+        "かくとう": "T07KKT",
+        "どく": "T08DOK",
+        "じめん": "T09ZMN",
+        "ひこう": "T10HKU",
+        "エスパー": "T11ESP",
+        "むし": "T12MUS",
+        "いわ": "T13IWA",
+        "ゴースト": "T14GST",
+        "ドラゴン": "T15DGN",
+        "あく": "T16AKU",
+        "はがね": "T17HGN",
+        "フェアリー": "T18FRY"
+    };
+
+    $('#pokemon-container').on('change', 'input[name="product_select"]', function() {
+        var selectedSID = $(this).val(); // チェックされたSIDを取得
+
+        var selectedProduct = filteredPokemon.find(pokemon => pokemon.SID === selectedSID);
+
+        if (selectedProduct) {
+            // 画像プレビューをリセット
+            resetImagePreview(parent.document);
+
+            // 画像のパスを取得してプレビューに表示
+            var imagePath = selectedProduct.Image_path; 
+            $('#image_preview', parent.document).attr('src', imagePath); // 画像プレビューにセット
+            $('#image_preview_container', parent.document).show(); // プレビューコンテナを表示
+
+            // 親ドキュメントのフィールドを更新
+            var productName = selectedProduct.Name;
+            var gender = selectedProduct.Gender;
+            var type1Value = typeMapping[selectedProduct.Type1] || null;
+            var type2Value = typeMapping[selectedProduct.Type2] || null;
+
+            $('#product_name', parent.document).val(productName); // 名前
+            $('#gender', parent.document).val(gender); // ジェンダー
+            $('#type1-select', parent.document).val(type1Value); // タイプ1
+            $('#type2-select', parent.document).val(type2Value); // タイプ2
+            
+            // タイプの表示/非表示を制御
+            updateTypeVisibility(gender, parent.document);
+        }
+    });
+
+    // 画像プレビューをリセットする関数
+    function resetImagePreview(parentDoc) {
+        var $parent = $(parentDoc);
+        $parent.find('#product_image').val(""); // ファイル選択をリセット
+        $parent.find('#file_name_input').val(""); // ファイル名をリセット
+        $parent.find('#file_name_label, #file_name_input, #image_preview_container').hide(); // プレビューを非表示
+        $parent.find('#image_preview').attr('src', ""); // 画像プレビューをクリア
+    }
+    
     // "さらに読み込む" ボタンの処理
     $('#load-more').on('click', function() {
         if (offset < filteredPokemon.length) {
@@ -490,186 +474,19 @@ $(document).ready(function() {
     $('#type-filters input').on('change', function() {
         applyFilters(); 
     });
-
-    // 個数更新ボタンのクリックイベント
-    $(document).ready(function() {
-
-        $('#update-cart-quantities').on('click', function() {
-            var hasInvalidUpdate = false; // 不正な更新があったかどうか
-            var hasChanges = false; // 変更があったかどうか
-
-            cartItems.forEach(function(item, index) {
-                var newQuantity = parseInt($(`#cart-quantity-${index}`).val());
-                var pokemon = pokemonData.find(p => p.SID === item.sid);
-
-                if (newQuantity <= 0) { // 個数が1未満の場合
-                    alert('個数は1以上である必要があります。');
-                    $(`#cart-quantity-${index}`).val(item.quantity); // 元の個数に戻す
-                    hasInvalidUpdate = true; // フラグを立てる
-                    return; // 処理を終了
-                }
-
-                var availableInventory = pokemon.Inventory + item.quantity; // 利用可能な在庫
-
-                if (newQuantity > availableInventory) { // 在庫を超える場合
-                    alert(`${pokemon.Name} の在庫を超える個数は追加できません。`); // 名前を含めたアラート
-                    $(`#cart-quantity-${index}`).val(item.quantity); // 元の個数に戻す
-                    hasInvalidUpdate = true; // フラグを立てる
-                    return; // 処理を終了
-                }
-
-                if (newQuantity !== item.quantity) { // 個数が変わったか確認
-                    hasChanges = true; // 変更があったフラグ
-                    var quantityDifference = newQuantity - item.quantity; // 個数差
-                    pokemon.Inventory -= quantityDifference; // 在庫調整
-
-                    // 在庫表示を更新
-                    $(`#inventory-${pokemon.SID}`).text(`在庫: ${pokemon.Inventory}`);
-
-                    // カートアイテムの個数を更新
-                    item.quantity = newQuantity;
-                }
-            });
-
-            if (hasInvalidUpdate) {
-                return; // フラグが立っている場合、処理を終了
-            }
-
-            if (hasChanges) { // 変更があった場合のみ
-                // カートの内容を更新
-                updateCartDisplay();
-
-                // アラートで個数更新を通知
-                alert('個数が更新されました。');
-            }
-        });
-    });
 });
 
-    function addToCart(sid, name) {
-        var quantity = parseInt($('#quantity-' + sid).val());
-        var pokemon = pokemonData.find(p => p.SID === sid);
+    // 親ドキュメントでタイプの表示/非表示を制御する関数
+    function updateTypeVisibility(gender, parentDoc) {
+        var $parent = $(parentDoc);
 
-        if (quantity <= 0) {
-            alert('正しい個数を入力してください。');
-            return;
-        }
-
-        if (quantity > pokemon.Inventory) {
-            alert(`${name} の在庫を超える個数は追加できません。`);
-            return;
-        }
-
-        // カートにすでに同じ商品があるか確認
-        var existingItem = cartItems.find(item => item.sid === sid);
-
-        if (existingItem) {
-            // 既存の商品の数量を更新
-            existingItem.quantity += quantity;
+        if (gender === 'egg' || gender === 'item' || gender === 'ball') {
+            $parent.find('#type1, #type2').hide();
+            $parent.find('#type1-select, #type2-select').val(null); // 値をクリア
         } else {
-            // 新しい商品を追加
-            cartItems.push({ sid, name, quantity, price: pokemon.Price, inventory: pokemon.Inventory });
-        }
-
-        // 在庫を減らす
-        pokemon.Inventory -= quantity;
-
-        // 在庫表示を更新
-        $(`#inventory-${pokemon.SID}`).text(`在庫: ${pokemon.Inventory}`);
-
-        // カートの内容を更新
-        updateCartDisplay();
-
-        alert(`${name} を ${quantity} 個カートに追加しました。`);
-    }
-
-    var grandTotalPrice = 0; // 合計金額の変数を宣言
-
-    function updateCartDisplay() {
-        var cartList = $('#cart-items');
-        cartList.empty(); // カートをクリア
-
-        grandTotalPrice = 0; // 合計金額をリセット
-
-        if (cartItems.length === 0) {
-            // カートが空のときの表示
-            cartList.append('<li>カートの中身は空です</li>');
-
-            // ボタンを非表示にする
-            $('#update-cart-quantities').hide();
-            $('#proceed-to-payment').hide();
-        } else {
-            cartItems.forEach(function(item, index) {
-                var totalPrice = item.price * item.quantity; // 小計
-                grandTotalPrice += totalPrice; // 合計金額に加算
-
-                cartList.append(`
-                    <li>
-                        ${item.name} 
-                        <input type="number" class="form-control" style="width: 50px; display: inline-block;" min="1" value="${item.quantity}" id="cart-quantity-${index}"/>
-                        ¥${totalPrice.toLocaleString()}
-                        <button class="btn btn-danger btn-sm remove-from-cart" data-index="${index}">削除</button>
-                    </li>
-                `);
-            });
-
-            cartList.append(`
-                <li>
-                    <strong>合計金額: ¥${grandTotalPrice.toLocaleString()}</strong>
-                </li>
-            `);
-
-            // ボタンを表示
-            $('#update-cart-quantities').show();
-            $('#proceed-to-payment').show();
-
-            // 削除ボタンのイベントリスナー
-            $('.remove-from-cart').on('click', function() {
-                var index = $(this).data('index'); // 削除するアイテムのインデックス
-                var removedItem = cartItems.splice(index, 1)[0]; // カートから削除されたアイテム
-                var pokemon = pokemonData.find(p => p.SID === removedItem.sid);
-
-                pokemon.Inventory += removedItem.quantity; // 在庫を戻す
-
-                // HTML 上の在庫表示を更新
-                $(`#inventory-${pokemon.SID}`).text(`在庫: ${pokemon.Inventory}`);
-
-                // カートの内容を更新
-                updateCartDisplay();
-
-                alert(`${removedItem.name} をカートから削除しました。`);
-            });
+            $parent.find('#type1, #type2').show(); // 表示
         }
     }
-
-    // JavaScript: カート内の商品と合計金額を Payment_7thA.php へ送信
-    $('#proceed-to-payment').on('click', function() {
-        var form = $('<form></form>'); // 新しいフォームを作成
-        form.attr('method', 'POST'); // POST メソッド
-        form.attr('action', 'Payment_7thA.php'); // 送信先
-
-        cartItems.forEach(function(item) {
-            // アイテムの情報を JSON 形式で送信
-            form.append($('<input>').attr({
-                type: 'hidden',
-                name: 'cartItems[]',
-                value: JSON.stringify(item) // JSON データとして送信
-            }));
-        });
-
-        // 合計金額も追加
-        form.append($('<input>').attr({
-            type: 'hidden',
-            name: 'grand_total_price',
-            value: grandTotalPrice
-        }));
-
-        $('body').append(form); // フォームをボディに追加
-        form.submit(); // フォームを送信
-    });
-
-
-
 </script>
 
 </body>
