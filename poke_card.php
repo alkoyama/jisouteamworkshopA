@@ -106,6 +106,24 @@
                 width: calc(50% - 10px); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
             }
         }
+
+        #gender-filters {
+            display: flex; /* ラベルをフレックスボックスで均等配置 */
+            flex-wrap: wrap; /* ラベルを折り返す */
+            justify-content: space-between; /* 均等に配置 */
+        }
+
+        #gender-filters label {
+            width: calc(16.66% - 10px); /* タイプフィルターと同様の幅 */
+            margin-bottom: 10px; /* ラベルの間隔を確保 */
+        }
+
+        @media (max-width: 768px) {
+            #gender-filters label {
+                width: calc(50% - 10px); /* レスポンシブ対応：狭い画面では2つずつ配置 */
+            }
+        }
+
         /* 画面幅が小さい場合のフォントサイズ調整 */
         @media (max-width: 768px) {
             .pokemon-card {
@@ -125,7 +143,17 @@
 
 <div class="container">
     <h1 class="text-center">商品一覧</h1>
-    
+
+    <div class="mt-3" id="gender-filters">
+        <label><input type="checkbox" value="male"> オスポケモン</label>
+        <label><input type="checkbox" value="female"> メスポケモン</label>
+        <label><input type="checkbox" value="unknown"> せいべつふめい</label>
+        <label><input type="checkbox" value="egg"> タマゴ</label>
+        <label><input type="checkbox" value="item"> どうぐ</label>
+        <label><input type="checkbox" value="ball"> ボール</label>
+    </div>
+    <hr> <!-- タイプフィルターとの間に横線を追加 -->
+
     <!-- タイプフィルタリング用チェックボックス -->
     <div class="mt-3" id="type-filters">
         <label><input type="checkbox" value="ノーマル"> ノーマル</label>
@@ -238,7 +266,7 @@ $sql = 'SELECT
         ?>
 
 
-var offset = 5; // 最初の5個を表示
+var offset = 8; // 最初の5個を表示
 var cartItems = []; // カートに追加された商品の情報を保持する配列
 var filteredPokemon = pokemonData; // フィルターされたポケモンのリスト
 
@@ -265,7 +293,7 @@ function sortPokemon(type, order) {
 
     var container = $('#pokemon-container');
     container.empty(); // 既存の表示をクリア
-    offset = 5; // オフセットをリセット
+    offset = 8; // オフセットをリセット
     displayPokemon(filteredPokemon.slice(0, offset)); // ソート後のポケモンを再表示
 }
 
@@ -275,28 +303,39 @@ function applyFilters() {
         selectedTypes.push($(this).val());
     });
 
-    // フィルターが何も選択されていない場合は、すべてのポケモンを表示
-    if (selectedTypes.length === 0) {
-        filteredPokemon = pokemonData;
-    } else {
-        filteredPokemon = pokemonData.filter(function(pokemon) {
-            // ポケモンが選択されたすべてのタイプを持っているかをチェック
-            var pokemonTypes = [pokemon.Type1];
-            if (pokemon.Type2) {
-                pokemonTypes.push(pokemon.Type2);
-            }
-            // ポケモンのタイプにすべての選択されたタイプが含まれるかを確認
-            return selectedTypes.every(function(type) {
-                return pokemonTypes.includes(type);
-            });
+    var selectedGenders = [];
+    $('#gender-filters input:checked').each(function() {
+        selectedGenders.push($(this).val());
+    });
+
+    filteredPokemon = pokemonData.filter(function(pokemon) {
+        var pokemonTypes = [pokemon.Type1];
+        if (pokemon.Type2) {
+            pokemonTypes.push(pokemon.Type2);
+        }
+
+        // タイプフィルターの適用
+        var typeMatch = selectedTypes.length === 0 || selectedTypes.every(function(type) {
+            return pokemonTypes.includes(type);
         });
-    }
+
+        // ジェンダーフィルターの適用
+        var genderMatch = selectedGenders.length === 0 || selectedGenders.includes(pokemon.Gender);
+
+        return typeMatch && genderMatch;
+    });
 
     var container = $('#pokemon-container');
-    container.empty(); // 既存の表示をクリア
-    offset = 5; // リセット
-    displayPokemon(filteredPokemon.slice(0, offset)); // フィルター後のポケモンを表示
+    container.empty();
+    offset = 8;
+    displayPokemon(filteredPokemon.slice(0, offset));
 }
+
+// ジェンダーフィルターの変更イベントを追加
+$('#gender-filters input').on('change', function() {
+    applyFilters(); // フィルターを適用
+});
+
 
 function getGenderIconPath(gender) {
     switch (gender) {
@@ -412,9 +451,9 @@ $(document).ready(function() {
     // "さらに読み込む" ボタンの処理
     $('#load-more').on('click', function() {
         if (offset < filteredPokemon.length) {
-            var nextPokemon = filteredPokemon.slice(offset, offset + 5);
+            var nextPokemon = filteredPokemon.slice(offset, offset + 8);
             displayPokemon(nextPokemon);
-            offset += 5;
+            offset += 8;
         } else {
             alert('すべてのポケモンを読み込みました。');
         }
