@@ -94,6 +94,49 @@ try {
             <div id="last-updated"></div>
             <button id="refresh" type="button">更新する</button>
         </div>
+         <!-- タイプフィルタリング用チェックボックス -->
+    <div class="mt-3" id="type-filters">
+        <label><input type="checkbox" value="ノーマル"> ノーマル</label>
+        <label><input type="checkbox" value="ほのお"> ほのお</label>
+        <label><input type="checkbox" value="みず"> みず</label>
+        <label><input type="checkbox" value="でんき"> でんき</label>
+        <label><input type="checkbox" value="くさ"> くさ</label>
+        <label><input type="checkbox" value="こおり"> こおり</label>
+        <label><input type="checkbox" value="かくとう"> かくとう</label>
+        <label><input type="checkbox" value="どく"> どく</label>
+        <label><input type="checkbox" value="じめん"> じめん</label>
+        <label><input type="checkbox" value="ひこう"> ひこう</label>
+        <label><input type="checkbox" value="エスパー"> エスパー</label>
+        <label><input type="checkbox" value="むし"> むし</label>
+        <label><input type="checkbox" value="いわ"> いわ</label>
+        <label><input type="checkbox" value="ゴースト"> ゴースト</label>
+        <label><input type="checkbox" value="ドラゴン"> ドラゴン</label>
+        <label><input type="checkbox" value="あく"> あく</label>
+        <label><input type="checkbox" value="はがね"> はがね</label>
+        <label><input type="checkbox" value="フェアリー"> フェアリー</label>
+    </div>
+    <div class="text-center mt-3">
+        <!-- 名前の昇順・降順 -->
+        <button class="btn btn-primary" id="sort-name-asc">アイウエオ順</button>
+        <button class="btn btn-primary" id="sort-name-desc">アイウエオ逆順</button>
+
+        <!-- 価格の昇順・降順 -->
+        <button class="btn btn-secondary" id="sort-price-asc">価格の安い順</button>
+        <button class="btn btn-secondary" id="sort-price-desc">価格の高い順</button>
+    
+        <!-- 在庫の昇順・降順のボタンを追加 -->
+        <button class="btn btn-warning" id="sort-inventory-asc">在庫の少ない順</button>
+        <button class="btn btn-warning" id="sort-inventory-desc">在庫の多い順</button>
+    </div>
+
+    <div class="row" id="pokemon-container">
+        <!-- 最初の5個を表示 -->
+    </div>
+    
+    <div class="text-center mt-3">
+        <button class="btn btn-primary" id="load-more">さらに読み込む</button>
+    </div>
+</div>
     </div>
         <table border="1" id="product-table">
             <thead>
