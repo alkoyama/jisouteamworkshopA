@@ -67,6 +67,7 @@ try {
     echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
     exit; // スクリプト終了
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -78,22 +79,22 @@ try {
     <link rel="stylesheet" href="./css/order_7thA.css">
     <link rel="stylesheet" href="./css/stock_management_7thA.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+   
 </head>
 
 <body>
     <h1>商品一覧</h1>
 
     <div class="container_st">
-    <div class="row">
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="SIDまたは商品名を入力してください">
-            <button id="search-button">検索</button>
-            <button id="reset-button">リセット</button>
+        <div class="mt-3" id="gender-filters">
+        <label><input type="checkbox" value="male"> オスポケモン</label>
+        <label><input type="checkbox" value="female"> メスポケモン</label>
+        <label><input type="checkbox" value="unknown"> せいべつふめい</label>
+        <label><input type="checkbox" value="egg"> タマゴ</label>
+        <label><input type="checkbox" value="item"> どうぐ</label>
+        <label><input type="checkbox" value="ball"> ボール</label>
         </div>
-        <div class="update-container">
-            <div id="last-updated"></div>
-            <button id="refresh" type="button">更新する</button>
-        </div>
+    <hr> <!-- タイプフィルターとの間に横線を追加 -->
          <!-- タイプフィルタリング用チェックボックス -->
     <div class="mt-3" id="type-filters">
         <label><input type="checkbox" value="ノーマル"> ノーマル</label>
@@ -132,12 +133,14 @@ try {
     <div class="row" id="pokemon-container">
         <!-- 最初の5個を表示 -->
     </div>
-    
-    <div class="text-center mt-3">
-        <button class="btn btn-primary" id="load-more">さらに読み込む</button>
+    <!-- 更新情報を表示するコンテナ -->
+    <div class="parent-container"> <!-- .parent-container を追加 -->
+    <div class="update-container">
+        <div id="last-updated"></div>
+        <button id="refresh" type="button">更新する</button>
     </div>
 </div>
-    </div>
+
         <table border="1" id="product-table">
             <thead>
                 <tr>
@@ -201,7 +204,7 @@ try {
             <td>${product.SID}</td>
             <td>${product.PID}</td>
             <td>${product.Name}</td>
-            <td><img src="${product.Image_path}" alt="商品画像" width="100" height="100"></td>
+            <td><img src="${product.Image_path}" alt="商品画像" width="80" height="80"></td>
             <td>${product.Type1}</td>
             <td>${type2}</td>
             <td>${product.Gender}</td>
@@ -250,46 +253,86 @@ try {
         $(document).ready(function() {
             loadMoreProducts(); // 商品情報を読み込み
         });
-    </script>
-    <!-- // 検索関数 -->
-    <script>
-        function searchTable() {
-            const searchKeyword = $('#search-input').val().toUpperCase(); // 大文字に変換
-            if (searchKeyword.trim() === '') {
-                // 検索キーワードが空の場合は全ての行を表示
-                $('#product-table tbody tr').show();
-            } else {
-                // 検索キーワードでフィルタリング
-                $('#product-table tbody tr').each(function() {
-                    const sid = $(this).find('td:eq(0)').text().toUpperCase(); // 大文字に変換
-                    const name = $(this).find('td:eq(2)').text().toUpperCase(); // 大文字に変換
-                    if (sid.includes(searchKeyword) || name.includes(searchKeyword)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
+
+        function applyFilters() {
+    // フィルターされた商品を表示するためにテーブルの内容をクリア
+    $('#product-table tbody').empty();
+
+    // チェックされた性別フィルターを取得
+    const genders = [];
+    $('#gender-filters input:checked').each(function() {
+        genders.push($(this).val());
+    });
+
+    // チェックされたタイプフィルターを取得
+    const types = [];
+    $('#type-filters input:checked').each(function() {
+        types.push($(this).val());
+    });
+
+    // フィルターされた商品を取得
+    const filteredProducts = products.filter(product => {
+        // 性別フィルターを適用
+        if (!genders.length || genders.includes(product.Gender)) {
+            // タイプフィルターを適用
+            if (!types.length || types.includes(product.Type1) || types.includes(product.Type2)) {
+                return true;
             }
         }
+        return false;
+    });
 
-        // 検索ボタンのクリックイベントリスナーを設定
-        $('#search-button').click(function() {
-            searchTable();
-        });
+    // フィルターされた商品をテーブルに表示
+    appendProducts(filteredProducts, currentPage, total_pages);
+}
+ 
+// チェックボックスの変更を監視してフィルターを適用
+$('#gender-filters input, #type-filters input').change(function() {
+    applyFilters();
+});
 
-        // リセットボタンのクリックイベントリスナーを設定
-        $('#reset-button').click(function() {
-            $('#search-input').val('');
-            searchTable();
-        });
+// 商品をソートする関数
+function sortProducts(key, order) {
+    // テーブルの内容をクリア
+    $('#product-table tbody').empty();
 
-        // Enterキーで検索実行
-        $('#search-input').keypress(function(event) {
-            if (event.which === 13) {
-                searchTable();
-            }
-        });
-    </script>
+    // ソート
+    products.sort((a, b) => {
+        if (a[key] < b[key]) return order === 'asc' ? -1 : 1;
+        if (a[key] > b[key]) return order === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    // ソートされた商品を表示
+    appendProducts(products, currentPage, total_pages);
+}
+
+// ソートボタンのクリックを監視してソートを実行
+$('#sort-name-asc').click(function() {
+    sortProducts('Name', 'asc');
+});
+
+$('#sort-name-desc').click(function() {
+    sortProducts('Name', 'desc');
+});
+
+$('#sort-price-asc').click(function() {
+    sortProducts('Price', 'asc');
+});
+
+$('#sort-price-desc').click(function() {
+    sortProducts('Price', 'desc');
+});
+
+$('#sort-inventory-asc').click(function() {
+    sortProducts('Inventory', 'asc');
+});
+
+$('#sort-inventory-desc').click(function() {
+    sortProducts('Inventory', 'desc');
+});
+
+   </script>
 </body>
 
 </html>
