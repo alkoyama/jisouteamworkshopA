@@ -1,24 +1,26 @@
 @charset "UTF-8";
 body {
-  
+  font-family: "Aoboshi One", serif;
+  font-weight: 400;	
+  font-style: normal;
+  background-image: url(../images/background/index_background.png);
 }
 /******************************
  header
 ******************************/
 header {
   width: 100%;
-  background-color:rgba(255,255,255,0.5);
+  background-color:rgba(255,255,255,0.7);
   z-index: 1000;
   padding: 0;
   box-shadow: 2px 2px 4px gray;
 }
-
+a {
+  text-decoration: none;
+}
 .head_A {
   padding-left: 10px;
   padding-right: 10px;
-}
-a {
-  text-decoration: none;
 }
 .head_A img {
   width: 70%; 
@@ -26,20 +28,25 @@ a {
 
 .head_B ul {
   margin: 0;
-  padding: 0;
   list-style: none;
+}
+.head_B ul li{
+  padding-left: 10px;
+  padding-right: 15px;
 }
 .head_B a {
   display: block;
   padding: 8px;
   color: #000000;
-  font-size: 17px;
   text-decoration: none;
   border-bottom: 3px solid none;
 }
 .head_B a:hover {
   margin-top: -3px;
   border-bottom: 3px solid #000;
+}
+.head_B img{
+  width: 50px;
 }
 
 @media(min-width: 1024px) {
@@ -128,41 +135,62 @@ a {
   footer
 **********************************/
 footer{
-  width: 100%;
-  background-color:rgba(255,255,255,0.5);
-  z-index: 1000;
-  padding: 0;
+  background-color:rgba(255,255,255,0.7);
   box-shadow: 2px 2px 4px gray;
 }
-.foot_A {
-  margin-left:auto;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-.foot_A img {
-  
-  width: 50%; 
-}
-.footer_menu{
+.footer_menu {
+  color: #000000;
   text-align: center;
+  padding: 30px;
 }
-.foot_B{
-  text-align: center;
+.footer_menu a {
+  color: #000000;
+  display: inline-block;
+  font-size:120%;
+  text-decoration:none;
+  position: relative;
+  transition: .3s;
+  padding-bottom: 5px;
 }
-.foot_B ul {
+.footer_menu a::after{
+  position: absolute;
+	bottom: 0;
+	left: 50%;
+	content: '';
+	width: 0;
+	height: 1px;
+	background-color: #000000;
+	transition: .3s;
+	transform: translateX(-50%);
+  border-bottom: 2px solid #000000;
+}
+.footer_menu a:hover::after {
+  width: 100%;
+}
+.footer_menu .foot_B {
   margin: 0;
   padding: 0;
   list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
-.foot_B a {
-  display: block;
-  padding: 8px;
-  color: #000000;
-  font-size: 17px;
-  text-decoration: none;
-  border-bottom: 3px solid none;
+.footer_menu .foot_B li {
+  margin: 0;
+  padding: 0 20px;
 }
-.foot_B a:hover {
-  margin-top: -3px;
-  border-bottom: 3px solid #000;
+.footer_menu .copyright {
+  font-size: small;
+  margin: 0;
+  padding: 20px 0 0 0;
+}
+
+.foot_A{
+  display: flex;
+  justify-content: flex-end;
+}
+.foot_A img{
+  width: 100%;
+  height: 100%;
+  max-width: 200px;
 }
