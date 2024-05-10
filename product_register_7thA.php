@@ -4,10 +4,12 @@ $username = "root";
 $password = "";
 $dbname = "teamworkshop_7thA";
 
+// データベース接続
 try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // ユニークなSIDを生成する関数
     function generateUniqueSID($conn) {
         $sql = "SELECT MAX(SID) FROM product_stock";
         $stmt = $conn->query($sql);
@@ -20,6 +22,7 @@ try {
         }
     }
 
+    // PIDを生成する関数
     function generateUniquePID($conn) {
         $sql = "SELECT MAX(PID) FROM poke_info";
         $stmt = $conn->query($sql);
@@ -43,81 +46,104 @@ try {
             return "G001";
         }
     }
+        // フォーム表示の際にGIDを生成
+        $newGID = generateUniqueGID($conn);
+        $numericPartOfGID = (int)substr($newGID, 1); // GIDの数字部分
 
-    // フォーム表示の際にGIDを生成
-    $newGID = generateUniqueGID($conn);
-    $numericPartOfGID = (int)substr($newGID, 1); // GIDの数字部分
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $existingPID = $_POST['existingPID'] === 'null' ? null : $_POST['existingPID'];
+            $productName = $_POST['product_name'];
+            $gender = $_POST['gender'];
+            $type1 = isset($_POST['type1']) ? $_POST['type1'] : null;
+            $type2 = isset($_POST['type2']) && $_POST['type2'] !== "" ? $_POST['type2'] : null; // 空の場合は null
+            $price = (int)$_POST['price'];
+            $inventory = (int)$_POST['inventory'];
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $productName = $_POST['product_name'];
-        $gender = $_POST['gender'];
-        $type1 = isset($_POST['type1']) ? $_POST['type1'] : null;
-        $type2 = isset($_POST['type2']) ? $_POST['type2'] : null;
-        $price = (int)$_POST['price'];
-        $inventory = (int)$_POST['inventory'];
-    
-        $newSID = generateUniqueSID($conn);
-        $newPID = generateUniquePID($conn);
-    
-        if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] == UPLOAD_ERR_OK) {
-            $image = $_FILES['product_image'];
-            $originalName = basename($image['name']); // オリジナルのファイル名
-    
-            // 新しいファイル名のプレフィックス
-            $filePrefix = "pokemon_" . str_pad($numericPartOfGID, 3, "0", STR_PAD_LEFT) . "_";
+            // 新しいファイルパスを取得
+            // $newImagePath = isset($_POST['newImagePath']) ? $_POST['newImagePath'] : null;
+        
+            $newSID = generateUniqueSID($conn);
+        
+            if ($existingPID) { // 既存のPIDがある場合
+                $productStockSql = "INSERT INTO product_stock (SID, PID, Gender, Price, Inventory) 
+                                    VALUES (:sid, :pid, :gender, :price, :inventory)";
+                $productStockStmt = $conn->prepare($productStockSql);
+                $productStockStmt->bindParam(':sid', $newSID);
+                $productStockStmt->bindParam(':pid', $existingPID);
+                $productStockStmt->bindParam(':gender', $gender);
+                $productStockStmt->bindParam(':price', $price);
+                $productStockStmt->bindParam(':inventory', $inventory);
+                $productStockStmt->execute();
+            } else { // 新しいPIDを作成
+                $newPID = generateUniquePID($conn);
+        
+                // INSERT INTO poke_info
+                $pokeInfoSql = "INSERT INTO poke_info (PID, Name, Type1, Type2, GID) 
+                                VALUES (:pid, :name, :type1, :type2, :gid)";
+                $pokeInfoStmt = $conn->prepare($pokeInfoSql);
+                $pokeInfoStmt->bindParam(':pid', $newPID);
+                $pokeInfoStmt->bindParam(':name', $productName);
+                $pokeInfoStmt->bindParam(':type1', $type1);
+                $pokeInfoStmt->bindParam(':type2', $type2);
+                $pokeInfoStmt->bindParam(':gid', $newGID);
+                $pokeInfoStmt->execute();
 
-            // ファイル名に指定されたテキストを追加
-            if (!empty($_POST['file_name'])) {
-                $newFileName = $filePrefix . preg_replace("/[^a-zA-Z0-9_.-]/", "_", $_POST['file_name']); // 安全なファイル名
-            } else {
-                $newFileName = $filePrefix . $originalName;
-            }
-    
-            $uploadDir = './images/pokemon/';
-            $imagePath = $uploadDir . $newFileName; // 新しい保存パス
+                if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] == UPLOAD_ERR_OK) {
+                    $image = $_FILES['product_image'];
+                    $originalName = basename($image['name']); // オリジナルのファイル名
             
-            if (!move_uploaded_file($image['tmp_name'], $imagePath)) {
-                throw new Exception("画像の保存に失敗しました");
+                    // 新しいファイル名のプレフィックス
+                    $filePrefix = "pokemon_" . str_pad($numericPartOfGID, 3, "0", STR_PAD_LEFT) . "_";
+        
+                    // ファイル名に指定されたテキストを追加
+                    if (!empty($_POST['file_name'])) {
+                        $newFileName = $filePrefix . preg_replace("/[^a-zA-Z0-9_.-]/", "_", $_POST['file_name']); // 安全なファイル名
+                    } else {
+                        $newFileName = $filePrefix . $originalName;
+                    }
+            
+                    $uploadDir = './images/pokemon/';
+                    $imagePath = $uploadDir . $newFileName; // 新しい保存パス
+                    
+                    if (!move_uploaded_file($image['tmp_name'], $imagePath)) {
+                        throw new Exception("画像の保存に失敗しました");
+                    }
+                } else {
+                    $imagePath = './images/pokemon/pokemon_000_preparation.jpg';
+                }
+
+                // INSERT INTO poke_graphics
+                if ($imagePath) {
+                    $pokeGraphicsSql = "INSERT INTO poke_graphics (GID, path) VALUES (:gid, :path)";
+                    $pokeGraphicsStmt = $conn->prepare($pokeGraphicsSql);
+                    $pokeGraphicsStmt->bindParam(':gid', $newGID);
+                    $pokeGraphicsStmt->bindParam(':path', $imagePath);
+                    $pokeGraphicsStmt->execute();
+                }
+        
+                // INSERT INTO product_stock
+                $productStockSql = "INSERT INTO product_stock (SID, PID, Gender, Price, Inventory) 
+                                    VALUES (:sid, :pid, :gender, :price, :inventory)";
+                $productStockStmt = $conn->prepare($productStockSql);
+                $productStockStmt->bindParam(':sid', $newSID);
+                $productStockStmt->bindParam(':pid', $newPID);
+                $productStockStmt->bindParam(':gender', $gender);
+                $productStockStmt->bindParam(':price', $price);
+                $productStockStmt->bindParam(':inventory', $inventory);
+                $productStockStmt->execute();
             }
-        } else {
-            $imagePath = null;
+        
+
+            // 成功時のメッセージ
+            echo "<script>alert('商品が正常に登録されました。');</script>";
+            echo "<script>document.getElementsByTagName('form')[0].reset();</script>"; // フォームをリセット
+            exit; // スクリプトを終了
+
         }
-    
-        // データベースへのデータ挿入
-        $pokeInfoSql = "INSERT INTO poke_info (PID, Name, Type1, Type2, GID) VALUES (:pid, :name, :type1, :type2, :gid)";
-        $pokeInfoStmt = $conn->prepare($pokeInfoSql);
-        $pokeInfoStmt->bindParam(':pid', $newPID);
-        $pokeInfoStmt->bindParam(':name', $productName);
-        $pokeInfoStmt->bindParam(':type1', $type1);
-        $pokeInfoStmt->bindParam(':type2', $type2);
-        $pokeInfoStmt->bindParam(':gid', $newGID);
-        $pokeInfoStmt->execute();
-    
-        if ($imagePath) {
-            $pokeGraphicsSql = "INSERT INTO poke_graphics (GID, path) VALUES (:gid, :path)";
-            $pokeGraphicsStmt = $conn->prepare($pokeGraphicsSql);
-            $pokeGraphicsStmt->bindParam(':gid', $newGID);
-            $pokeGraphicsStmt->bindParam(':path', $imagePath);
-            $pokeGraphicsStmt->execute();
-        }
-    
-        $productStockSql = "INSERT INTO product_stock (SID, PID, Gender, Price, Inventory) VALUES (:sid, :pid, :gender, :price, :inventory)";
-        $productStockStmt = $conn->prepare($productStockSql);
-        $productStockStmt->bindParam(':sid', $newSID);
-        $productStockStmt->bindParam(':pid', $newPID);
-        $productStockStmt->bindParam(':gender', $gender);
-        $productStockStmt->bindParam(':price', $price);
-        $productStockStmt->bindParam(':inventory', $inventory);
-        $productStockStmt->execute();
-    
-        echo "<script>alert('商品が正常に登録されました。');</script>";
-        echo "<script>document.getElementsByTagName('form')[0].reset();</script>";
-        exit;
-    }
 } catch (PDOException $e) {
-    echo "エラー: " . $e->getMessage();
+    echo "エラー: " . $e->getMessage(); // エラーメッセージ
 } catch (Exception $e) {
-    echo "エラー: " . $e->getMessage();
+    echo "エラー: " . $e->getMessage(); // その他のエラーメッセージ
 }
 ?>
 
@@ -129,42 +155,59 @@ try {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
     $(document).ready(function() {
-    // フォーム送信時の処理
-    $('#product_form').on('submit', function(event) {
-        event.preventDefault(); // デフォルトのフォーム送信を防止
+        // フォーム送信時の処理
+        $('#product_form').on('submit', function(event) {
+            event.preventDefault(); // デフォルトのフォーム送信を防止
+            var formData = new FormData(this); // フォームデータのオブジェクト作成
 
-        var type1 = $('#type1-select').val(); // タイプ1の選択値
-        var type2 = $('#type2-select').val(); // タイプ2の選択値
+            var productName = $('#product_name').val(); // 商品名
+            var gender = $('#gender').val(); // 分類
 
-        // タイプ1とタイプ2が同じ場合はエラーメッセージ
-        if (type1 === type2 && type1 !== '') {
-            alert('タイプ1とタイプ2が重複しています。'); // エラーメッセージ表示
-            return; // フォーム送信を中止
-        }
+            // iframeの中のpoke_card_register.phpのデータを取得
+            var iframe = $('.right-panel iframe')[0].contentWindow; // iframeのウィンドウオブジェクト
+            var pokemonData = iframe.pokemonData; // iframe内のデータ
+            var isDuplicate = false; // 重複チェックフラグ
 
-        var formData = new FormData(this); // フォームデータのオブジェクト作成
+            // 重複チェック
+            for (var i = 0; i < pokemonData.length; i++) {
+                var pokemon = pokemonData[i];
+                if (pokemon.Name === productName && pokemon.Gender === gender) {
+                    isDuplicate = true; // 重複があればフラグを立てる
+                    break; // ループを抜ける
+                }
+            }
 
-        $.ajax({
-            url: '', // 送信先は現在のページ
-            method: 'POST', // POSTメソッドを使用
-            data: formData, // フォームデータを送信
-            contentType: false, // Content-Typeを自動的に設定
-            processData: false, // データを処理しない
-                success: function(response) { // 成功時の処理
+            if (isDuplicate) {
+                alert("同名同分類の重複登録は不可です。"); // 重複エラー
+                return; // 登録を中断
+            }
+
+            // 重複がなければAJAXでデータを送信
+            $.ajax({
+                url: '', // 送信先は現在のページ
+                method: 'POST', // POSTメソッドを使用
+                data: formData, // フォームデータを送信
+                contentType: false, // Content-Typeを自動的に設定
+                processData: false, // データを処理しない
+                success: function(response) {
                     // GIDの数値部分を取得して増加させる
                     var currentNumericPart = parseInt('<?= (int)substr($newGID, 1) ?>'); // 現在の数値部分
                     var newNumericPart = currentNumericPart + 1; // 1を加算
 
                     // 新しいプレフィックスを作成してラベルを更新
                     var newPrefix = "pokemon_" + newNumericPart.toString().padStart(3, '0') + "_"; // 3桁のゼロパッド
-                    $('#file_name_label').text("ファイル名 (prefix: " + newPrefix + "):"); // ラベルを更新
+                    $('#file_name_label').html("保存されるファイル名<br>./images/pokemon/" + newPrefix + ""); // 改行を含むテキストでラベルを更新
+                    alert('商品が正常に登録されました。'); // 成功メッセージ
 
-                    // フォームをリセットし、不要な要素を非表示
                     $('#product_form')[0].reset(); // フォームをリセット
                     $('#file_name_label, #file_name_input, #image_preview_container').hide(); // 非表示
                     $('#image_preview').attr('src', ""); // 画像プレビューをクリア
 
-                    alert('商品が正常に登録されました。'); // 成功メッセージ
+                    // 隠しフィールドもリセット
+                    $('#existingPID').val(""); // 隠しフィールドのリセット
+
+                    // iframeの更新
+                    $('.right-panel iframe').attr('src', 'poke_card_register.php'); // iframeを再読み込み
                 },
                 error: function(xhr, status, error) { // エラー時の処理
                     alert('登録中にエラーが発生しました: ' + error); // エラーメッセージ表示
@@ -174,23 +217,33 @@ try {
 
         // 商品画像選択時の処理
         $('#product_image').change(function() {
+            // PIDをリセット
+            $('#existingPID').val(""); // 隠しフィールドのリセット
+            
             var fileInput = $(this);
             var file = fileInput[0].files[0]; // 選択されたファイル
             var fileName = fileInput.val().split('\\').pop(); // ファイル名を取得
-            
+
             if (fileName && file) {
                 $('#file_name_label, #file_name_input').show(); // ラベルと入力フィールドを表示
-                $('#file_name_input').val(fileName); // ファイル名を入力フィールドに表示
+                $('#file_name_input').val(fileName); // ファイル名を入力フィールドに設定
 
-                $('#image_preview_container').show(); // プレビュー用コンテナを表示
-
+                // プレビューの表示と画像の設定
+                $('#image_preview_container').show(); 
                 if (file.type.startsWith('image/')) {
                     var reader = new FileReader();
                     reader.onload = function(e) {
-                        $('#image_preview').attr('src', e.target.result); // プレビューを設定
+                        $('#image_preview').attr('src', e.target.result); // プレビューを更新
                     };
                     reader.readAsDataURL(file); // 画像のデータURLを読み込む
                 }
+
+                // 新しいファイルパスを生成
+                // var newFileName = "pokemon_" + fileName; // ファイル名プレフィックス
+                // var uploadDir = "./images/pokemon/"; // アップロード先のディレクトリ
+                // var newImagePath = uploadDir + newFileName; // 新しい保存パス
+
+                $('#imagePath').val(newImagePath); // 修正: 隠しフィールドに保存パスを設定
             } else {
                 $('#file_name_label, #file_name_input, #image_preview_container').hide(); // 非表示
             }
@@ -202,33 +255,9 @@ try {
             $('#file_name_input').val(""); // ファイル名フィールドをリセット
             $('#file_name_label, #file_name_input, #image_preview_container').hide(); // プレビューを非表示
             $('#image_preview').attr('src', ""); // プレビュー画像をリセット
+            // 隠しフィールドのリセット
+            $('#existingPID').val(""); 
         });
-
-        // 初期状態では非表示
-        $('#file_name_label, #file_name_input, #image_preview_container').hide();
-
-        // ファイル選択時にファイル名を表示
-        $('#product_image').change(function() {
-            var fileName = $(this).val().split('\\').pop(); // ファイル名を取得
-            $('#file_name').val(fileName); // テキストボックスに表示
-        });
-
-        // ジェンダーに基づくタイプ1, タイプ2の表示/非表示
-        $('#gender').change(function() {
-            var gender = $(this).val();
-            if (gender == 'egg' || gender == 'item' || gender == 'ball') {
-                $('#type1, #type2').hide();
-                $('#type1-select, #type2-select').val(null);
-            } else {
-                $('#type1, #type2').show();
-            }
-        });
-
-        // 初期状態の確認
-        var initialGender = $('#gender').val();
-        if (initialGender == 'egg' || initialGender == 'item' || gender == 'ball') {
-            $('#type1, #type2').hide();
-        }
     });
     </script>
     <style>
@@ -281,15 +310,17 @@ try {
     <!-- 左側のパネル -->
     <div class="left-panel">
         <h1>商品登録ページ</h1>
+        <p>※カードのラジオボタンをチェックすると情報を引用できます。</p>
+        <p>　なお、同名同分類の重複登録は不可です。</p><br>
         <form id="product_form" method="post" enctype="multipart/form-data">
             <label for="product_name">商品名:</label>
             <input type="text" id="product_name" name="product_name" required><br><br>
 
-            <label for="gender">ジェンダー:</label>
+            <label for="gender">分類:</label>
             <select id="gender" name="gender" required>
-                <option value="male">♂</option>
-                <option value="female">♀</option>
-                <option value="unknown">せいべつふめい</option>
+                <option value="male">♂ポケモン</option>
+                <option value="female">♀ポケモン</option>
+                <option value="unknown">せいべつふめいポケモン</option>
                 <option value="egg">タマゴ</option>
                 <option value="item">どうぐ</option>
                 <option value="ball">ボール</option>
@@ -359,10 +390,14 @@ try {
                 <button id="cancel_image" type="button">画像取消</button> <!-- 取消ボタン -->
             </div><br>
 
-            <label id="file_name_label" for="file_name">ファイル名 (prefix: pokemon_<?= str_pad($numericPartOfGID, 3, "0", STR_PAD_LEFT) ?>_):</label>
+            <label id="file_name_label" for="file_name">登録されるファイル名<br>
+            ./images/pokemon/pokemon_<?= str_pad($numericPartOfGID, 3, "0", STR_PAD_LEFT) ?>_</label>
             <input id="file_name_input" type="text" name="file_name"><br><br>
 
             <button type="submit" class="styled-button">登録</button> <!-- 登録ボタン -->
+
+            <!-- 隠しフィールド -->
+            <input type="hidden" id="existingPID" name="existingPID" value="">
         </form>
     </div>
 
@@ -373,4 +408,18 @@ try {
 </div>
 
 </body>
+    <script>
+    // 初期状態では非表示
+    $('#file_name_label, #file_name_input, #image_preview_container').hide();
+            // ジェンダーに基づくタイプ1, タイプ2の表示/非表示
+            $('#gender').change(function() {
+            var gender = $(this).val();
+            if (gender == 'egg' || gender == 'item' || gender == 'ball') {
+                $('#type1, #type2').hide();
+                $('#type1-select, #type2-select').val(null);
+            } else {
+                $('#type1, #type2').show();
+            }
+        });
+    </script>
 </html>

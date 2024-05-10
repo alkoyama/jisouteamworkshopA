@@ -75,6 +75,13 @@
             margin-right: 10px;
             font-size: 1vw;
         }   
+        .large-input {
+            width: 30%; /* 幅をコンテナに合わせる */
+            padding: 10px; /* 内側の余白を増やす */
+            font-size: 16px; /* フォントサイズを大きくする */
+            border: 1px solid #ccc; /* 境界線 */
+            border-radius: 5px; /* 角を少し丸める */
+        }   
         /* ライトグレーのテキスト用のクラス */
         .light-gray {
             color: lightgray; /* ライトグレーに設定 */
@@ -83,6 +90,17 @@
             #type-filters label {
                 width: calc(50% - 10px); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
             }
+        }
+
+        #gender-filters {
+            display: flex; /* ラベルをフレックスボックスで均等配置 */
+            flex-wrap: wrap; /* ラベルを折り返す */
+            justify-content: space-between; /* 均等に配置 */
+        }
+
+        #gender-filters label {
+            width: calc(16.66% - 10px); /* タイプフィルターと同様の幅 */
+            margin-bottom: 10px; /* ラベルの間隔を確保 */
         }
         /* 画面幅が小さい場合のフォントサイズ調整 */
         @media (max-width: 768px) {
@@ -102,8 +120,23 @@
 <body>
 
 <div class="container">
-    <h1 class="text-center">商品一覧</h1>
-    
+    <h3 class="text-left">文字列でさがす</h3>
+    <div class="mt-3">
+        <input type="text" id="search-name" class="form-control large-input" placeholder="商品名で検索" />
+    </div>
+    <hr>
+    <h3 class="text-left">分類でさがす</h3>
+    <div class="mt-3" id="gender-filters">
+        <label><input type="checkbox" value="male"> オスポケモン</label>
+        <label><input type="checkbox" value="female"> メスポケモン</label>
+        <label><input type="checkbox" value="unknown"> せいべつふめい</label>
+        <label><input type="checkbox" value="egg"> タマゴ</label>
+        <label><input type="checkbox" value="item"> どうぐ</label>
+        <label><input type="checkbox" value="ball"> ボール</label>
+    </div>
+    <hr> <!-- タイプフィルターとの間に横線を追加 -->
+
+    <h3 class="text-left">ポケモンのタイプでさがす</h3>
     <!-- タイプフィルタリング用チェックボックス -->
     <div class="mt-3" id="type-filters">
         <label><input type="checkbox" value="ノーマル"> ノーマル</label>
@@ -125,7 +158,8 @@
         <label><input type="checkbox" value="はがね"> はがね</label>
         <label><input type="checkbox" value="フェアリー"> フェアリー</label>
     </div>
-    
+    <hr>
+    <h3 class="text-left">ソートする</h3>
     <div class="text-center mt-3">
         <!-- 名前の昇順・降順 -->
         <button class="btn btn-primary" id="sort-name-asc">アイウエオ順</button>
@@ -204,8 +238,25 @@ $sql = 'SELECT
         ?>
 
 
-var offset = 8; // 最初の5個を表示
+var offset = 8; // 最初の8個を表示
+var cartItems = []; // カートに追加された商品の情報を保持する配列
 var filteredPokemon = pokemonData; // フィルターされたポケモンのリスト
+
+// 検索フィールドの変更時に検索処理を行う
+$('#search-name').on('input', function() {
+    var searchText = $(this).val().toLowerCase(); // 入力されたテキストを小文字に変換
+    var container = $('#pokemon-container');
+    container.empty(); // 既存の表示をクリア
+
+    // 検索結果を取得
+    filteredPokemon = pokemonData.filter(function(pokemon) {
+        return pokemon.Name.toLowerCase().includes(searchText); // 名前に検索テキストが含まれているかチェック
+    });
+
+    // フィルタリングされたポケモンを表示
+    displayPokemon(filteredPokemon.slice(0, offset));
+});
+
 
 function sortPokemon(type, order) {
     if (type === 'name') {
@@ -235,33 +286,48 @@ function sortPokemon(type, order) {
 }
 
 function applyFilters() {
-    var selectedTypes = [];
+    var searchText = $('#search-name').val().toLowerCase(); // 検索フィールドの文字列
+    var selectedTypes = []; // 選択されたタイプ
     $('#type-filters input:checked').each(function() {
         selectedTypes.push($(this).val());
     });
 
-    // フィルターが何も選択されていない場合は、すべてのポケモンを表示
-    if (selectedTypes.length === 0) {
-        filteredPokemon = pokemonData;
-    } else {
-        filteredPokemon = pokemonData.filter(function(pokemon) {
-            // ポケモンが選択されたすべてのタイプを持っているかをチェック
-            var pokemonTypes = [pokemon.Type1];
-            if (pokemon.Type2) {
-                pokemonTypes.push(pokemon.Type2);
-            }
-            // ポケモンのタイプにすべての選択されたタイプが含まれるかを確認
-            return selectedTypes.every(function(type) {
-                return pokemonTypes.includes(type);
-            });
+    var selectedGenders = []; // 選択されたジェンダー
+    $('#gender-filters input:checked').each(function() {
+        selectedGenders.push($(this).val());
+    });
+
+    filteredPokemon = pokemonData.filter(function(pokemon) {
+        var matchesSearchText = pokemon.Name.toLowerCase().includes(searchText);
+        
+        var pokemonTypes = [pokemon.Type1];
+        if (pokemon.Type2) {
+            pokemonTypes.push(pokemon.Type2);
+        }
+
+        var typeMatch = selectedTypes.length === 0 || selectedTypes.every(function(type) {
+            return pokemonTypes.includes(type);
         });
-    }
+
+        var genderMatch = selectedGenders.length === 0 || selectedGenders.includes(pokemon.Gender);
+
+        return matchesSearchText && typeMatch && genderMatch;
+    });
 
     var container = $('#pokemon-container');
     container.empty(); // 既存の表示をクリア
-    offset = 8; // リセット
-    displayPokemon(filteredPokemon.slice(0, offset)); // フィルター後のポケモンを表示
+    offset = 0; // オフセットをリセット
+    displayPokemon(filteredPokemon.slice(0, offset + 8)); // フィルタリングされたポケモンを表示
 }
+
+// 文字列検索の変更イベント
+$('#search-name').on('input', applyFilters);
+
+// タイプフィルターの変更イベント
+$('#type-filters input').on('change', applyFilters);
+
+// ジェンダーフィルターの変更イベント
+$('#gender-filters input').on('change', applyFilters);
 
 function getGenderIconPath(gender) {
     switch (gender) {
@@ -340,8 +406,8 @@ function displayPokemon(pokemonArray) {
         var card = `
             <div class="pokemon-card" style="animation-delay: ${delay}s; line-height: 1.0;">
                     <!-- ラジオボタン -->
-                    <div style="position: absolute; top: 10px; left: 10px;">
-                        <input type="radio" name="product_select" value="${pokemon.SID}"> <!-- 商品選択用のラジオボタン -->
+                    <div style="position: absolute; top: 10px; left: 10px; transform:scale(2.5)">
+                        <input type="radio" name="product_select" value="${pokemon.SID}")> <!-- 商品選択用のラジオボタン -->
                     </div>
                 <div style="display: flex; justify-content: space-between;">
                     <div>
@@ -367,8 +433,14 @@ function displayPokemon(pokemonArray) {
 
 
 $(document).ready(function() {
+    // デフォルトでSIDの数字部分を使用して降順にソート
+    filteredPokemon.sort((a, b) => {
+        const sidA = parseInt(a.SID.replace(/[^0-9]/g, '')); // SIDの数字部分を抽出して整数化
+        const sidB = parseInt(b.SID.replace(/[^0-9]/g, ''));
+        return sidB - sidA; // 降順にソート
+    });
 
-    // 最初に5個のポケモンを表示
+    // 最初に8個のポケモンを表示
     displayPokemon(filteredPokemon.slice(0, offset));
 
     // ポケモンタイプの名前と `value` の対応表を作成
@@ -393,31 +465,37 @@ $(document).ready(function() {
         "フェアリー": "T18FRY"
     };
 
-    $('#pokemon-container').on('change', 'input[name="product_select"]', function() {
-        var selectedSID = $(this).val(); // チェックされたSIDを取得
-
+        // ラジオボタンの変更イベント
+        $('#pokemon-container').on('change', 'input[name="product_select"]', function() {
+        var selectedSID = $(this).val(); // チェックされた SID を取得
         var selectedProduct = filteredPokemon.find(pokemon => pokemon.SID === selectedSID);
 
         if (selectedProduct) {
-            // 画像プレビューをリセット
-            resetImagePreview(parent.document);
-
-            // 画像のパスを取得してプレビューに表示
-            var imagePath = selectedProduct.Image_path; 
-            $('#image_preview', parent.document).attr('src', imagePath); // 画像プレビューにセット
-            $('#image_preview_container', parent.document).show(); // プレビューコンテナを表示
-
-            // 親ドキュメントのフィールドを更新
             var productName = selectedProduct.Name;
             var gender = selectedProduct.Gender;
+
             var type1Value = typeMapping[selectedProduct.Type1] || null;
             var type2Value = typeMapping[selectedProduct.Type2] || null;
 
-            $('#product_name', parent.document).val(productName); // 名前
+            var imagePath = selectedProduct.Image_path; // 画像パスを取得
+            var pid = selectedProduct.PID; // PID を取得
+
+            // 親ドキュメントのフィールドを更新
+            $('#product_name', parent.document).val(productName); // 商品名
             $('#gender', parent.document).val(gender); // ジェンダー
             $('#type1-select', parent.document).val(type1Value); // タイプ1
             $('#type2-select', parent.document).val(type2Value); // タイプ2
             
+            // PIDを隠しフィールドにセット
+            $('#existingPID', parent.document).val(pid);
+
+            // 画像プレビューをリセット
+            resetImagePreview(parent.document);
+
+            // 画像プレビューに画像をセット
+            $('#image_preview', parent.document).attr('src', imagePath); // 画像プレビューにセット
+            $('#image_preview_container', parent.document).show(); // プレビューを表示
+        
             // タイプの表示/非表示を制御
             updateTypeVisibility(gender, parent.document);
         }

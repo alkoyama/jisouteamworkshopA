@@ -96,6 +96,13 @@
             margin-left: 10px;
             margin-right: 10px;
             font-size: 1vw;
+        }
+        .large-input {
+            width: 30%; /* 幅をコンテナに合わせる */
+            padding: 10px; /* 内側の余白を増やす */
+            font-size: 16px; /* フォントサイズを大きくする */
+            border: 1px solid #ccc; /* 境界線 */
+            border-radius: 5px; /* 角を少し丸める */
         }   
         /* ライトグレーのテキスト用のクラス */
         .light-gray {
@@ -143,7 +150,12 @@
 
 <div class="container">
     <h1 class="text-center">商品一覧</h1>
-
+    <h3 class="text-left">文字列でさがす</h3>
+    <div class="mt-3">
+        <input type="text" id="search-name" class="form-control large-input" placeholder="商品名で検索" />
+    </div>
+    <hr>
+    <h3 class="text-left">分類でさがす</h3>
     <div class="mt-3" id="gender-filters">
         <label><input type="checkbox" value="male"> オスポケモン</label>
         <label><input type="checkbox" value="female"> メスポケモン</label>
@@ -154,6 +166,7 @@
     </div>
     <hr> <!-- タイプフィルターとの間に横線を追加 -->
 
+    <h3 class="text-left">ポケモンのタイプでさがす</h3>
     <!-- タイプフィルタリング用チェックボックス -->
     <div class="mt-3" id="type-filters">
         <label><input type="checkbox" value="ノーマル"> ノーマル</label>
@@ -175,7 +188,8 @@
         <label><input type="checkbox" value="はがね"> はがね</label>
         <label><input type="checkbox" value="フェアリー"> フェアリー</label>
     </div>
-    
+    <hr>
+    <h3 class="text-left">ソートする</h3>
     <div class="text-center mt-3">
         <!-- 名前の昇順・降順 -->
         <button class="btn btn-primary" id="sort-name-asc">アイウエオ順</button>
@@ -266,9 +280,25 @@ $sql = 'SELECT
         ?>
 
 
-var offset = 8; // 最初の5個を表示
+var offset = 8; // 最初の8個を表示
 var cartItems = []; // カートに追加された商品の情報を保持する配列
 var filteredPokemon = pokemonData; // フィルターされたポケモンのリスト
+
+// 検索フィールドの変更時に検索処理を行う
+$('#search-name').on('input', function() {
+    var searchText = $(this).val().toLowerCase(); // 入力されたテキストを小文字に変換
+    var container = $('#pokemon-container');
+    container.empty(); // 既存の表示をクリア
+
+    // 検索結果を取得
+    filteredPokemon = pokemonData.filter(function(pokemon) {
+        return pokemon.Name.toLowerCase().includes(searchText); // 名前に検索テキストが含まれているかチェック
+    });
+
+    // フィルタリングされたポケモンを表示
+    displayPokemon(filteredPokemon.slice(0, offset));
+});
+
 
 function sortPokemon(type, order) {
     if (type === 'name') {
@@ -298,43 +328,48 @@ function sortPokemon(type, order) {
 }
 
 function applyFilters() {
-    var selectedTypes = [];
+    var searchText = $('#search-name').val().toLowerCase(); // 検索フィールドの文字列
+    var selectedTypes = []; // 選択されたタイプ
     $('#type-filters input:checked').each(function() {
         selectedTypes.push($(this).val());
     });
 
-    var selectedGenders = [];
+    var selectedGenders = []; // 選択されたジェンダー
     $('#gender-filters input:checked').each(function() {
         selectedGenders.push($(this).val());
     });
 
     filteredPokemon = pokemonData.filter(function(pokemon) {
+        var matchesSearchText = pokemon.Name.toLowerCase().includes(searchText);
+        
         var pokemonTypes = [pokemon.Type1];
         if (pokemon.Type2) {
             pokemonTypes.push(pokemon.Type2);
         }
 
-        // タイプフィルターの適用
         var typeMatch = selectedTypes.length === 0 || selectedTypes.every(function(type) {
             return pokemonTypes.includes(type);
         });
 
-        // ジェンダーフィルターの適用
         var genderMatch = selectedGenders.length === 0 || selectedGenders.includes(pokemon.Gender);
 
-        return typeMatch && genderMatch;
+        return matchesSearchText && typeMatch && genderMatch;
     });
 
     var container = $('#pokemon-container');
-    container.empty();
-    offset = 8;
-    displayPokemon(filteredPokemon.slice(0, offset));
+    container.empty(); // 既存の表示をクリア
+    offset = 0; // オフセットをリセット
+    displayPokemon(filteredPokemon.slice(0, offset + 8)); // フィルタリングされたポケモンを表示
 }
 
-// ジェンダーフィルターの変更イベントを追加
-$('#gender-filters input').on('change', function() {
-    applyFilters(); // フィルターを適用
-});
+// 文字列検索の変更イベント
+$('#search-name').on('input', applyFilters);
+
+// タイプフィルターの変更イベント
+$('#type-filters input').on('change', applyFilters);
+
+// ジェンダーフィルターの変更イベント
+$('#gender-filters input').on('change', applyFilters);
 
 
 function getGenderIconPath(gender) {
