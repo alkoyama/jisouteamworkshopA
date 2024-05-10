@@ -4,6 +4,8 @@ $dsn = 'mysql:host=localhost;dbname=teamworkshop_7thA;charset=utf8mb4';
 $user = 'root';
 $password = '';
 
+session_start(); // セッション開始
+
 try {
     $pdo = new PDO($dsn, $user, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -39,6 +41,36 @@ try {
         // 在庫データをJavaScriptに渡す
         echo '<script>var inventoryData = ' . $inventoryJson . ';</script>';
     }
+
+    // ログイン中のユーザー情報を取得
+    $customerInfo = [];
+    if (isset($_SESSION['CID'])) { // セッションからCIDを取得
+        $cid = $_SESSION['CID']; // 現在のCIDを取得
+
+        $query = "SELECT CID, Name, Address, Phone, Card_info FROM customer_management WHERE CID = :cid";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':cid', $cid, PDO::PARAM_STR);
+        $stmt->execute();
+
+        if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $customerInfo = [
+                'CID' => $result['CID'],
+                'Name' => $result['Name'],
+                'Address' => $result['Address'],
+                'Phone' => $result['Phone'],
+                'Card_info' => $result['Card_info']
+            ];
+
+            // 顧客情報をJSONエンコード
+            $customerJson = json_encode($customerInfo);
+
+            // 顧客情報をJavaScriptに渡す
+            echo '<script>var customerData = ' . $customerJson . ';</script>';
+        }
+    } else {
+        // ログインしていない場合、GUESTを設定
+        echo '<script>var customerData = { "CID": "GUEST" };</script>';
+    }
 } catch (PDOException $e) {
     die('データベース接続エラー: ' . $e->getMessage());
 }
@@ -55,99 +87,32 @@ try {
     <div class="container">
         <h1>決済情報</h1>
 
-        <div class="container">
-            <h1>ユーザー情報</h1>
-
+        <form method="POST" action="payment_confirmation_7thA.php" id="checkout-form">
+            <!-- お客様情報 -->
             <div class="mb-3">
-            <label for="viewOption">表示オプション:</label>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="viewOption" id="viewOptionView" value="view" checked>
-                <label class="form-check-label" for="viewOptionView">
-                情報を確認する
-
-                <?php
-                // Start a session if not already started
-                if (session_status() === PHP_SESSION_NONE) {
-                    session_start();
-                }
-
-                // Replace with your database connection details
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "teamworkshop_7thA";
-
-                try {
-                    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                    $cid = $_SESSION["CID"]; // Assuming CID is stored in the session
-
-                    $sql = "SELECT * FROM customer_management WHERE CID = :cid";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->bindParam(':cid', $cid);
-                    $stmt->execute();
-
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch data as an associative array
-
-                    if ($result) {
-                    echo "<table>";
-                    echo "<tr>";
-                    echo "</tr>";
-                    echo "<tr>";
-                    echo "<td>" . $result["CID"] . "</td>"; // Replace with actual column names
-                    echo "<td>" . $result["Name"] . "</td>";
-                    echo "<td>" . $result["Address"] . "</td>";
-                    echo "<td>" . $result["Phone"] . "</td>";
-                    echo "<td>" . $result["Card_info"] . "</td>";
-                    echo "</tr>";
-                    echo "</table>";
-                    } else {
-                    echo "No user found for CID: " . $cid;
-                    }
-                } catch(PDOException $e) {
-                    echo "Error: " . $e->getMessage();
-                }
-
-                $conn = null;
-                ?>
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="viewOption" id="viewOptionEdit" value="edit">
-                <label class="form-check-label" for="viewOptionEdit">
-                情報編集
-                </label>
-            </div>
+                <label for="cid" class="form-label">CID:</label>
+                <input type="text" name="cid" class="form-control" id="cid" required readonly>
             </div>
 
-            <div id="user-info-view" class="mb-3">
-            </div>
-
-            <form id="user-info-edit" method="post" action="update_user_info.php">
-            <div class="mb-3">
-                <label for="sid" class="form-label">SID:</label>
-                <input type="text" class="form-control" id="sid" name="sid" readonly>
-            </div>
             <div class="mb-3">
                 <label for="name" class="form-label">名前:</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+                <input type="text" name="name" class="form-control" id="name" required>
             </div>
+
             <div class="mb-3">
                 <label for="address" class="form-label">住所:</label>
-                <input type="text" class="form-control" id="address" name="address" required>
+                <input type="text" name="address" class="form-control" id="address" required>
             </div>
+
             <div class="mb-3">
                 <label for="phone" class="form-label">電話番号:</label>
-                <input type="text" class="form-control" id="phone" name="phone" required>
+                <input type="text" name="phone" class="form-control" id="phone" required>
             </div>
+
             <div class="mb-3">
-                <label for="card_info" class="form-label">カード情報:</label>
-                <input type="text" class="form-control" id="card_info" name="card_info" required>
+                <label for="card-info" class="form-label">カード情報:</label>
+                <input type="text" name="card_info" class="form-control" id="card-info" required>
             </div>
-            <button type="submit" class="btn btn-primary">情報を更新</button>
-            </form>
-        </div>
 
             <!-- カート内容 -->
             <?php
@@ -207,6 +172,15 @@ try {
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
             $(document).ready(function() {
+                // 顧客情報をフィールドに自動入力
+                if (typeof customerData !== 'undefined') {
+                    $('#cid').val(customerData.CID || 'GUEST'); // CIDがない場合はGUEST
+                    $('#name').val(customerData.Name || ''); // 名前がない場合は空白
+                    $('#address').val(customerData.Address || ''); // 住所がない場合は空白
+                    $('#phone').val(customerData.Phone || ''); // 電話番号がない場合は空白
+                    $('#card-info').val(customerData.Card_info || ''); // カード情報がない場合は空白
+                }
+
                 // 更新後、カートデータをJSONで隠しフィールドに更新
                 function updateCartJson() {
                     const cartData = [];
