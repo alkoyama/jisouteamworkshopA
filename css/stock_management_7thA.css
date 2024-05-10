@@ -19,31 +19,74 @@
         .bottom-margin {
             height: 20px;
         }
+
+        /* 更新ボタンの部分 */
+        .parent-container {
+            display: flex;
+            justify-content: flex-end; /* 全体を右側に移動 */
+            margin-top: 20px; /* 必要に応じてマージンを追加 */
+        }
+        
+        .update-container {
+            display: flex;
+            align-items: center;
+            margin-left: auto; /* 右側に移動 */
+        }
+        
+        .update-container > * {
+            margin-left: 20px; /* 要素間のマージンを追加 */
+        }
+        
+        #search-input {
+            width: 250px; /* サイズを調整 */
+        }
        
-.row {
-    display: flex;
-    justify-content: space-between; /* 左右の間にスペースを作成 */
-    align-items: center;
-    margin-bottom: 10px; /* 下部の余白を追加 */
-}
+  /* 検索機能の部分 */
+        #type-filters label {
+            display: inline-block;
+            width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
+            margin-bottom: 10px;
+        }
+        .text-center {
+            display: flex;
+            justify-content: space-around; /* 中央寄せ */
+            margin-left: 10px;
+            margin-right: 10px;
+            font-size: 1vw;
+        }   
+        /* ライトグレーのテキスト用のクラス */
+        .light-gray {
+            color: lightgray; /* ライトグレーに設定 */
+        }
+        @media (max-width: 768px) {
+            #type-filters label {
+                width: calc(50% - 10px); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
+            }
+        }
 
-.search-container {
-    display: flex;
-    align-items: center;
-}
+        #gender-filters {
+            display: flex; /* ラベルをフレックスボックスで均等配置 */
+            flex-wrap: wrap; /* ラベルを折り返す */
+            justify-content: space-between; /* 均等に配置 */
+        }
 
-.search-container > * {
-    margin-right: 10px; /* 要素間の右側の余白を追加 */
-}
+        #gender-filters label {
+            width: calc(16.66% - 10px); /* タイプフィルターと同様の幅 */
+            margin-bottom: 10px; /* ラベルの間隔を確保 */
+        }
 
-.update-container {
-    display: flex;
-    align-items: center;
-}
+        @media (max-width: 768px) {
+            #gender-filters label {
+                width: calc(50% - 10px); /* レスポンシブ対応：狭い画面では2つずつ配置 */
+            }
+        }
 
-.update-container > * {
-    margin-left: 10px;
-}
-#search-input {
-    width: 250px; /* サイズを調整 */
-}
+        /* 画面幅が小さい場合のフォントサイズ調整 */
+        @media (max-width: 768px) {
+            .pokemon-card {
+                font-size: 0.875rem; /* 小さい画面ではフォントサイズを少し小さくする */
+            }
+        }
+
+       
+        
