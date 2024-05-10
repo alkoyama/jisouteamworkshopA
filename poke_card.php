@@ -485,12 +485,12 @@ $(document).ready(function() {
 
     // "さらに読み込む" ボタンの処理
     $('#load-more').on('click', function() {
-        if (offset < filteredPokemon.length) {
-            var nextPokemon = filteredPokemon.slice(offset, offset + 8);
-            displayPokemon(nextPokemon);
-            offset += 8;
+        if (offset < filteredPokemon.length) { // フィルタされたポケモンの範囲内か確認
+            var nextPokemon = filteredPokemon.slice(offset, offset + 8); // 次の8個を取得
+            displayPokemon(nextPokemon); // 次の8個を表示
+            offset += 8; // オフセットを更新して、次の読み込み範囲を示す
         } else {
-            alert('すべてのポケモンを読み込みました。');
+            alert('すべてのポケモンを読み込みました。'); // 全部表示済みなら警告
         }
     });
 
