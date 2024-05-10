@@ -462,7 +462,7 @@ function displayPokemon(pokemonArray) {
                         <p><strong>在庫:</strong> <span id="inventory-${pokemon.SID}">${pokemon.Inventory}</span></p>
                     </div>
                 </div>
-                ${pokemon.Inventory === 0 ? `<img src="index_soldout.png" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; opacity: 0.7;">` : ''}
+                ${pokemon.Inventory === 0 ? `<img src="./images/assets/index_soldout.png" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; opacity: 0.7;">` : ''}
                 <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
                     <input type="number" class="form-control" style="width: 60px; margin-right: 10px;" placeholder="個数" aria-label="個数" aria-describedby="basic-addon2" id="quantity-${pokemon.SID}" value="0" min="0">
                     <button class="btn btn-primary" type="button" onclick="addToCart('${pokemon.SID}', '${pokemon.Name}')">カートに追加</button>
