@@ -570,57 +570,6 @@ $(document).ready(function() {
 ////////////////////////////////////////////////////////////////////
    
 
-// 更新ボタンをクリックしたときの処理
-$('#refresh').click(function() {
-    // 現在の日時を取得
-    const currentTime = new Date();
-    const formattedTime = currentTime.toLocaleString(); // 日時を文字列に変換
-
-    // 最終更新時刻を表示
-    $('#last-updated').text('最終更新: ' + formattedTime);
-
-    currentPage = 0; // ページ番号をリセット
-    $('#product-table tbody').empty(); // テーブルの内容をクリア
-    $('#load-more').show(); // 読み込むボタンを表示
-    $('.no-more-data').hide(); // メッセージを非表示
-    loadMoreProducts(displayPokemon); // 商品情報を再読み込みし、displayPokemon関数をコールバックとして渡す
-});
-
-// 商品を追加する関数
-function loadMoreProducts(callback) {
-    // ページ番号をインクリメント
-    currentPage++;
-
-    // AJAXリクエストを送信
-    $.ajax({
-    url: 'stock_2.php', // PHPファイルのパス
-    type: 'GET',
-    success: function(response) {
-        // 成功時の処理
-        console.log('Received data:', response);
-        // ここでデータを処理するための関数を呼び出すなど
-    },
-    error: function(xhr, status, error) {
-        // エラー時の処理
-        console.error('Error:', error);
-    }
-});
-
-}
-// ページが読み込まれたときの処理
-$(document).ready(function() {
-            // 現在の日時を取得
-            const currentTime = new Date();
-            const formattedTime = currentTime.toLocaleString(); // 日時を文字列に変換
-
-            // 最終更新時刻を表示
-            $('#last-updated').text('最終更新: ' + formattedTime);
-        });
-
-        // ドキュメントのロード完了時の処理
-        $(document).ready(function() {
-            loadMoreProducts(); // 商品情報を読み込み
-        });
 
     </script>
     
