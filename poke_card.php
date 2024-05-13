@@ -44,6 +44,8 @@
             overflow: hidden; /* コンテンツがカードの高さを超えないようにする */
         }
 
+        /* カード内のテキストコンテンツのスタイル */
+
 
         /* 画像のサイズを調整して、カード内に収まるようにする */
         .pokemon-image {
@@ -61,27 +63,17 @@
             padding-top: 10px; /* 上部にパディングを追加 */
         }
         
-        /* カートの最大高さを設定し、スクロールを可能にする */
         #cart {
             position: fixed; /* 固定位置 */
-            bottom: 550px; /* 下からの距離 */
+            bottom: 200px; /* 下からの距離 */
             right: 20px; /* 右からの距離 */
             width: 300px; /* 横幅 */
-            max-height: 300px; /* 最大高さ */
-            overflow-y: auto; /* 縦方向のスクロールを可能に */
-            background-color: rgba(255, 255, 255, 0.7); /* 背景色 */
-            padding: 10px; /* パディング */
-            border: 1px solid #ccc; /* 境界線 */
-            border-radius: 5px; /* 角を丸める */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 影を追加 */
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             z-index: 1000; /* 重なり順の設定 */
-        }
-
-        /* カートの項目を適切に配置し、要素間に余白を設ける */
-        #cart-items {
-            list-style-type: none; /* リストスタイルを無効に */
-            padding: 0; /* パディングをゼロに */
-            margin: 0; /* マージンをゼロに */
         }
 
         #cart h2 {
@@ -93,49 +85,6 @@
             padding: 0;
             margin: 0;
         }
-
-          /* 吹き出しのスタイル */
-        .speech-bubble {
-            background-image: url('./images/assets/index_fukidashi.png');
-            width: 330px; /* 吹き出しの幅 */
-            height: 142px; /* 吹き出しの高さ */
-            background-size: cover; /* 画像をサイズに合わせる */
-            position: fixed; /* 固定位置 */
-            bottom: 400px;
-            right: 20px; /* 右からの距離 */
-        }
-
-        #speechBubbleText {
-            text-align: center;
-            line-height: 1.5;
-        }
-        
-        /* 立ち絵のスタイル */
-        .character {
-            background-image: url('./images/assets/index_Iono.png');
-            width: 600px; /* 立ち絵の幅 */
-            height: 400px; /* 立ち絵の高さ */
-            background-size: cover; /* 画像をサイズに合わせる */
-            position: fixed; /* 固定位置 */
-            bottom: 0; /* カートの下に配置 */
-            right: -90px; /* 右からの距離 */
-            opacity: 0; /* 透明度を0に設定して非表示にする */
-            animation: floatUpDown 2s infinite ease-in-out, fadeIn 1s ease-in; /* アニメーションを適用 */
-            animation-fill-mode: forwards; /* アニメーション後に最終状態を維持 */
-            overflow: visible;
-            z-index: -1;
-        }
-
-        @keyframes floatUpDown {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(20px); } /* 上下に10pxふわふわさせる */
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; } /* 透明度を0から開始 */
-            to { opacity: 1; } /* 透明度を1に変化させる */
-        }
-
         #type-filters label {
             display: inline-block;
             width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
@@ -276,49 +225,45 @@
     <!-- 決済へ進むボタン -->
     <button class="btn btn-success" id="proceed-to-payment">決済へ進む</button>
 </div>
-    <div class="speech-bubble" id="speechBubbleText"></div>
-    <div class="character"></div>
 
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+<?php
+// データベース接続情報
+$dsn = 'mysql:host=localhost;dbname=teamworkshop_7tha;charset=utf8mb4';
+$username = 'root';
+$password = '';
 
-    <!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-    <script>
-    <?php
-        // データベース接続情報
-        $dsn = 'mysql:host=localhost;dbname=teamworkshop_7tha;charset=utf8mb4';
-        $username = 'root';
-        $password = '';
+// データベースに接続
+try {
+    $pdo = new PDO($dsn, $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die('データベースに接続できません: ' . $e->getMessage());
+}
 
-        // データベースに接続
-        try {
-            $pdo = new PDO($dsn, $username, $password);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            die('データベースに接続できません: ' . $e->getMessage());
-        }
-
-        // データを取得するSQLクエリ
-        $sql = 'SELECT 
-                    product_stock.SID,
-                    product_stock.PID,
-                    poke_info.Name,
-                    poke_type1.type_name AS Type1,  -- poke_type1を参照
-                    poke_type2.type_name AS Type2,  -- poke_type2を参照
-                    product_stock.Gender,
-                    product_stock.Price,
-                    product_stock.Inventory,
-                    poke_graphics.path AS Image_path
-                FROM 
-                    product_stock
-                JOIN 
-                    poke_info ON product_stock.PID = poke_info.PID
-                LEFT JOIN 
-                    poke_graphics ON poke_info.GID = poke_graphics.GID
-                LEFT JOIN 
-                    poke_type AS poke_type1 ON poke_type1.TID = poke_info.Type1
-                LEFT JOIN 
-                    poke_type AS poke_type2 ON poke_type2.TID = poke_info.Type2';
+// データを取得するSQLクエリ
+$sql = 'SELECT 
+            product_stock.SID,
+            product_stock.PID,
+            poke_info.Name,
+            poke_type1.type_name AS Type1,  -- poke_type1を参照
+            poke_type2.type_name AS Type2,  -- poke_type2を参照
+            product_stock.Gender,
+            product_stock.Price,
+            product_stock.Inventory,
+            poke_graphics.path AS Image_path
+        FROM 
+            product_stock
+        JOIN 
+            poke_info ON product_stock.PID = poke_info.PID
+        LEFT JOIN 
+            poke_graphics ON poke_info.GID = poke_graphics.GID
+        LEFT JOIN 
+            poke_type AS poke_type1 ON poke_type1.TID = poke_info.Type1
+        LEFT JOIN 
+            poke_type AS poke_type2 ON poke_type2.TID = poke_info.Type2';
 
         // クエリを実行
         $statement = $pdo->prepare($sql);
@@ -332,340 +277,321 @@
 
         // JavaScriptで利用できる形式で出力
         echo "var pokemonData = {$json_data};";
-    ?>
+        ?>
 
 
-    var offset = 8; // 最初の8個を表示
-    var cartItems = []; // カートに追加された商品の情報を保持する配列
-    var filteredPokemon = pokemonData; // フィルターされたポケモンのリスト
+var offset = 8; // 最初の8個を表示
+var cartItems = []; // カートに追加された商品の情報を保持する配列
+var filteredPokemon = pokemonData; // フィルターされたポケモンのリスト
 
-    // 検索フィールドの変更時に検索処理を行う
-    $('#search-name').on('input', function() {
-        var searchText = $(this).val().toLowerCase(); // 入力されたテキストを小文字に変換
-        var container = $('#pokemon-container');
-        container.empty(); // 既存の表示をクリア
+// 検索フィールドの変更時に検索処理を行う
+$('#search-name').on('input', function() {
+    var searchText = $(this).val().toLowerCase(); // 入力されたテキストを小文字に変換
+    var container = $('#pokemon-container');
+    container.empty(); // 既存の表示をクリア
 
-        // 検索結果を取得
-        filteredPokemon = pokemonData.filter(function(pokemon) {
-            return pokemon.Name.toLowerCase().includes(searchText); // 名前に検索テキストが含まれているかチェック
-        });
-
-        // フィルタリングされたポケモンを表示
-        displayPokemon(filteredPokemon.slice(0, offset));
+    // 検索結果を取得
+    filteredPokemon = pokemonData.filter(function(pokemon) {
+        return pokemon.Name.toLowerCase().includes(searchText); // 名前に検索テキストが含まれているかチェック
     });
 
+    // フィルタリングされたポケモンを表示
+    displayPokemon(filteredPokemon.slice(0, offset));
+});
 
-    function sortPokemon(type, order) {
-        if (type === 'name') {
-            if (order === 'asc') {
-                filteredPokemon.sort((a, b) => a.Name.localeCompare(b.Name, 'ja'));
+
+function sortPokemon(type, order) {
+    if (type === 'name') {
+        if (order === 'asc') {
+            filteredPokemon.sort((a, b) => a.Name.localeCompare(b.Name, 'ja'));
+        } else {
+            filteredPokemon.sort((a, b) => b.Name.localeCompare(a.Name, 'ja'));
+        }
+    } else if (type === 'price') {
+        if (order === 'asc') {
+            filteredPokemon.sort((a, b) => a.Price - b.Price);
+        } else {
+            filteredPokemon.sort((a, b) => b.Price - a.Price);
+        }
+    } else if (type === 'inventory') {
+        if (order === 'asc') {
+            filteredPokemon.sort((a, b) => a.Inventory - b.Inventory); // 在庫の昇順
+        } else {
+            filteredPokemon.sort((a, b) => b.Inventory - a.Inventory); // 在庫の降順
+        }
+    }
+
+    var container = $('#pokemon-container');
+    container.empty(); // 既存の表示をクリア
+    offset = 8; // オフセットをリセット
+    displayPokemon(filteredPokemon.slice(0, offset)); // ソート後のポケモンを再表示
+}
+
+function applyFilters() {
+    var searchText = $('#search-name').val().toLowerCase(); // 検索フィールドの文字列
+    var selectedTypes = []; // 選択されたタイプ
+    $('#type-filters input:checked').each(function() {
+        selectedTypes.push($(this).val());
+    });
+
+    var selectedGenders = []; // 選択されたジェンダー
+    $('#gender-filters input:checked').each(function() {
+        selectedGenders.push($(this).val());
+    });
+
+    filteredPokemon = pokemonData.filter(function(pokemon) {
+        var matchesSearchText = pokemon.Name.toLowerCase().includes(searchText);
+        
+        var pokemonTypes = [pokemon.Type1];
+        if (pokemon.Type2) {
+            pokemonTypes.push(pokemon.Type2);
+        }
+
+        var typeMatch = selectedTypes.length === 0 || selectedTypes.every(function(type) {
+            return pokemonTypes.includes(type);
+        });
+
+        var genderMatch = selectedGenders.length === 0 || selectedGenders.includes(pokemon.Gender);
+
+        return matchesSearchText && typeMatch && genderMatch;
+    });
+
+    var container = $('#pokemon-container');
+    container.empty(); // 既存の表示をクリア
+    offset = 0; // オフセットをリセット
+    displayPokemon(filteredPokemon.slice(0, offset + 8)); // フィルタリングされたポケモンを表示
+}
+
+// 文字列検索の変更イベント
+$('#search-name').on('input', applyFilters);
+
+// タイプフィルターの変更イベント
+$('#type-filters input').on('change', applyFilters);
+
+// ジェンダーフィルターの変更イベント
+$('#gender-filters input').on('change', applyFilters);
+
+
+function getGenderIconPath(gender) {
+    switch (gender) {
+        case 'male':
+            return './images/assets/male.png';
+        case 'female':
+            return './images/assets/female.png';
+        default:
+            return '';
+    }
+}
+
+function getClassIconPath(gender) {
+    switch (gender) {
+        case 'unknown':
+            return './images/assets/unknown.png';
+        case 'egg':
+            return './images/assets/egg.png';
+        case 'item':
+            return './images/assets/item.png';
+        case 'ball':
+            return './images/assets/ball.png';
+        default:
+            return '';
+    }
+}
+
+function getClassLabel(gender) {
+    switch (gender) {
+        case 'unknown':
+            return 'せいべつふめい';
+        case 'egg':
+            return 'タマゴ';
+        case 'item':
+            return 'どうぐ';
+        case 'ball':
+            return 'ボール';
+        default:
+            return '';
+    }
+}
+
+function displayPokemon(pokemonArray) {
+    var container = $('#pokemon-container');
+    var delay = 0; // アニメーションの遅延を設定するための変数
+
+    pokemonArray.forEach(function(pokemon) {
+        var type1Label = pokemon.Type2 ? 'タイプ1' : 'タイプ';
+        var type1Display = pokemon.Type1 ? `<p><strong>${type1Label}</strong></p><p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type1}</p>` : `<div style="height: 50px;"></div>`;
+        var type2Display = pokemon.Type2 ? `<p><strong>タイプ2</strong></p><p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type2}</p>` : `<div style="height: 50px;"></div>`;
+
+        var genderIconPath = getGenderIconPath(pokemon.Gender);
+        var classIconPath = getClassIconPath(pokemon.Gender);
+        var classLabel = getClassLabel(pokemon.Gender);
+
+        var genderIconDisplay = ''; // 性別アイコンを表示するためのHTML
+        if (pokemon.Gender === 'male' || pokemon.Gender === 'female') {
+            genderIconDisplay = `<img src="${genderIconPath}" alt="${pokemon.Gender}" style="height: 20px; width: 20px; margin-left: 5px; vertical-align: middle;">`; // 名前の横にアイコン
+        }
+
+        var classIconDisplay = ''; // クラスアイコンとラベルを表示するためのHTML
+        if (classIconPath && classLabel) {
+            if (classLabel === 'せいべつふめい') { // 特定のテキストの場合
+                classIconDisplay = `<div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
+                    <img src="${classIconPath}" style="height: 20px; width: 20px; vertical-align: middle;">
+                    <span style="color: lightgray;">&nbsp;${classLabel}</span> <!-- ライトグレーに設定 -->
+                </div>`;
             } else {
-                filteredPokemon.sort((a, b) => b.Name.localeCompare(a.Name, 'ja'));
-            }
-        } else if (type === 'price') {
-            if (order === 'asc') {
-                filteredPokemon.sort((a, b) => a.Price - b.Price);
-            } else {
-                filteredPokemon.sort((a, b) => b.Price - a.Price);
-            }
-        } else if (type === 'inventory') {
-            if (order === 'asc') {
-                filteredPokemon.sort((a, b) => a.Inventory - b.Inventory); // 在庫の昇順
-            } else {
-                filteredPokemon.sort((a, b) => b.Inventory - a.Inventory); // 在庫の降順
+                classIconDisplay = `<div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
+                    <img src="${classIconPath}" style="height: 20px; width: 20px; vertical-align: middle;">
+                    &nbsp;${classLabel}
+                </div>`;
             }
         }
 
-        var container = $('#pokemon-container');
-        container.empty(); // 既存の表示をクリア
-        offset = 8; // オフセットをリセット
-        displayPokemon(filteredPokemon.slice(0, offset)); // ソート後のポケモンを再表示
-    }
+        var card = `
+            <div class="pokemon-card" style="animation-delay: ${delay}s; line-height: 1.0;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <img class="pokemon-image" src="${pokemon.Image_path}" alt="${pokemon.Name}" style="margin-top: 40px;">
+                        <p><strong>${pokemon.Name}</strong>${genderIconDisplay}</p> <!-- 名前の横にアイコン -->
+                        ${classIconDisplay} <!-- クラスアイコンとラベル -->
+                    </div>
+                    <div>
+                        ${type1Display}
+                        ${type2Display}
+                        <p><strong>ねだん</strong></p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Price}</p>
+                        <p><strong>在庫:</strong> <span id="inventory-${pokemon.SID}">${pokemon.Inventory}</span></p>
+                    </div>
+                </div>
+                ${pokemon.Inventory === 0 ? `<img src="index_soldout.png" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; opacity: 0.7;">` : ''}
+                <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
+                    <input type="number" class="form-control" style="width: 60px; margin-right: 10px;" placeholder="個数" aria-label="個数" aria-describedby="basic-addon2" id="quantity-${pokemon.SID}" value="0" min="0">
+                    <button class="btn btn-primary" type="button" onclick="addToCart('${pokemon.SID}', '${pokemon.Name}')">カートに追加</button>
+                </div>
+            </div>
+        `;
+        container.append(card);
+        delay += 0.1; // アニメーションの遅延を徐々に増やす
+    });
+}
 
-    function applyFilters() {
-        var searchText = $('#search-name').val().toLowerCase();
-        var selectedTypes = [];
-        $('#type-filters input:checked').each(function() {
-            selectedTypes.push($(this).val());
-        });
 
-        var selectedGenders = [];
-        $('#gender-filters input:checked').each(function() {
-            selectedGenders.push($(this).val());
-        });
 
-        // フィルタリングされた結果を生成
-        filteredPokemon = pokemonData.filter(function(pokemon) {
-            var matchesSearchText = pokemon.Name.toLowerCase().includes(searchText);
+$(document).ready(function() {
+    // 最初にカートの内容を更新してボタンの状態をチェック
+    updateCartDisplay();
 
-            var pokemonTypes = [pokemon.Type1];
-            if (pokemon.Type2) {
-                pokemonTypes.push(pokemon.Type2);
-            }
+    // 最初に5個のポケモンを表示
+    displayPokemon(filteredPokemon.slice(0, offset));
 
-            var typeMatch = selectedTypes.length === 0 || selectedTypes.every(function(type) {
-                return pokemonTypes.includes(type);
-            });
-
-            var genderMatch = selectedGenders.length === 0 || selectedGenders.includes(pokemon.Gender);
-
-            return matchesSearchText && typeMatch && genderMatch;
-        });
-
-        // データ表示のリセット
-        var container = $('#pokemon-container');
-        container.empty();
-        offset = 8; // フィルタリング後に最初の8個を表示する
-        displayPokemon(filteredPokemon.slice(0, offset));
-    }
-
-    // ボタンの処理
+    // "さらに読み込む" ボタンの処理
     $('#load-more').on('click', function() {
         if (offset < filteredPokemon.length) {
             var nextPokemon = filteredPokemon.slice(offset, offset + 8);
             displayPokemon(nextPokemon);
-            offset += 8; // 読み込みオフセットを更新
+            offset += 8;
         } else {
-            displayMessageWithSound('\nすべての商品を読み込みました！', "./audio/voice/index_008_voice.mp3");
+            alert('すべてのポケモンを読み込みました。');
         }
     });
 
-    // フィルター変更時の処理
-    $('#type-filters input').on('change', applyFilters);
-    $('#gender-filters input').on('change', applyFilters);
-    $('#search-name').on('input', applyFilters);
+    // 名前の昇順・降順
+    $('#sort-name-asc').on('click', function() {
+        sortPokemon('name', 'asc');
+    });
 
+    $('#sort-name-desc').on('click', function() {
+        sortPokemon('name', 'desc');
+    });
 
+    // 価格の昇順・降順
+    $('#sort-price-asc').on('click', function() {
+        sortPokemon('price', 'asc');
+    });
 
-    function getGenderIconPath(gender) {
-        switch (gender) {
-            case 'male':
-                return './images/assets/male.png';
-            case 'female':
-                return './images/assets/female.png';
-            default:
-                return '';
-        }
-    }
+    $('#sort-price-desc').on('click', function() {
+        sortPokemon('price', 'desc');
+    });
 
-    function getClassIconPath(gender) {
-        switch (gender) {
-            case 'unknown':
-                return './images/assets/unknown.png';
-            case 'egg':
-                return './images/assets/egg.png';
-            case 'item':
-                return './images/assets/item.png';
-            case 'ball':
-                return './images/assets/ball.png';
-            default:
-                return '';
-        }
-    }
+    // 在庫の昇順・降順のクリックイベント
+    $('#sort-inventory-asc').on('click', function() {
+        sortPokemon('inventory', 'asc'); // 在庫の昇順
+    });
 
-    function getCartIconPath(gender) {
-        switch (gender) {
-            case 'male':
-                return './images/assets/male.png';
-            case 'female':
-                return './images/assets/female.png';
-            case 'unknown':
-                return './images/assets/unknown.png';
-            case 'egg':
-                return './images/assets/egg.png';
-            case 'item':
-                return './images/assets/item.png';
-            case 'ball':
-                return './images/assets/ball.png';
-            default:
-                return '';
-        }
-    }
+    $('#sort-inventory-desc').on('click', function() {
+        sortPokemon('inventory', 'desc'); // 在庫の降順
+    });
 
-    function getClassLabel(gender) {
-        switch (gender) {
-            case 'unknown':
-                return 'せいべつふめい';
-            case 'egg':
-                return 'タマゴ';
-            case 'item':
-                return 'どうぐ';
-            case 'ball':
-                return 'ボール';
-            default:
-                return '';
-        }
-    }
+    // タイプフィルターの変更処理
+    $('#type-filters input').on('change', function() {
+        applyFilters(); 
+    });
 
-    function displayPokemon(pokemonArray) {
-        var container = $('#pokemon-container');
-        var delay = 0; // アニメーションの遅延を設定するための変数
-
-        pokemonArray.forEach(function(pokemon) {
-            var type1Label = pokemon.Type2 ? 'タイプ1' : 'タイプ';
-            var type1Display = pokemon.Type1 ? `<p><strong>${type1Label}</strong></p><p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type1}</p>` : `<div style="height: 50px;"></div>`;
-            var type2Display = pokemon.Type2 ? `<p><strong>タイプ2</strong></p><p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Type2}</p>` : `<div style="height: 50px;"></div>`;
-
-            var genderIconPath = getGenderIconPath(pokemon.Gender);
-            var classIconPath = getClassIconPath(pokemon.Gender);
-            var classLabel = getClassLabel(pokemon.Gender);
-
-            var genderIconDisplay = ''; // 性別アイコンを表示するためのHTML
-            if (pokemon.Gender === 'male' || pokemon.Gender === 'female') {
-                genderIconDisplay = `<img src="${genderIconPath}" alt="${pokemon.Gender}" style="height: 20px; width: 20px; margin-left: 5px; vertical-align: middle;">`; // 名前の横にアイコン
-            }
-
-            var classIconDisplay = ''; // クラスアイコンとラベルを表示するためのHTML
-            if (classIconPath && classLabel) {
-                if (classLabel === 'せいべつふめい') { // 特定のテキストの場合
-                    classIconDisplay = `<div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
-                        <img src="${classIconPath}" style="height: 20px; width: 20px; vertical-align: middle;">
-                        <span style="color: lightgray;">&nbsp;${classLabel}</span> <!-- ライトグレーに設定 -->
-                    </div>`;
-                } else {
-                    classIconDisplay = `<div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
-                        <img src="${classIconPath}" style="height: 20px; width: 20px; vertical-align: middle;">
-                        &nbsp;${classLabel}
-                    </div>`;
-                }
-            }
-
-            var card = `
-                <div class="pokemon-card" style="animation-delay: ${delay}s; line-height: 1.0;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <div>
-                            <img class="pokemon-image" src="${pokemon.Image_path}" alt="${pokemon.Name}" style="margin-top: 40px;">
-                            <p><strong>${pokemon.Name}</strong>${genderIconDisplay}</p> <!-- 名前の横にアイコン -->
-                            ${classIconDisplay} <!-- クラスアイコンとラベル -->
-                        </div>
-                        <div>
-                            ${type1Display}
-                            ${type2Display}
-                            <p><strong>ねだん</strong></p>
-                            <p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Price}</p>
-                            <p><strong>在庫:</strong> <span id="inventory-${pokemon.SID}">${pokemon.Inventory}</span></p>
-                        </div>
-                    </div>
-                    ${pokemon.Inventory === 0 ? `<img src="./images/assets/index_soldout.png" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; opacity: 0.7;">` : ''}
-                    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px;">
-                        <input type="number" class="form-control" style="width: 60px; margin-right: 10px;" placeholder="個数" aria-label="個数" aria-describedby="basic-addon2" id="quantity-${pokemon.SID}" value="0" min="0">
-                        <button class="btn btn-primary" type="button" onclick="addToCart('${pokemon.SID}', '${pokemon.Name}')">カートに追加</button>
-                    </div>
-                </div>
-            `;
-            container.append(card);
-            delay += 0.1; // アニメーションの遅延を徐々に増やす
-        });
-    }
-
+    // 個数更新ボタンのクリックイベント
     $(document).ready(function() {
 
-        displayMessage('\nいらっしゃいませ！！\n商品をカートに追加してね♪');
+        $('#update-cart-quantities').on('click', function() {
+            var hasInvalidUpdate = false; // 不正な更新があったかどうか
+            var hasChanges = false; // 変更があったかどうか
 
-        // 最初にカートの内容を更新してボタンの状態をチェック
-        updateCartDisplay();
+            cartItems.forEach(function(item, index) {
+                var newQuantity = parseInt($(`#cart-quantity-${index}`).val());
+                var pokemon = pokemonData.find(p => p.SID === item.sid);
 
-        // 最初に8個のポケモンを表示
-        displayPokemon(filteredPokemon.slice(0, offset));
-
-        // 名前の昇順・降順
-        $('#sort-name-asc').on('click', function() {
-            sortPokemon('name', 'asc');
-        });
-
-        $('#sort-name-desc').on('click', function() {
-            sortPokemon('name', 'desc');
-        });
-
-        // 価格の昇順・降順
-        $('#sort-price-asc').on('click', function() {
-            sortPokemon('price', 'asc');
-        });
-
-        $('#sort-price-desc').on('click', function() {
-            sortPokemon('price', 'desc');
-        });
-
-        // 在庫の昇順・降順のクリックイベント
-        $('#sort-inventory-asc').on('click', function() {
-            sortPokemon('inventory', 'asc'); // 在庫の昇順
-        });
-
-        $('#sort-inventory-desc').on('click', function() {
-            sortPokemon('inventory', 'desc'); // 在庫の降順
-        });
-
-        // タイプフィルターの変更処理
-        $('#type-filters input').on('change', function() {
-            applyFilters(); 
-        });
-
-        // 個数更新ボタンのクリックイベント
-        $(document).ready(function() {
-
-            $('#update-cart-quantities').on('click', function() {
-                var hasInvalidUpdate = false; // 不正な更新があったかどうか
-                var hasChanges = false; // 変更があったかどうか
-
-                cartItems.forEach(function(item, index) {
-                    var newQuantity = parseInt($(`#cart-quantity-${index}`).val());
-                    var pokemon = pokemonData.find(p => p.SID === item.sid);
-
-                    if (newQuantity <= 0) { // 個数が1未満の場合
-                        displayMessageWithSound('\n個数は1以上である必要があります。', "./audio/voice/index_001_voice.mp3");
-                        $(`#cart-quantity-${index}`).val(item.quantity); // 元の個数に戻す
-                        hasInvalidUpdate = true; // フラグを立てる
-                        return; // 処理を終了
-                    }
-
-                    var availableInventory = pokemon.Inventory + item.quantity; // 利用可能な在庫
-
-                    if (newQuantity > availableInventory) { // 在庫を超える場合
-                        displayMessageWithSound(`\n${pokemon.Name} の\n在庫を超える個数は追加できません。`, "./audio/voice/index_002_voice.mp3"); // 名前を含めたアラート
-                        $(`#cart-quantity-${index}`).val(item.quantity); // 元の個数に戻す
-                        hasInvalidUpdate = true; // フラグを立てる
-                        return; // 処理を終了
-                    }
-
-                    if (newQuantity !== item.quantity) { // 個数が変わったか確認
-                        hasChanges = true; // 変更があったフラグ
-                        var quantityDifference = newQuantity - item.quantity; // 個数差
-                        pokemon.Inventory -= quantityDifference; // 在庫調整
-
-                        // 在庫表示を更新
-                        $(`#inventory-${pokemon.SID}`).text(`${pokemon.Inventory}`);
-
-                        // カートアイテムの個数を更新
-                        item.quantity = newQuantity;
-                    }
-                });
-
-                if (hasInvalidUpdate) {
-                    return; // フラグが立っている場合、処理を終了
+                if (newQuantity <= 0) { // 個数が1未満の場合
+                    alert('個数は1以上である必要があります。');
+                    $(`#cart-quantity-${index}`).val(item.quantity); // 元の個数に戻す
+                    hasInvalidUpdate = true; // フラグを立てる
+                    return; // 処理を終了
                 }
 
-                if (hasChanges) { // 変更があった場合のみ
-                    // カートの内容を更新
-                    updateCartDisplay();
+                var availableInventory = pokemon.Inventory + item.quantity; // 利用可能な在庫
 
-                    // アラートで個数更新を通知
-                    displayMessageWithSound('\n個数が更新されました。', "./audio/voice/index_003_voice.mp3");
+                if (newQuantity > availableInventory) { // 在庫を超える場合
+                    alert(`${pokemon.Name} の在庫を超える個数は追加できません。`); // 名前を含めたアラート
+                    $(`#cart-quantity-${index}`).val(item.quantity); // 元の個数に戻す
+                    hasInvalidUpdate = true; // フラグを立てる
+                    return; // 処理を終了
+                }
+
+                if (newQuantity !== item.quantity) { // 個数が変わったか確認
+                    hasChanges = true; // 変更があったフラグ
+                    var quantityDifference = newQuantity - item.quantity; // 個数差
+                    pokemon.Inventory -= quantityDifference; // 在庫調整
+
+                    // 在庫表示を更新
+                    $(`#inventory-${pokemon.SID}`).text(`在庫: ${pokemon.Inventory}`);
+
+                    // カートアイテムの個数を更新
+                    item.quantity = newQuantity;
                 }
             });
+
+            if (hasInvalidUpdate) {
+                return; // フラグが立っている場合、処理を終了
+            }
+
+            if (hasChanges) { // 変更があった場合のみ
+                // カートの内容を更新
+                updateCartDisplay();
+
+                // アラートで個数更新を通知
+                alert('個数が更新されました。');
+            }
         });
     });
+});
 
     function addToCart(sid, name) {
         var quantity = parseInt($('#quantity-' + sid).val());
         var pokemon = pokemonData.find(p => p.SID === sid);
 
         if (quantity <= 0) {
-            displayMessageWithSound('\n正しい個数を入力してください。', "./audio/voice/index_004_voice.mp3");
+            alert('正しい個数を入力してください。');
             return;
         }
 
         if (quantity > pokemon.Inventory) {
-            displayMessageWithSound(`\n${name} の\n在庫を超える個数は追加できません。`, "./audio/voice/index_005_voice.mp3");
+            alert(`${name} の在庫を超える個数は追加できません。`);
             return;
         }
 
@@ -684,13 +610,12 @@
         pokemon.Inventory -= quantity;
 
         // 在庫表示を更新
-        $(`#inventory-${pokemon.SID}`).text(`${pokemon.Inventory}`);
+        $(`#inventory-${pokemon.SID}`).text(`在庫: ${pokemon.Inventory}`);
 
         // カートの内容を更新
         updateCartDisplay();
 
-        displayMessageWithSound(`\n${name} を ${quantity} 個\nカートに追加しました。`, "./audio/voice/index_006_voice.mp3");
-
+        alert(`${name} を ${quantity} 個カートに追加しました。`);
     }
 
     var grandTotalPrice = 0; // 合計金額の変数を宣言
@@ -710,27 +635,15 @@
             $('#proceed-to-payment').hide();
         } else {
             cartItems.forEach(function(item, index) {
-                var pokemon = pokemonData.find(p => p.SID === item.sid);
-                var genderIconPath = getCartIconPath(pokemon.Gender); // 分類アイコンのパスを取得
-                var genderIconHtml = genderIconPath ? `<img src="${genderIconPath}" alt="${pokemon.Gender}" style="height: 20px; width: 20px;">` : '';
-
                 var totalPrice = item.price * item.quantity; // 小計
                 grandTotalPrice += totalPrice; // 合計金額に加算
 
-                // アイテムのレイアウトを変更
                 cartList.append(`
-                    <li style="margin-bottom: 10px;"> <!-- 要素間に余白を追加 -->
-                        <!-- 性別アイコンと商品名 -->
-                        ${item.name}
-                        ${genderIconHtml} <br> <!-- 性別アイコンの後に改行 -->
-
-                        <!-- 商品情報 -->
-                        <div style="margin-left: 20px; display: inline-block;">
-                            個数
-                            <input type="number" class="form-control" style="width: 50px;" min="1" value="${item.quantity}" id="cart-quantity-${index}"/>
-                            小計¥${totalPrice.toLocaleString()}
-                            <button class="btn btn-danger btn-sm remove-from-cart" data-index="${index}">削除</button>
-                        </div>
+                    <li>
+                        ${item.name} 
+                        <input type="number" class="form-control" style="width: 50px; display: inline-block;" min="1" value="${item.quantity}" id="cart-quantity-${index}"/>
+                        ¥${totalPrice.toLocaleString()}
+                        <button class="btn btn-danger btn-sm remove-from-cart" data-index="${index}">削除</button>
                     </li>
                 `);
             });
@@ -754,15 +667,16 @@
                 pokemon.Inventory += removedItem.quantity; // 在庫を戻す
 
                 // HTML 上の在庫表示を更新
-                $(`#inventory-${pokemon.SID}`).text(`${pokemon.Inventory}`);
+                $(`#inventory-${pokemon.SID}`).text(`在庫: ${pokemon.Inventory}`);
 
                 // カートの内容を更新
                 updateCartDisplay();
 
-                displayMessageWithSound(`\n${removedItem.name} を\nカートから削除しました。`, "./audio/voice/index_007_voice.mp3");
+                alert(`${removedItem.name} をカートから削除しました。`);
             });
         }
     }
+
     // JavaScript: カート内の商品と合計金額を Payment_7thA.php へ送信
     $('#proceed-to-payment').on('click', function() {
         var form = $('<form></form>'); // 新しいフォームを作成
@@ -789,27 +703,9 @@
         form.submit(); // フォームを送信
     });
 
-    function displayMessage(message) {
-        const speechBubble = document.getElementById('speechBubbleText');
-        speechBubble.innerText = message;
-    }
-
-    function playSound(mp3Path) {
-        const sound = new Howl({
-        src: [mp3Path],
-        preload: true,
-        autoplay: true,
-        onload: () => {
-            console.log("load!");
-        }
-    });
-}
 
 
-    function displayMessageWithSound(message, mp3Path) {
-        displayMessage(message); // メッセージを表示
-        playSound(mp3Path); // MP3を再生
-    }
 </script>
+
 </body>
 </html>

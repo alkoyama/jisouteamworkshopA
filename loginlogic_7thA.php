@@ -21,14 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION["loggedIn"] = true;  // Store login status in session
     $_SESSION["CID"] = $CID;  // Store user CID in session
 
-    echo "ログイン完了<br><br>";
-    $linkUrl = "index_7thA.php";
-    $linkText = "ストアページに戻る";
-    
-    $link = "<a href='$linkUrl'>$linkText</a>";
-    
-    echo $link;
-    
+    echo "Login successful! Welcome back.";
   } else {
     echo "Invalid CID or password.";
   }

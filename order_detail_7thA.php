@@ -37,7 +37,7 @@
         // ");
         $stmt = $conn->prepare("
 
-            SELECT od.ODID, od.OID, pi.Name, od.Order_quantity, od.Total_price
+            SELECT od.ODID, od.OID, ps.SID, pi.Name, od.Order_quantity, Price * od.Order_quantity AS Total_price
             FROM order_detail od
             INNER JOIN product_stock ps ON od.SID = ps.SID
             INNER JOIN poke_info pi ON ps.PID = pi.PID
