@@ -16,6 +16,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- データベース: `teamworkshop_7tha`
+--
+CREATE DATABASE IF NOT EXISTS `teamworkshop_7tha` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `teamworkshop_7tha`;
+
+--
 -- Table structure for table `customer_management`
 --
 
