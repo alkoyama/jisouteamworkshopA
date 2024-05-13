@@ -14,14 +14,6 @@
      <title>index</title>
    </head>
    <body>
-    <?php
-     session_start();
-     if (isset($_SESSION["user_id"])) {
-     // User is logged in, display content or functionalities specific to logged-in users
-     } else {
-     // User is not logged in, redirect to login page or display a login prompt
-     }
-    ?>
     <header class="header" id="header">
       <div class="header_container">
        <div class="header_container_small">
@@ -34,6 +26,16 @@
        </div>
        <nav class="head_B">
         <ul>
+                 <?php
+             session_start();
+             if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"] === true) {
+              echo "<p>ID: " . $_SESSION["CID"] . "</p>";
+    
+    } else {
+     // User is not logged in, redirect to login page or display a login prompt
+     echo "ログインしてください。</p>";
+     }
+    ?>
          <li><a href="./" class="header_shop"><span title="SHOP"><img src="./images/icon/index_header-shop.png" alt="shop"></span></a></li>
          <li><a href="./" class="header_mypage"><span title="MY PAGE"><img src="./images/icon/index_header-mypage.png" alt="shop"></span></a></li>
          <li><a href="./" class="header_contact"><span title="CONTACT"><img src="./images/icon/index_header-contact.png" alt="shop"></span></a></li>
