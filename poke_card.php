@@ -44,8 +44,6 @@
             overflow: hidden; /* コンテンツがカードの高さを超えないようにする */
         }
 
-        /* カード内のテキストコンテンツのスタイル */
-
 
         /* 画像のサイズを調整して、カード内に収まるようにする */
         .pokemon-image {
@@ -66,7 +64,7 @@
         /* カートの最大高さを設定し、スクロールを可能にする */
         #cart {
             position: fixed; /* 固定位置 */
-            bottom: 500px; /* 下からの距離 */
+            bottom: 550px; /* 下からの距離 */
             right: 20px; /* 右からの距離 */
             width: 300px; /* 横幅 */
             max-height: 300px; /* 最大高さ */
@@ -95,6 +93,49 @@
             padding: 0;
             margin: 0;
         }
+
+          /* 吹き出しのスタイル */
+        .speech-bubble {
+            background-image: url('./images/assets/index_fukidashi.png');
+            width: 330px; /* 吹き出しの幅 */
+            height: 142px; /* 吹き出しの高さ */
+            background-size: cover; /* 画像をサイズに合わせる */
+            position: fixed; /* 固定位置 */
+            bottom: 400px;
+            right: 20px; /* 右からの距離 */
+        }
+
+        #speechBubbleText {
+            text-align: center;
+            line-height: 1.5;
+        }
+        
+        /* 立ち絵のスタイル */
+        .character {
+            background-image: url('./images/assets/index_Iono.png');
+            width: 600px; /* 立ち絵の幅 */
+            height: 400px; /* 立ち絵の高さ */
+            background-size: cover; /* 画像をサイズに合わせる */
+            position: fixed; /* 固定位置 */
+            bottom: 0; /* カートの下に配置 */
+            right: -90px; /* 右からの距離 */
+            opacity: 0; /* 透明度を0に設定して非表示にする */
+            animation: floatUpDown 2s infinite ease-in-out, fadeIn 1s ease-in; /* アニメーションを適用 */
+            animation-fill-mode: forwards; /* アニメーション後に最終状態を維持 */
+            overflow: auto;
+            z-index: -1;
+        }
+
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); } /* 上下に10pxふわふわさせる */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; } /* 透明度を0から開始 */
+            to { opacity: 1; } /* 透明度を1に変化させる */
+        }
+
         #type-filters label {
             display: inline-block;
             width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
@@ -235,9 +276,13 @@
     <!-- 決済へ進むボタン -->
     <button class="btn btn-success" id="proceed-to-payment">決済へ進む</button>
 </div>
+    <div class="speech-bubble" id="speechBubbleText"></div>
+    <div class="character"></div>
+
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
     <script>
     <?php
         // データベース接続情報
@@ -381,7 +426,7 @@
             displayPokemon(nextPokemon);
             offset += 8; // 読み込みオフセットを更新
         } else {
-            alert('すべての商品を読み込みました。');
+            displayMessageWithSound('\nすべての商品を読み込みました！', "./audio/voice/index_008_voice.mp3");
         }
     });
 
@@ -514,6 +559,9 @@
     }
 
     $(document).ready(function() {
+
+        displayMessage('\nいらっしゃいませ！！\n商品をカートに追加してね♪');
+
         // 最初にカートの内容を更新してボタンの状態をチェック
         updateCartDisplay();
 
@@ -564,7 +612,7 @@
                     var pokemon = pokemonData.find(p => p.SID === item.sid);
 
                     if (newQuantity <= 0) { // 個数が1未満の場合
-                        alert('個数は1以上である必要があります。');
+                        displayMessageWithSound('\n個数は1以上である必要があります。', "./audio/voice/index_001_voice.mp3");
                         $(`#cart-quantity-${index}`).val(item.quantity); // 元の個数に戻す
                         hasInvalidUpdate = true; // フラグを立てる
                         return; // 処理を終了
@@ -573,7 +621,7 @@
                     var availableInventory = pokemon.Inventory + item.quantity; // 利用可能な在庫
 
                     if (newQuantity > availableInventory) { // 在庫を超える場合
-                        alert(`${pokemon.Name} の在庫を超える個数は追加できません。`); // 名前を含めたアラート
+                        displayMessageWithSound(`\n${pokemon.Name} の\n在庫を超える個数は追加できません。`, "./audio/voice/index_002_voice.mp3"); // 名前を含めたアラート
                         $(`#cart-quantity-${index}`).val(item.quantity); // 元の個数に戻す
                         hasInvalidUpdate = true; // フラグを立てる
                         return; // 処理を終了
@@ -601,7 +649,7 @@
                     updateCartDisplay();
 
                     // アラートで個数更新を通知
-                    alert('個数が更新されました。');
+                    displayMessageWithSound('\n個数が更新されました。', "./audio/voice/index_003_voice.mp3");
                 }
             });
         });
@@ -612,12 +660,12 @@
         var pokemon = pokemonData.find(p => p.SID === sid);
 
         if (quantity <= 0) {
-            alert('正しい個数を入力してください。');
+            displayMessageWithSound('\n正しい個数を入力してください。', "./audio/voice/index_004_voice.mp3");
             return;
         }
 
         if (quantity > pokemon.Inventory) {
-            alert(`${name} の在庫を超える個数は追加できません。`);
+            displayMessageWithSound(`\n${name} の\n在庫を超える個数は追加できません。`, "./audio/voice/index_005_voice.mp3");
             return;
         }
 
@@ -641,7 +689,8 @@
         // カートの内容を更新
         updateCartDisplay();
 
-        alert(`${name} を ${quantity} 個カートに追加しました。`);
+        displayMessageWithSound(`\n${name} を ${quantity} 個\nカートに追加しました。`, "./audio/voice/index_006_voice.mp3");
+
     }
 
     var grandTotalPrice = 0; // 合計金額の変数を宣言
@@ -710,7 +759,7 @@
                 // カートの内容を更新
                 updateCartDisplay();
 
-                alert(`${removedItem.name} をカートから削除しました。`);
+                displayMessageWithSound(`\n${removedItem.name} を\nカートから削除しました。`, "./audio/voice/index_007_voice.mp3");
             });
         }
     }
@@ -739,6 +788,28 @@
         $('body').append(form); // フォームをボディに追加
         form.submit(); // フォームを送信
     });
+
+    function displayMessage(message) {
+        const speechBubble = document.getElementById('speechBubbleText');
+        speechBubble.innerText = message;
+    }
+
+    function playSound(mp3Path) {
+        const sound = new Howl({
+        src: [mp3Path],
+        preload: true,
+        autoplay: true,
+        onload: () => {
+            console.log("load!");
+        }
+    });
+}
+
+
+    function displayMessageWithSound(message, mp3Path) {
+        displayMessage(message); // メッセージを表示
+        playSound(mp3Path); // MP3を再生
+    }
 </script>
 </body>
 </html>
