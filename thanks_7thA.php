@@ -10,7 +10,6 @@
 <body>
   <div class="container text-center mt-5">
     <div class="fade-in"><img src="./images/thanks/thanks_001_fade-in.png" alt="ご注文感謝☆彡"></div> 
-    <div class="korokoro"><img src="./images/thanks/thanks_002_korokoro.gif"></div>
         
     <?php
     if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['oid'])) {
@@ -22,7 +21,7 @@
     ?>
 
         <!-- ホームページに戻る -->
-    <div class="korokoro"><img src="./images/thanks/thanks_korokoro.gif"></div>
+    <div class="korokoro"><img src="./images/thanks/thanks_002_korokoro.gif"></div>
     <a href="index_7thA.php" class="btn btn-primary ">ストアフロントに戻る</a>
   </div>
 </body>
