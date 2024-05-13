@@ -27,6 +27,8 @@
         /* カードのスタイル */
         .pokemon-card {
             width: calc(22% - 20px);
+            min-width:200px;
+            max-width:250px;
             height: 250px; /* 固定の高さを設定 */
             margin: 10px;
             padding: 10px;
@@ -49,7 +51,7 @@
 
         /* 画像のサイズを調整して、カード内に収まるようにする */
         .pokemon-image {
-            max-width: 90%;
+            max-width: 70%;
             height: auto;
             margin: 0 20;
             display: block;
