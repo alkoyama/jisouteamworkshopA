@@ -122,13 +122,13 @@
             opacity: 0; /* 透明度を0に設定して非表示にする */
             animation: floatUpDown 2s infinite ease-in-out, fadeIn 1s ease-in; /* アニメーションを適用 */
             animation-fill-mode: forwards; /* アニメーション後に最終状態を維持 */
-            overflow: auto;
+            overflow: visible;
             z-index: -1;
         }
 
         @keyframes floatUpDown {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); } /* 上下に10pxふわふわさせる */
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(20px); } /* 上下に10pxふわふわさせる */
         }
 
         @keyframes fadeIn {
