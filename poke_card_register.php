@@ -286,20 +286,21 @@ function sortPokemon(type, order) {
 }
 
 function applyFilters() {
-    var searchText = $('#search-name').val().toLowerCase(); // 検索フィールドの文字列
-    var selectedTypes = []; // 選択されたタイプ
+    var searchText = $('#search-name').val().toLowerCase();
+    var selectedTypes = [];
     $('#type-filters input:checked').each(function() {
         selectedTypes.push($(this).val());
     });
 
-    var selectedGenders = []; // 選択されたジェンダー
+    var selectedGenders = [];
     $('#gender-filters input:checked').each(function() {
         selectedGenders.push($(this).val());
     });
 
+    // フィルタリングされた結果を生成
     filteredPokemon = pokemonData.filter(function(pokemon) {
         var matchesSearchText = pokemon.Name.toLowerCase().includes(searchText);
-        
+
         var pokemonTypes = [pokemon.Type1];
         if (pokemon.Type2) {
             pokemonTypes.push(pokemon.Type2);
@@ -314,20 +315,28 @@ function applyFilters() {
         return matchesSearchText && typeMatch && genderMatch;
     });
 
+    // データ表示のリセット
     var container = $('#pokemon-container');
-    container.empty(); // 既存の表示をクリア
-    offset = 0; // オフセットをリセット
-    displayPokemon(filteredPokemon.slice(0, offset + 8)); // フィルタリングされたポケモンを表示
+    container.empty();
+    offset = 8; // フィルタリング後に最初の8個を表示する
+    displayPokemon(filteredPokemon.slice(0, offset));
 }
 
-// 文字列検索の変更イベント
-$('#search-name').on('input', applyFilters);
+// ボタンの処理
+$('#load-more').on('click', function() {
+    if (offset < filteredPokemon.length) {
+        var nextPokemon = filteredPokemon.slice(offset, offset + 8);
+        displayPokemon(nextPokemon);
+        offset += 8; // 読み込みオフセットを更新
+    } else {
+        alert('すべての商品を読み込みました。');
+    }
+});
 
-// タイプフィルターの変更イベント
+// フィルター変更時の処理
 $('#type-filters input').on('change', applyFilters);
-
-// ジェンダーフィルターの変更イベント
 $('#gender-filters input').on('change', applyFilters);
+$('#search-name').on('input', applyFilters);
 
 function getGenderIconPath(gender) {
     switch (gender) {
@@ -509,17 +518,6 @@ $(document).ready(function() {
         $parent.find('#file_name_label, #file_name_input, #image_preview_container').hide(); // プレビューを非表示
         $parent.find('#image_preview').attr('src', ""); // 画像プレビューをクリア
     }
-    
-    // "さらに読み込む" ボタンの処理
-    $('#load-more').on('click', function() {
-        if (offset < filteredPokemon.length) {
-            var nextPokemon = filteredPokemon.slice(offset, offset + 8);
-            displayPokemon(nextPokemon);
-            offset += 8;
-        } else {
-            alert('すべてのポケモンを読み込みました。');
-        }
-    });
 
     // 名前の昇順・降順
     $('#sort-name-asc').on('click', function() {
