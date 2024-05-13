@@ -21,7 +21,7 @@ try {
     $total_items = $total_result['total'];
 
     // ページに表示する注文情報を取得する
-    $stmt = $conn->prepare("SELECT DISTINCT o.*, (SELECT c.CID FROM customer_management c WHERE c.CID = o.CID) as CID, (SELECT c.Name FROM customer_management c WHERE c.CID = o.CID) as Name, (SELECT c.Address FROM customer_management c WHERE c.CID = o.CID) as Address, (SELECT c.Phone FROM customer_management c WHERE c.CID = o.CID) as Phone, (SELECT c.Card_info FROM customer_management c WHERE c.CID = o.CID) as Card_info, (SELECT c.Password FROM customer_management c WHERE c.CID = o.CID) as Password
+    $stmt = $conn->prepare("SELECT DISTINCT o.*, o.CID, o.Name, o.Address, o.Phone, o.Card_info
                         FROM order_management o
                         JOIN order_detail od ON o.OID = od.OID
                         LIMIT :offset, :items_per_page");
@@ -119,11 +119,11 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
             <tr>
                 <th>受注ID</th>
                 <th>注 文 日 時</th>
+                <th>顧客ID</th>
                 <th>名 前</th>
                 <th class="address">住 所</th>
                 <th>電 話 番 号</th>
                 <th>カード情報</th>
-                <th>パスワード</th>
                 <th>合計金額</th>
                 <th>削 除</th>
                 <th>注文詳細</th>
@@ -133,11 +133,11 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
                 <tr id="row_<?php echo $order['OID']; ?>">
                     <td><?php echo $order['OID']; ?></a></td>
                     <td><?php echo $order['Date_time']; ?></td>
+                    <td><?php echo $order['CID']; ?></a></td>
                     <td><?php echo $order['Name']; ?></td>
                     <td class="address"><?php echo $order['Address']; ?></td>
                     <td><?php echo $order['Phone']; ?></td>
                     <td><?php echo $order['Card_info']; ?></td>
-                    <td><?php echo $order['Password']; ?></td>
                     <td class="price"><?php echo number_format($order['Grand_total_price']); ?></td>
                     <td><button class="button delete-button" onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
                     <td><button class="button detail-button" onclick="openModal('<?php echo $order['OID']; ?>')">詳細を表示</button></td>
