@@ -1,8 +1,12 @@
 @charset "UTF-8";
+
+@font-face {
+  font-family: 'KeiFont';
+  src: url('./fonts/keifont.ttf') format('truetype');
+  /* 他のフォント形式もサポートする場合は、ここに追加します */
+}
 body {
-  font-family: "Aoboshi One", serif;
-  font-weight: 400;	
-  font-style: normal;
+  font-family: 'KeiFont', sans-serif;
   background-image: url(../images/background/index_background.png);
 }
 /******************************
@@ -46,7 +50,7 @@ a {
   border-bottom: 3px solid #000;
 }
 .head_B img{
-  width: 50px;
+  width: 60px;
 }
 
 @media(min-width: 1024px) {
@@ -92,7 +96,43 @@ a {
   .head_B {
       display: none;
   }
-}  
+}
+.login-container {
+  position: fixed;
+  top: 50px; /* Adjust as needed */
+  left: 50px;
+  width: 200px; /* Adjust as needed */
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+.login-container form {
+  display: flex;
+  flex-direction: column;
+}
+.login-container input {
+  margin-bottom: 10px;
+  padding: 5px;
+}
+.login-container button {
+  padding: 5px;
+}
+/* Responsive */
+@media screen and (max-width: 1200px) {
+    .login-container {
+      position: relative;
+      width: 95%;
+      top: 0;
+      left: 0;
+    }
+    .login-container button {
+      margin-left: 30%;
+      margin-right: 30%;
+    }
+  }
 
 /**********************************
   slick
