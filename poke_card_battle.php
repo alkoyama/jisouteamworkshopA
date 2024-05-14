@@ -1,3 +1,39 @@
+<?php
+session_start(); // セッションを開始
+
+// セッションからCIDを取得してテキストで表示
+if (isset($_SESSION['CID'])) {
+    $cid = $_SESSION['CID']; // 現在のCIDを取得
+    // データベース接続情報
+    $servername = "localhost";
+    $username = "root"; // データベースのユーザー名
+    $password = ""; // データベースのパスワード
+    $dbname = "teamworkshop_7tha"; // データベース名
+
+    // データベースに接続
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // クエリの準備
+    $query = "SELECT Name FROM customer_management WHERE CID = :cid";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':cid', $cid);
+    $stmt->execute();
+
+    // 結果を取得
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result) {
+        $name = $result['Name'];
+        echo $name . "さんのてもちポケモン";
+    } else {
+        echo "CIDに対応する名前が見つかりませんでした。";
+    }
+
+} else {
+    // セッションにCIDが設定されていない場合の処理（例えば、ログインページにリダイレクトなど）
+    echo "未ログインです。";
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -192,6 +228,7 @@ $dsn = 'mysql:host=localhost;dbname=teamworkshop_7tha;charset=utf8mb4';
 $username = 'root';
 $password = '';
 
+
 // データベースに接続
 try {
     $pdo = new PDO($dsn, $username, $password);
@@ -199,45 +236,58 @@ try {
 } catch (PDOException $e) {
     die('データベースに接続できません: ' . $e->getMessage());
 }
+// ログイン中のユーザー情報を取得
+if (isset($_SESSION['CID'])) { // セッションからCIDを取得
+    $cid = $_SESSION['CID']; // 現在のCIDを取得
 
-// データを取得するSQLクエリ
-$sql = 'SELECT 
-            product_stock.SID,
-            product_stock.PID,
-            poke_info.Name,
-            poke_type1.type_name AS Type1,
-            poke_type2.type_name AS Type2,
-            product_stock.Gender,
-            product_stock.Price,
-            product_stock.Inventory,
-            poke_graphics.path AS Image_path
-        FROM 
-            product_stock
-        JOIN 
-            poke_info ON product_stock.PID = poke_info.PID
-        LEFT JOIN 
-            poke_graphics ON poke_info.GID = poke_graphics.GID
-        LEFT JOIN 
-            poke_type AS poke_type1 ON poke_type1.TID = poke_info.Type1
-        LEFT JOIN 
-            poke_type AS poke_type2 ON poke_type2.TID = poke_info.Type2
-        WHERE
-            product_stock.Gender IN ("male", "female", "unknown")';
+    // 商品データを取得するSQLクエリ
+    $sql = 'SELECT 
+                product_stock.SID,
+                product_stock.PID,
+                poke_info.Name,
+                poke_type1.type_name AS Type1,
+                poke_type2.type_name AS Type2,
+                product_stock.Gender,
+                product_stock.Price,
+                product_stock.Inventory,
+                poke_graphics.path AS Image_path
+            FROM 
+                product_stock
+            JOIN 
+                poke_info ON product_stock.PID = poke_info.PID
+            LEFT JOIN 
+                poke_graphics ON poke_info.GID = poke_graphics.GID
+            LEFT JOIN 
+                poke_type AS poke_type1 ON poke_type1.TID = poke_info.Type1
+            LEFT JOIN 
+                poke_type AS poke_type2 ON poke_type2.TID = poke_info.Type2
+            JOIN
+                order_detail ON product_stock.SID = order_detail.SID
+            JOIN
+                order_management ON order_detail.OID = order_management.OID
+            WHERE
+                order_management.CID = :cid AND
+                product_stock.Gender IN ("male", "female", "unknown")';
+                
+    // クエリを準備
+    $statement = $pdo->prepare($sql);
 
+    // パラメータをバインド
+    $statement->bindParam(':cid', $cid, PDO::PARAM_STR);
 
-        // クエリを実行
-        $statement = $pdo->prepare($sql);
-        $statement->execute();
+    // クエリを実行
+    $statement->execute();
 
-        // 結果を配列として取得
-        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+    // 結果を配列として取得
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        // JSON形式に変換
-        $json_data = json_encode($results);
+    // JSON形式に変換
+    $json_data = json_encode($results);
 
-        // JavaScriptで利用できる形式で出力
-        echo "var pokemonData = {$json_data};";
-        ?>
+    // JavaScriptで利用できる形式で出力
+    echo "var pokemonData = {$json_data};";
+}
+?>
 
 
 var offset = 8; // 最初の8個を表示
@@ -429,9 +479,6 @@ function displayPokemon(pokemonArray) {
                     <div>
                         ${type1Display}
                         ${type2Display}
-                        <p><strong>ねだん</strong></p>
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;${pokemon.Price}</p>
-                        <p><strong>在庫:</strong> <span id="inventory-${pokemon.SID}">${pokemon.Inventory}</span></p>
                     </div>
                 </div>
             </div>
@@ -460,30 +507,38 @@ $(document).ready(function() {
 
         // 親ドキュメントのleft-panelを取得
         var leftPanel = window.parent.document.getElementById('column1');
-
+        $(leftPanel).find('.pokemon-card').remove(); // 既存のポケモンカード要素を削除
         // 親ドキュメントのleft-panel内のHTMLを空にする
-        $(leftPanel).find('.pokemon-card').empty();
+        // $(leftPanel).find('.pokemon-card').empty();
 
         // 選択されたポケモンのカードを親ドキュメントのleft-panelに表示する
         var pokemonCardHTML = `
-            <div class="pokemon-card" style="background-color: rgba(255, 255, 255, .7); display: flex; position: absolute; bottom: 50px; padding: 20px; border-radius: 10px;">
-                <img class="pokemon-image" src="${selectedPokemon.Image_path}" alt="${selectedPokemon.Name}">
-                <div class="pokemon-details" style="margin-left: 50px;">
-                    <p><strong>${selectedPokemon.Name}</strong></p>
-                    <p><strong>ねだん:</strong> ${selectedPokemon.Price}</p>
-                    <p><strong>在庫:</strong> <span>${selectedPokemon.Inventory}</span></p>
-                </div>
+        <div class="pokemon-card" style="background-color: rgba(255, 255, 255, .7); display: flex; position: absolute; bottom: 50px; padding: 20px; border-radius: 10px;">
+            <img class="pokemon-image" src="${selectedPokemon.Image_path}" alt="${selectedPokemon.Name}">
+            <div class="pokemon-details" style="margin-left: 50px;">
+                <p><strong>${selectedPokemon.Name}</strong></p>
+                <p><strong>タイプ1:</strong> <span>${selectedPokemon.Type1}</span></p>
+                ${selectedPokemon.Type2 ? `<p><strong>タイプ2:</strong> <span>${selectedPokemon.Type2}</span></p>` : ''}
+                <p><strong>HP:</strong> <span>100</span></p>
             </div>
-        `;
+        </div>
+    `;
+
+        // 選択されたポケモンの名前を隠しフィールドに設定する
+        $('#selectedPokemonName', window.parent.document).val(selectedPokemon.Name);
+
         $(leftPanel).append(pokemonCardHTML);
         // [バトル開始！]ボタンのHTMLを生成する
-        var battleButtonHTML = `
-            <button id="battleButton" style="width: 200px; height: 60px; font-size: 18px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">バトル開始！</button>
-        `;
+        // バトルボタンが存在する場合は新しく生成しない
+        if ($('#battleButton').length === 0) {
+            var battleButtonHTML = `
+                <button id="battleButton" style="width: 200px; height: 60px; font-size: 18px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">バトル開始！</button>
+            `;
+            $(battleButtonHTML).hide().appendTo(document.body); // ボタンを隠す
+        }
 
         // [バトル開始！]ボタンをleft-panelに追加する
         $(leftPanel).append(battleButtonHTML);
-
 
     });
     
