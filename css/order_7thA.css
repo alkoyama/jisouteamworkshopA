@@ -26,17 +26,17 @@ body {
 
 h1 {
   text-align: center;
-  margin-bottom: 0;
+  margin-bottom: 50px;
 }
 /* 表の装飾 */
 
 /* 受注ID、合計金額、削除、注文詳細のセルを小さくする */
 table th:nth-child(1), /* 受注ID */
-table th:nth-child(9), /* 削除 */
+table th:nth-child(8), /* 注文詳細 */
 table td:nth-child(1), /* 受注ID */
-table td:nth-child(9)/* 削除 */
+table td:nth-child(8)/* 注文詳細 */
 {
-  width: 90px; /* 例：80px */
+  width: 100px; /* 例：80px */
 }
 
 /* 住所のセルを大きくする */
@@ -45,10 +45,10 @@ table td.address {
   width: 350px; /* 住所のセルの幅 */
 }
 /* 合計金額のセルを大きくする */
-table th:nth-child(8), /* 合計金額 */
-table th:nth-child(10), /* 注文詳細 */
-table td:nth-child(8), /* 合計金額 */
-table td:nth-child(10)  /* 注文詳細 */
+table th:nth-child(9), /* 合計金額 */
+table th:nth-child(10), /* 削除 */
+table td:nth-child(9), /* 合計金額 */
+table td:nth-child(10)  /* 削除 */
 { 
   width: 130px;
 }

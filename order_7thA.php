@@ -125,8 +125,8 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
                 <th>電 話 番 号</th>
                 <th>カード情報</th>
                 <th>合計金額</th>
-                <th>削 除</th>
                 <th>注文詳細</th>
+                <th>削 除</th>
             </tr>
             <?php foreach ($customer_management as $order) : ?>
 
@@ -139,8 +139,8 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
                     <td><?php echo $order['Phone']; ?></td>
                     <td><?php echo $order['Card_info']; ?></td>
                     <td class="price"><?php echo number_format($order['Grand_total_price']); ?></td>
-                    <td><button class="button delete-button" onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
                     <td><button class="button detail-button" onclick="openModal('<?php echo $order['OID']; ?>')">詳細を表示</button></td>
+                    <td><button class="button delete-button" onclick="confirmDelete('<?php echo $order['OID']; ?>')">削除</button></td>
 
                 </tr>
             <?php endforeach; ?>

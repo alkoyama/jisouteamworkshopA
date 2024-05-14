@@ -1,96 +1,392 @@
-.button-center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-.no-more-data {
-  display: none;
-  justify-content: center;
-  text-align: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  color: #777;
-}
-
-.bottom-margin {
-  height: 20px;
-}
-
-/* 更新ボタンの部分 */
-.parent-container {
-  display: flex;
-  justify-content: flex-end; /* 全体を右側に移動 */
-  margin-top: 20px; /* 必要に応じてマージンを追加 */
-}
-
-.update-container {
-  display: flex;
-  align-items: center;
-  margin-left: auto; /* 右側に移動 */
-}
-
-.update-container > * {
-  margin-left: 20px; /* 要素間のマージンを追加 */
-}
-
-#search-input {
-  width: 250px; /* サイズを調整 */
-}
-
-/* 検索機能の部分 */
-#type-filters label {
-  display: inline-block;
-  width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
-  margin-bottom: 10px;
-}
-.text-center {
-  display: flex;
-  justify-content: space-around; /* 中央寄せ */
-  margin-left: 10px;
-  margin-right: 10px;
-  font-size: 1vw;
-}
-/* ライトグレーのテキスト用のクラス */
-.light-gray {
-  color: lightgray; /* ライトグレーに設定 */
-}
-@media (max-width: 768px) {
-  #type-filters label {
-    width: calc(
-      50% - 10px
-    ); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
-  }
-}
-
-#gender-filters {
-  display: flex; /* ラベルをフレックスボックスで均等配置 */
-  flex-wrap: wrap; /* ラベルを折り返す */
-  justify-content: space-between; /* 均等に配置 */
-}
-
-#gender-filters label {
-  width: calc(16.66% - 10px); /* タイプフィルターと同様の幅 */
-  margin-bottom: 10px; /* ラベルの間隔を確保 */
-}
-
-@media (max-width: 768px) {
-  #gender-filters label {
-    width: calc(50% - 10px); /* レスポンシブ対応：狭い画面では2つずつ配置 */
-  }
-}
-
-/* 画面幅が小さい場合のフォントサイズ調整 */
-@media (max-width: 768px) {
-  .pokemon-card {
-    font-size: 0.875rem; /* 小さい画面ではフォントサイズを少し小さくする */
-  }
-}
-
 
 table th:nth-child(9), /* 価格編集 */
 table td:nth-child(9)/* 価格編集 */ {
   width: 120px; /* 例：80px */
+}
+
+/* CSS for the left side */
+.filter-sort-section {
+  float: left;
+  width: 30%;
+  /* Adjust the width as needed */
+  flex-direction: column;
+}
+
+.filter-sort-section>* {
+  margin-bottom: 10px;
+}
+
+/* 親要素に flex レイアウトを適用 */
+#gender-filters,
+#type-filters {
+  display: flex;
+  flex-wrap: wrap;
+  /* 子要素が折り返すようにする */
+  justify-content: center;
+  /* 子要素を中央に配置する */
+}
+
+/* 各子要素の幅を調整して、2つごとに折り返す */
+#gender-filters>label,
+#type-filters>label {
+  flex-basis: calc(50% - 10px);
+  /* 幅を計算して設定 */
+  margin: 5px;
+  /* 子要素間の余白を設定 */
+}
+
+/* ソートボタンとリセットボタンのコンテナ */
+.sort-buttons-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sort-buttons-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.sort-buttons-row>.btn {
+  margin: 5px;
+}
+
+/* 共通のボタンスタイル */
+.btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 5px;
+  margin-bottom: 30px;
+}
+
+/* リセットボタンのスタイルを変更 */
+.btn.reset-btn {
+  padding: 15px 25px !important;
+  /* サイズを大きくするためのパディング */
+  font-size: 16px !important;
+  /* フォントサイズを大きくする */
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.btn-danger:hover {
+  background-color: #bd2130;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-warning,
+.btn-danger {
+  width: auto;
+}
+
+/* CSS for the right side */
+.container_st {
+  float: right;
+  width: 65%;
+  /* Adjust the width as needed */
+  flex: 1;
+  /* Take up all available space */
+}
+
+/* Clear floats */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* 最終更新時刻/取得ボタン */
+
+.update-container {
+  display: flex;
+  align-items: center; /* 垂直方向の中央揃え */
+}
+
+#last-updated {
+  margin-right: 20px; /* 最終時刻とボタンの間の間隔を設定 */
+}
+
+#refresh {
+  border: none;
+  /* ボーダーを削除 */
+  background: #e0e0e0;
+  /* 背景色を透明にする */
+  padding: 10px 20px;
+  /* 適切なパディングを設定 */
+  cursor: pointer;
+  /* カーソルをポインターに変更 */
+  transition: background-color 0.3s;
+  /* ホバー時の色変化のトランジションを設定 */
+}
+/* Success notification */
+.update-success.notification {
+  background-color: #dff0d8;
+  color: #3c763d;
+}
+
+/* Error notification */
+.update-error.notification {
+  background-color: #f2dede;
+  color: #a94442;
+}
+
+#refresh:hover {
+  background-color: #fffae9;
+  /* ホバー時の背景色を設定 */
+}
+
+/* 価格・在庫編集通知 */
+.notification {
+  display: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+}
+
+.notification.success {
+  background-color: #dff0d8;
+  color: #3c763d;
+}
+
+.notification.error {
+  background-color: #f2dede;
+  color: #a94442;
+}
+
+.hidden {
+  display: none;
+}
+
+.price-input,
+.inventory-input {
+  display: none;
+  width: 80px;
+  /* 適切な幅に設定 */
+  padding: 5px;
+  /* 適切なパディングを設定 */
+}
+
+/* FontAwesomeのアイコンに適用するスタイル */
+.fa {
+  font-family: 'Font Awesome 5 Free';
+  /* FontAwesomeのフォントファミリー */
+  font-weight: 900;
+  /* フォントウェイト */
+  border: none;
+  /* アイコンの外枠を削除 */
+}
+
+/* アイコンのサイズを調整する */
+.fa {
+  font-size: 1.2em;
+  /* デフォルトのアイコンサイズ */
+}
+
+/* アイコンを含むボタンのスタイル */
+/* 編集アイコン */
+.edit-price-btn,
+.edit-inventory-btn {
+  border: none;
+  /* ボーダーを削除 */
+  background: none;
+  /* 背景色を透明にする */
+}
+
+/* 保存アイコン */
+.save-price-btn,
+.save-inventory-btn {
+  border: none;
+  /* ボーダーを削除 */
+  background: none;
+  /* 背景色を透明にする */
+}
+
+
+/* 親要素に flex レイアウトを適用 */
+.filter-sort-section,
+.container_st {
+  width: 100%;
+  /* 幅を100%に設定 */
+  box-sizing: border-box;
+  /* ボックスモデルを指定 */
+  padding: 10px;
+  /* 余白を設定 */
+}
+
+/* レスポンシブ対応 */
+@media only screen and (min-width: 768px) {
+  /* 768px以上の画面幅の場合のスタイル */
+
+  /* フィルターとソート */
+  .filter-sort-section {
+      float: left;
+      width: 30%;
+      /* 左側に配置 */
+      flex-direction: column;
+  }
+
+  /* 商品一覧 */
+  .container_st {
+      float: right;
+      width: 65%;
+      /* 右側に配置 */
+  }
+}
+
+/* 通知メッセージ */
+.notification {
+  display: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+}
+
+.notification.success {
+  background-color: #dff0d8;
+  color: #3c763d;
+}
+
+.notification.error {
+  background-color: #f2dede;
+  color: #a94442;
+}
+
+.hidden {
+  display: none;
+}
+
+/* 価格・在庫編集通知 */
+.price-input,
+.inventory-input {
+  display: none;
+}
+
+/* ボタンスタイル */
+.btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 5px;
+  margin-bottom: 30px;
+}
+
+.btn.reset-btn {
+  padding: 15px 25px !important;
+  /* サイズを大きくするためのパディング */
+  font-size: 16px !important;
+  /* フォントサイズを大きくする */
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.btn-danger:hover {
+  background-color: #bd2130;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-warning,
+.btn-danger {
+  width: auto;
+}
+
+/* テーブル */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+/* 画像 */
+.product-img {
+  max-width: 100px;
+  max-height: 100px;
+}
+
+/* サイドバーの横並び */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* 更新ボタン */
+.update-container {
+  float: right;
+  /* 右側に配置 */
+  padding-bottom: 5px;
+}
+
+/* 読み込みボタン */
+.button-center {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* さらに読み込むボタン */
+#load-more {
+  padding: 10px 20px;
+  background-color: #0056b3;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#load-more:hover {
+  background-color: #004080;
+}
+
+/* さらに読み込むボタン非表示 */
+.no-more-data {
+  text-align: center;
+  margin-top: 20px;
+  display: none;
+}
+
+/* リセットボタン */
+#reset-button {
+  display: block;
+  margin: 0 auto;
 }
