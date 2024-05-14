@@ -16,5 +16,7 @@
 
     <input type="submit" value="Login">
   </form>
+  <br>
+  <a href="index_7thA.php">ストアフロントへ戻る</a>
 </body>
 </html>

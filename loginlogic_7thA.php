@@ -9,7 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $conn = new mysqli("localhost", "root", "", "teamworkshop_7tha");
 
   // Prepare and execute SQL statement
-  $sql = "SELECT * FROM customer_management WHERE CID = ? AND password = ?";
+  $sql = "SELECT CID, Name FROM customer_management WHERE CID = ? AND password = ?";
   $stmt = $conn->prepare($sql);
   $stmt->bind_param("ss", $CID, $password);
   $stmt->execute();
@@ -19,13 +19,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Login successful
     $row = $result->fetch_assoc();
     $_SESSION["loggedIn"] = true;  // Store login status in session
-    $_SESSION["CID"] = $CID;  // Store user CID in session
+    $_SESSION["CID"] = $row["CID"];  // Store user CID in session
+    $_SESSION["Name"] = $row["Name"];  // Store user Name in session
 
-    echo "Login successful! Welcome back.";
+    echo "Login successful! Welcome back, " . $row["Name"] . ".<br>";
+    echo '<a href="index_7thA.php">ストアフロントへ戻る</a>'; // Link to index_7thA.php
   } else {
     echo "Invalid CID or password.";
+    echo '<a href="index_7thA.php">ストアフロントへ戻る</a>'; // Link to index_7thA.php
   }
 
   $conn->close();
 }
 ?>
+
