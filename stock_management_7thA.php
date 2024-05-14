@@ -109,7 +109,7 @@ echo "</script>";
 </head>
 
 <body>
-    <h1>商品一覧</h1>
+    <h1>商品在庫管理</h1>
     <div class="container">
         <!-- 通知メッセージを表示するためのエリア -->
         <div id="notification" class="notification"></div>
