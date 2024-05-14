@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
  <html lang="ja">
    <head>
@@ -83,27 +80,51 @@
             $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // Prepare the SQL query
-            $sql = "SELECT * FROM customer_management WHERE CID = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([$cid]);
-
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+            $sql_user = "SELECT * FROM customer_management WHERE CID = ?"; // Assuming id is the primary key
+            $stmt_user = $conn->prepare($sql_user);
+            $stmt_user->execute([$cid]);
+            
+            $user = $stmt_user->fetch(PDO::FETCH_ASSOC);
+            
             if (!$user) {
-                echo "User not found"; // Handle case where user is not found
+              echo "User not found";
             } else {
-                echo "<h2>Welcome, " . $user['Name'] . "</h2>\n";
-                echo "<p>CID: " . $user['CID'] . "</p>\n";
-                echo "<p>Address: " . $user['Address'] . "</p>\n";
-                echo "<p>Phone: " . $user['Phone'] . "</p>\n";
-                // ... Add elements for other user details
+                if (!$user) {
+                    echo "User not found"; // Handle case where user is not found
+                } else {
+                    echo "<h2>Welcome, " . $user['Name'] . "</h2>\n";
+                    echo "<p>CID: " . $user['CID'] . "</p>\n";
+                    echo "<p>Address: " . $user['Address'] . "</p>\n";
+                    echo "<p>Phone: " . $user['Phone'] . "</p>\n";
+                    // ... Add elements for other user details
+                }
+            
+
+
+            ///以下、オーダー履歴部分
+              $sql_orders = "SELECT * FROM order_management WHERE cid = ?";
+              $stmt_orders = $conn->prepare($sql_orders);
+              $stmt_orders->execute([$cid]);
+            
+              $orders = $stmt_orders->fetchAll(PDO::FETCH_ASSOC); // Assuming multiple orders
+            
+              if ($orders) {
+                echo "<h3>Order History:</h3>";
+                foreach ($orders as $order) {
+                  echo "<p>Order ID: " . $order['OID'] . "</p>";
+                  echo "<p>Order Date: " . $order['Date_time'] . "</p>";
+                }
+              } else {
+                echo "<p>No orders found.</p>";
+              }
             }
-            } catch(PDOException $e) {
+
+        } catch(PDOException $e) {
             echo "Error: " . $e->getMessage();
             }
 
             $conn = null;
+
             ?>
 
 <a href="./logout_7tha.php" class="Logout">ログアウト</a>
@@ -125,6 +146,11 @@
        <div class="foot_A"><img src="./images/icon/index_footer-ball.gif" alt="ころころ"></div>
     </footer>
   
+     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+     <script type="text/javascript" src="./js/index_7thA.js"></script>
+   </body>
+  </html>
      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
      <script type="text/javascript" src="./js/index_7thA.js"></script>
