@@ -1,72 +1,96 @@
 <?php
-// データベース接続情報
-$dsn = 'mysql:host=localhost;dbname=teamworkshop_7tha;charset=utf8mb4';
-$username = 'root';
-$password = '';
-
-// 1回の読み込みで取得するアイテム数
-$items_per_page = 10;
-
-// データベース接続とデータ取得
+// MySQLに接続するためのPDOインスタンスを作成
+$dsn = "mysql:host=localhost;dbname=teamworkshop_7thA;charset=utf8";
+$username = "root";
+$password = ""; // パスワードが空欄の場合
+$options = [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+];
 try {
-    $pdo = new PDO($dsn, $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // オフセットとページ数を取得
-    $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-    $offset = ($current_page - 1) * $items_per_page;
-
-    // データ取得クエリ
-    $sql = 'SELECT 
-                product_stock.SID,
-                product_stock.PID,
-                poke_info.Name,
-                poke_type.type_name AS Type1,
-                (SELECT type_name FROM poke_type WHERE poke_type.TID = poke_info.Type2) AS Type2,
-                product_stock.Gender,
-                product_stock.Price,
-                product_stock.Inventory,
-                poke_graphics.path AS Image_path
-            FROM 
-                product_stock
-            JOIN 
-                poke_info ON product_stock.PID = poke_info.PID
-            JOIN 
-                poke_graphics ON poke_info.GID = poke_graphics.GID
-            JOIN 
-                poke_type ON poke_type.TID = poke_info.Type1
-            LIMIT :offset, :items_per_page';
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
-    $stmt->execute();
-
-    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // 合計アイテム数を取得
-    $total_items_sql = 'SELECT COUNT(*) FROM product_stock';
-    $total_items = $pdo->query($total_items_sql)->fetchColumn();
-
-    // レスポンスデータ
-    $data = [
-        'products' => $products,
-        'total_pages' => ceil($total_items / $items_per_page),
-        'current_page' => $current_page,
-    ];
-
-    if (isset($_GET['ajax'])) {
-        // AJAXリクエストの場合、JSONとして返す
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit; // スクリプト終了
-    }
+    $pdo = new PDO($dsn, $username, $password, $options);
 } catch (PDOException $e) {
-    // エラーが発生した場合のレスポンス
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
-    exit; // スクリプト終了
+    die("Database connection failed: " . $e->getMessage());
 }
+
+// データを取得するSQLクエリ
+$sql = 'SELECT 
+            product_stock.SID,
+            product_stock.PID,
+            poke_info.Name,
+            poke_type1.type_name AS Type1,  -- poke_type1を参照
+            poke_type2.type_name AS Type2,  -- poke_type2を参照
+            product_stock.Gender,
+            product_stock.Price,
+            product_stock.Inventory,
+            poke_graphics.path AS Image_path
+        FROM 
+            product_stock
+        JOIN 
+            poke_info ON product_stock.PID = poke_info.PID
+        LEFT JOIN 
+            poke_graphics ON poke_info.GID = poke_graphics.GID
+        LEFT JOIN 
+            poke_type AS poke_type1 ON poke_type1.TID = poke_info.Type1
+        LEFT JOIN 
+            poke_type AS poke_type2 ON poke_type2.TID = poke_info.Type2';
+
+// クエリを実行
+$statement = $pdo->prepare($sql);
+$statement->execute();
+
+// 結果を配列として取得
+$results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+// JSON形式に変換
+$json_data = json_encode($results);
+
+// JavaScriptで利用できる形式で出力
+echo "<script>";
+echo "var pokemonData = {$json_data};";
+
+// フィルターとソートのJavaScript関数を出力
+echo "
+function filterByName() {
+    var searchValue = document.getElementById('search-name').value.toLowerCase();
+    var filteredData = pokemonData.filter(function(item) {
+        return item.Name.toLowerCase().includes(searchValue);
+    });
+    displayData(filteredData);
+}
+
+function filterByGender(gender) {
+    var filteredData = pokemonData.filter(function(item) {
+        return item.Gender === gender || gender === 'all';
+    });
+    displayData(filteredData);
+}
+
+function filterByType(type) {
+    var filteredData = pokemonData.filter(function(item) {
+        return item.Type1 === type || item.Type2 === type;
+    });
+    displayData(filteredData);
+}
+
+function sortData(property, order) {
+    var sortedData = pokemonData.slice(0);
+    sortedData.sort(function(a, b) {
+        if (order === 'asc') {
+            return a[property] > b[property] ? 1 : -1;
+        } else {
+            return a[property] < b[property] ? 1 : -1;
+        }
+    });
+    displayData(sortedData);
+}
+
+function displayData(data) {
+    // データを表示するコードをここに追加する
+}
+";
+echo "</script>";
+
 ?>
 
 <!DOCTYPE html>
@@ -76,231 +100,295 @@ try {
     <meta charset="UTF-8">
     <title>在庫商品一覧</title>
     <link rel="stylesheet" href="./css/order_7thA.css">
+    <link rel="stylesheet" href="./css/stock_management_7thA.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        .button-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            margin-bottom: 20px;
+        /* CSS for the left side */
+        .filter-sort-section {
+            float: left;
+            width: 50%; /* Adjust the width as needed */
+            flex-direction: column;
         }
-
-        .no-more-data {
-            display: none;
-            justify-content: center;
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            color: #777;
+        .filter-sort-section > * {
+            margin-bottom: 10px;
         }
-
-        .bottom-margin {
-            height: 20px;
-        }
-        /* 追加 */
+        /* CSS for the right side */
         .container_st {
-    /* 他のスタイル */
-}
-
-.row {
-    display: flex;
-    justify-content: space-between; /* 左右の間にスペースを作成 */
-    align-items: center;
-    margin-bottom: 10px; /* 下部の余白を追加 */
-}
-
-.search-container {
-    display: flex;
-    align-items: center;
-}
-
-.search-container > * {
-    margin-right: 10px; /* 要素間の右側の余白を追加 */
-}
-
-.update-container {
-    display: flex;
-    align-items: center;
-}
-
-.update-container > * {
-    margin-left: 10px;
-}
-#search-input {
-    width: 250px; /* サイズを調整 */
-}
-
+            float: right;
+            width: 50%; /* Adjust the width as needed */
+            flex: 1; /* Take up all available space */
+           
+        }
+        
+        /* Clear floats */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
     </style>
 </head>
 
 <body>
     <h1>商品一覧</h1>
-
-    <div class="container_st">
-    <div class="row">
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="SIDまたは商品名を入力してください">
-            <button id="search-button">検索</button>
-            <button id="reset-button">リセット</button>
+    <div class="container">
+    <!-- フィルターとソート -->
+    <div class="filter-sort-section">
+        <h3 class="text-left">文字列でさがす</h3>
+        <div class="mt-3">
+            <input type="text" id="search-name" class="form-control large-input" placeholder="商品名で検索" />
         </div>
-        <div class="update-container">
-            <div id="last-updated"></div>
-            <button id="refresh" type="button">更新する</button>
+        <hr>
+        <h3 class="text-left">genderでさがす</h3>
+        <div class="mt-3" id="gender-filters">
+            <label><input type="checkbox" value="male" onclick="filterByGender('male')"> オスポケモン</label>
+            <label><input type="checkbox" value="female" onclick="filterByGender('female')"> メスポケモン</label>
+            <label><input type="checkbox" value="unknown" onclick="filterByGender('unknown')"> せいべつふめい</label>
+            <label><input type="checkbox" value="egg" onclick="filterByGender('egg')"> タマゴ</label>
+            <label><input type="checkbox" value="item" onclick="filterByGender('item')"> どうぐ</label>
+            <label><input type="checkbox" value="ball" onclick="filterByGender('ball')"> ボール</label>
+        </div>
+        <hr>
+        <h3 class="text-left">ポケモンのタイプでさがす</h3>
+        <div class="mt-3" id="type-filters">
+            <label><input type="checkbox" value="ノーマル" onclick="filterByType('ノーマル')"> ノーマル</label>
+            <label><input type="checkbox" value="ほのお" onclick="filterByType('ほのお')"> ほのお</label>
+            <label><input type="checkbox" value="みず" onclick="filterByType('みず')"> みず</label>
+            <label><input type="checkbox" value="でんき" onclick="filterByType('でんき')"> でんき</label>
+            <label><input type="checkbox" value="くさ" onclick="filterByType('くさ')"> くさ</label>
+            <label><input type="checkbox" value="こおり" onclick="filterByType('こおり')"> こおり</label>
+            <label><input type="checkbox" value="かくとう" onclick="filterByType('かくとう')"> かくとう</label>
+            <label><input type="checkbox" value="どく" onclick="filterByType('どく')"> どく</label>
+            <label><input type="checkbox" value="じめん" onclick="filterByType('じめん')"> じめん</label>
+            <label><input type="checkbox" value="ひこう" onclick="filterByType('ひこう')"> ひこう</label>
+            <label><input type="checkbox" value="エスパー" onclick="filterByType('エスパー')"> エスパー</label>
+            <label><input type="checkbox" value="むし" onclick="filterByType('むし')"> むし</label>
+            <label><input type="checkbox" value="いわ" onclick="filterByType('いわ')"> いわ</label>
+            <label><input type="checkbox" value="ゴースト" onclick="filterByType('ゴースト')"> ゴースト</label>
+            <label><input type="checkbox" value="ドラゴン" onclick="filterByType('ドラゴン')"> ドラゴン</label>
+            <label><input type="checkbox" value="あく" onclick="filterByType('あく')"> あく</label>
+            <label><input type="checkbox" value="はがね" onclick="filterByType('はがね')"> はがね</label>
+            <label><input type="checkbox" value="フェアリー" onclick="filterByType('フェアリー')"> フェアリー</label>
+        </div>
+        <hr>
+        <h3 class="text-left">ソートする</h3>
+        <div class="text-center mt-3">
+            <button class="btn btn-primary" onclick="sortData('Name', 'asc')">アイウエオ順</button>
+            <button class="btn btn-primary" onclick="sortData('Name', 'desc')">アイウエオ逆順</button>
+            <button class="btn btn-secondary" onclick="sortData('Price', 'asc')">価格の安い順</button>
+            <button class="btn btn-secondary" onclick="sortData('Price', 'desc')">価格の高い順</button>
+            <button class="btn btn-warning" onclick="sortData('Inventory', 'asc')">在庫の少ない順</button>
+            <button class="btn btn-warning" onclick="sortData('Inventory', 'desc')">在庫の多い順</button>
         </div>
     </div>
+
+    <div class="container_st">
+        <div class="row">
+            <div class="update-container">
+                <div id="last-updated"></div>
+                <button id="refresh" type="button" onclick="refreshData()">最新の情報を取得</button>
+
+            </div>
+        </div>
         <table border="1" id="product-table">
             <thead>
                 <tr>
                     <th>SID</th>
                     <th>PID</th>
                     <th>商品名</th>
-                    <th>画像</th>
+                    <th>画 像</th>
                     <th>タイプ1</th>
                     <th>タイプ2</th>
-                    <th>販売</th>
-                    <th>価格</th>
-                    <th>在庫数</th>
+                    <th>分 類</th>
+                    <th>価 格</th>
+                    <th>価格編集</th>
+                    <th>在 庫</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- データがここに追加されます -->
             </tbody>
+
+
         </table>
-    </div>
+    
+
     <div class="button-center">
         <button id="load-more" onclick="loadMoreProducts()">さらに読み込む</button>
     </div>
-    <div class="no-more-data">これ以上のデータはありません</div> <!-- 最後のページに到着したときに表示 -->
-    <!-- 画面最下部の隙間 -->
-    <div class="bottom-margin">
+    <div class="no-more-data">これ以上のデータはありません</div>
+    <div class="bottom-margin"></div>
     </div>
-
+    
     <script>
-        // 初期のページ番号を定義
-        let currentPage = 0;
+        var displayedData = 10; // 初期表示するデータ数
+        var increment = 10; // 追加で表示するデータ数
 
-        // 商品を追加する関数
+    
+// データを表示する関数
+function displayData(data) {
+    var tableBody = document.querySelector('#product-table tbody');
+    tableBody.innerHTML = ''; // テーブルの内容をクリア
+
+    var searchValue = document.getElementById('search-name').value.toLowerCase();
+    var genderFilters = Array.from(document.querySelectorAll('#gender-filters input:checked')).map(function(checkbox) {
+        return checkbox.value;
+    });
+    var typeFilters = Array.from(document.querySelectorAll('#type-filters input:checked')).map(function(checkbox) {
+        return checkbox.value;
+    });
+
+    
+data.filter(function(item) {
+    return item.Name.toLowerCase().includes(searchValue) &&
+        (genderFilters.length === 0 || genderFilters.includes(item.Gender)) &&
+        (typeFilters.length === 0 || (item.Type1 !== null && typeFilters.includes(item.Type1)) || (item.Type2 !== null && typeFilters.includes(item.Type2)));
+}).slice(0, displayedData).forEach(function(item) {
+    var row = document.createElement('tr');
+    row.innerHTML = `
+    <td>${item.SID}</td>
+    <td>${item.PID}</td>
+    <td>${item.Name}</td>
+    <td><img src="${item.Image_path}" alt="商品画像" width="100" height="100"></td>
+    <td>${item.Type1 || ''}</td> <!-- タイプが null の場合は空白表示 -->
+<td>${item.Type2 || ''}</td> <!-- タイプが null の場合は空白表示 -->
+    <td>${item.Gender}</td>
+    
+    <td>
+<span class="price-display">${item.Price}</span>
+<input type="number" class="price-input" style="display: none;" value="${item.Price}">
+</td>
+<td>
+<button class="edit-price-btn" onclick="togglePriceEdit(this)">編集</button>
+<button class="save-price-btn" style="display: none;" onclick="savePrice(this)">保存</button>
+</td>
+
+    <td>${item.Inventory}</td>
+`;
+    tableBody.appendChild(row);
+});
+
+
+
+
+    // データを全て表示したらさらに読み込むボタンを非表示にする
+    if (displayedData >= data.length) {
+        document.getElementById('load-more').style.display = 'none';
+        document.querySelector('.no-more-data').style.display = 'block';
+    } else {
+        document.getElementById('load-more').style.display = 'block';
+        document.querySelector('.no-more-data').style.display = 'none';
+    }
+}
+
+
+        // 初期表示
+        displayData(pokemonData);
+
+        // さらに読み込むボタンが押された時の処理
         function loadMoreProducts() {
-            // ページ番号をインクリメント
-            currentPage++;
+            displayedData += increment;
+            displayData(pokemonData);
+        }
 
-            // AJAXリクエストを送信
-            $.ajax({
-                url: `?ajax=1&page=${currentPage}`, // ページ番号を含むURL
-                type: 'GET', // GETリクエスト
-                success: function(response) { // リクエスト成功時の処理
-                    if (response.error) { // エラーチェック
-                        alert(response.error); // エラーメッセージを表示
-                        return; // 関数を終了
-                    }
-                    appendProducts(response.products, currentPage, response.total_pages); // 商品を追加する関数を呼び出す
-                },
-                error: function() { // リクエスト失敗時の処理
-                    alert('製品の読み込みエラー。'); // エラーメッセージを表示
+        // フィルターが変更された時の処理
+        function applyFilters() {
+            displayedData = 10;
+            displayData(pokemonData);
+        }
+
+        // フィルターの変更イベントを追加
+        document.getElementById('search-name').addEventListener('input', applyFilters);
+        document.querySelectorAll('#gender-filters input[type="checkbox"]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', applyFilters);
+        });
+        document.querySelectorAll('#type-filters input[type="checkbox"]').forEach(function(checkbox) {
+            checkbox.addEventListener('change', applyFilters);
+        });
+
+        // 最新の情報を取得する
+        function refreshData() {
+            // サーバーから最新のデータを取得するためにページをリロードする
+            location.reload();
+        }
+
+        // 時間の表示ページのロード時
+        $(document).ready(function() {
+            const currentTime = new Date();
+            const formattedTime = currentTime.toLocaleString(); // 現在時刻を表示
+            $('#last-updated').text('最終更新: ' + formattedTime);
+
+            loadMoreProducts(); // 初期商品を読み込み
+        });
+
+
+/////////////////////////////////////
+
+        // 価格の編集
+        // 金額の編集をトグルし、商品IDを保存する関数
+        function togglePriceEdit(button) {
+            var row = button.parentNode.parentNode;
+            var SID = row.querySelector('td:first-child').textContent;
+            console.log(SID); // SID の値を取得した後にログに出力
+            var priceDisplay = row.querySelector('.price-display');
+            var priceInput = row.querySelector('.price-input');
+            var editBtn = row.querySelector('.edit-price-btn');
+            var saveBtn = row.querySelector('.save-price-btn');
+
+            // 表示と入力フィールドを切り替える
+            priceDisplay.style.display = 'none';
+            priceInput.style.display = 'inline-block';
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'inline-block';
+
+            // 保存ボタンに商品IDをデータ属性としてセット
+            saveBtn.dataset.sid = SID;
+        }
+
+        // 金額を保存する関数
+        function savePrice(button) {
+            var SID = button.dataset.sid;
+            var row = button.parentNode.parentNode;
+            var priceDisplay = row.querySelector('.price-display');
+            var priceInput = row.querySelector('.price-input');
+            var editBtn = row.querySelector('.edit-price-btn');
+            var saveBtn = row.querySelector('.save-price-btn');
+
+            // 入力された金額を取得し、表示を更新する
+            var newPrice = priceInput.value;
+            priceDisplay.textContent = newPrice;
+
+            // 表示と入力フィールドを切り替える
+            priceDisplay.style.display = 'inline-block';
+            priceInput.style.display = 'none';
+            editBtn.style.display = 'inline-block';
+            saveBtn.style.display = 'none';
+
+            // 保存した価格をデータベースに反映するためにAjaxリクエストを送信する
+            var formData = new FormData();
+            formData.append('SID', SID); // SIDを追加
+            formData.append('Price', newPrice);
+
+            // Ajaxリクエストを送信
+            fetch('stock_update_price.php', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
+                return response.text();
+            }).then(data => {
+                console.log(data);
+                // サーバーからの応答をログに出力
+            }).catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
             });
         }
-
-        // 商品を追加する関数
-        function appendProducts(products, currentPage, total_pages) {
-            // 取得した商品リストを反復処理
-            products.forEach(product => {
-                // 商品情報をHTMLテーブルの行に変換
-                const type2 = product.Type2 ? product.Type2 : ''; // タイプ2があるかどうかの条件付き代入
-                const row = `<tr>
-            <td>${product.SID}</td>
-            <td>${product.PID}</td>
-            <td>${product.Name}</td>
-            <td><img src="${product.Image_path}" alt="商品画像" width="100" height="100"></td>
-            <td>${product.Type1}</td>
-            <td>${type2}</td>
-            <td>${product.Gender}</td>
-            <td>${product.Price}</td>
-            <td>${product.Inventory}</td>
-        </tr>`;
-                // テーブルのtbody要素に行を追加
-                $('#product-table tbody').append(row);
-            });
-
-            // 最後のページならメッセージを表示
-            if (currentPage >= total_pages) {
-                console.log("最後のページ");
-                $('#load-more').hide(); // ボタンを非表示
-                $('.no-more-data').show(); // メッセージを表示
-            }
-        }
-
-        // 更新ボタンをクリックしたときの処理
-        $('#refresh').click(function() {
-            // 現在の日時を取得
-            const currentTime = new Date();
-            const formattedTime = currentTime.toLocaleString(); // 日時を文字列に変換
-
-            // 最終更新時刻を表示
-            $('#last-updated').text('最終更新: ' + formattedTime);
-
-            currentPage = 0; // ページ番号をリセット
-            $('#product-table tbody').empty(); // テーブルの内容をクリア
-            $('#load-more').show(); // 読み込むボタンを表示
-            $('.no-more-data').hide(); // メッセージを非表示
-            loadMoreProducts(); // 商品情報を再読み込み
-        });
-
-        // ページが読み込まれたときの処理
-        $(document).ready(function() {
-            // 現在の日時を取得
-            const currentTime = new Date();
-            const formattedTime = currentTime.toLocaleString(); // 日時を文字列に変換
-
-            // 最終更新時刻を表示
-            $('#last-updated').text('最終更新: ' + formattedTime);
-        });
-
-        // ドキュメントのロード完了時の処理
-        $(document).ready(function() {
-            loadMoreProducts(); // 商品情報を読み込み
-        });
     </script>
-    <!-- // 検索関数 -->
-    <script>
-        function searchTable() {
-            const searchKeyword = $('#search-input').val().toUpperCase(); // 大文字に変換
-            if (searchKeyword.trim() === '') {
-                // 検索キーワードが空の場合は全ての行を表示
-                $('#product-table tbody tr').show();
-            } else {
-                // 検索キーワードでフィルタリング
-                $('#product-table tbody tr').each(function() {
-                    const sid = $(this).find('td:eq(0)').text().toUpperCase(); // 大文字に変換
-                    const name = $(this).find('td:eq(2)').text().toUpperCase(); // 大文字に変換
-                    if (sid.includes(searchKeyword) || name.includes(searchKeyword)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            }
-        }
 
-        // 検索ボタンのクリックイベントリスナーを設定
-        $('#search-button').click(function() {
-            searchTable();
-        });
 
-        // リセットボタンのクリックイベントリスナーを設定
-        $('#reset-button').click(function() {
-            $('#search-input').val('');
-            searchTable();
-        });
-
-        // Enterキーで検索実行
-        $('#search-input').keypress(function(event) {
-            if (event.which === 13) {
-                searchTable();
-            }
-        });
-    </script>
 </body>
+
 
 </html>
