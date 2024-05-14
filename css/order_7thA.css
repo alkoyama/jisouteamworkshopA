@@ -26,7 +26,7 @@ body {
 
 h1 {
   text-align: center;
-  margin-bottom: 50px;
+  /* margin-bottom: 50px; */
 }
 /* 表の装飾 */
 
@@ -177,8 +177,100 @@ td {
   background-color: #ccc;
 }
 
-/* stock_managment_7thAのCSS */
-.container_st{
-  width: 70%; /* ページの幅の90%を占める */
-  margin: 0 auto; /* 左右の余白を自動的に調整して中央に配置 */
+/* 歯車アイコンの大きさを変更 */
+#back-to-admin .fa-cog {
+  font-size: 2em;
+  /* 大きさを2emに設定（例） */
+  border: none; /* 外枠を削除 */
+  background: none; /* ボタンの背景を削除 */
+  padding: 0; /* 不要なパディングを削除 */
+  margin: 0; /* 不要なマージンを削除 */
+  box-shadow: none; /* ボックスシャドウを削除 */
+}
+
+/* ホバーメッセージのスタイル */
+#hover-message {
+  display: none;
+  /* デフォルトでは表示しない */
+  position: absolute;
+  background-color: #bad4d1;
+  /* 背景色を青に設定 */
+  color: #000;
+  /* 文字色を白に設定 */
+  padding: 5px 10px;
+  border-radius: 5px;
+  bottom: 40px;
+  /* 適切な位置に調整 */
+  left: 50%;
+  /* 適切な位置に調整 */
+  transform: translateX(-50%);
+  /* 中央揃え */
+  white-space: nowrap;
+}
+
+.back-btn {
+  position: relative;
+  display: inline-block;
+  float: right;
+  /* 右側に配置 */
+  margin-right: 20px;
+  /* 適切な余白に調整 */
+  margin-bottom: 10px;
+}
+
+.back-btn:hover #hover-message {
+  display: block;
+  /* ホバー時に表示 */
+}
+
+/* レスポンシブ */
+/* メディアクエリでレスポンシブ対応 */
+@media (max-width: 1200px) {
+  .container {
+    width: 95%; /* 幅を95%に調整 */
+  }
+
+  .modal-content {
+    width: 70%; /* モーダルの幅を70%に */
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 100%; /* 幅を100%に調整 */
+    padding: 10px;
+  }
+
+  .modal-content {
+    width: 90%; /* モーダルの幅を90%に */
+    margin: 20% auto; /* 上部のマージンを調整 */
+    padding: 20px;
+  }
+
+  th {
+    font-size: 18px; /* タイトルの文字の大きさを18pxに */
+  }
+
+  td {
+    font-size: 16px; /* セルの文字の大きさを16pxに */
+  }
+
+  #back-to-admin .fa-cog {
+    font-size: 1.5em; /* アイコンの大きさを1.5emに調整 */
+  }
+
+  #hover-message {
+    bottom: 30px; /* ホバーメッセージの位置を調整 */
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95%; /* モーダルの幅を95%に */
+    padding: 10px;
+  }
+
+  .pagination a {
+    padding: 3px 6px; /* ページネーションのパディングを調整 */
+  }
 }
