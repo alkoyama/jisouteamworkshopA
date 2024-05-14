@@ -1,92 +1,96 @@
+.button-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 
-        .button-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
+.no-more-data {
+  display: none;
+  justify-content: center;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  color: #777;
+}
 
-        .no-more-data {
-            display: none;
-            justify-content: center;
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            color: #777;
-        }
+.bottom-margin {
+  height: 20px;
+}
 
-        .bottom-margin {
-            height: 20px;
-        }
+/* 更新ボタンの部分 */
+.parent-container {
+  display: flex;
+  justify-content: flex-end; /* 全体を右側に移動 */
+  margin-top: 20px; /* 必要に応じてマージンを追加 */
+}
 
-        /* 更新ボタンの部分 */
-        .parent-container {
-            display: flex;
-            justify-content: flex-end; /* 全体を右側に移動 */
-            margin-top: 20px; /* 必要に応じてマージンを追加 */
-        }
-        
-        .update-container {
-            display: flex;
-            align-items: center;
-            margin-left: auto; /* 右側に移動 */
-        }
-        
-        .update-container > * {
-            margin-left: 20px; /* 要素間のマージンを追加 */
-        }
-        
-        #search-input {
-            width: 250px; /* サイズを調整 */
-        }
-       
-  /* 検索機能の部分 */
-        #type-filters label {
-            display: inline-block;
-            width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
-            margin-bottom: 10px;
-        }
-        .text-center {
-            display: flex;
-            justify-content: space-around; /* 中央寄せ */
-            margin-left: 10px;
-            margin-right: 10px;
-            font-size: 1vw;
-        }   
-        /* ライトグレーのテキスト用のクラス */
-        .light-gray {
-            color: lightgray; /* ライトグレーに設定 */
-        }
-        @media (max-width: 768px) {
-            #type-filters label {
-                width: calc(50% - 10px); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
-            }
-        }
+.update-container {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* 右側に移動 */
+}
 
-        #gender-filters {
-            display: flex; /* ラベルをフレックスボックスで均等配置 */
-            flex-wrap: wrap; /* ラベルを折り返す */
-            justify-content: space-between; /* 均等に配置 */
-        }
+.update-container > * {
+  margin-left: 20px; /* 要素間のマージンを追加 */
+}
 
-        #gender-filters label {
-            width: calc(16.66% - 10px); /* タイプフィルターと同様の幅 */
-            margin-bottom: 10px; /* ラベルの間隔を確保 */
-        }
+#search-input {
+  width: 250px; /* サイズを調整 */
+}
 
-        @media (max-width: 768px) {
-            #gender-filters label {
-                width: calc(50% - 10px); /* レスポンシブ対応：狭い画面では2つずつ配置 */
-            }
-        }
+/* 検索機能の部分 */
+#type-filters label {
+  display: inline-block;
+  width: calc(16.66% - 10px); /* 横6つに並べるために幅を調整 */
+  margin-bottom: 10px;
+}
+.text-center {
+  display: flex;
+  justify-content: space-around; /* 中央寄せ */
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 1vw;
+}
+/* ライトグレーのテキスト用のクラス */
+.light-gray {
+  color: lightgray; /* ライトグレーに設定 */
+}
+@media (max-width: 768px) {
+  #type-filters label {
+    width: calc(
+      50% - 10px
+    ); /* レスポンシブ対応：画面幅が狭い場合は横2つに並べる */
+  }
+}
 
-        /* 画面幅が小さい場合のフォントサイズ調整 */
-        @media (max-width: 768px) {
-            .pokemon-card {
-                font-size: 0.875rem; /* 小さい画面ではフォントサイズを少し小さくする */
-            }
-        }
+#gender-filters {
+  display: flex; /* ラベルをフレックスボックスで均等配置 */
+  flex-wrap: wrap; /* ラベルを折り返す */
+  justify-content: space-between; /* 均等に配置 */
+}
 
-       
-        
+#gender-filters label {
+  width: calc(16.66% - 10px); /* タイプフィルターと同様の幅 */
+  margin-bottom: 10px; /* ラベルの間隔を確保 */
+}
+
+@media (max-width: 768px) {
+  #gender-filters label {
+    width: calc(50% - 10px); /* レスポンシブ対応：狭い画面では2つずつ配置 */
+  }
+}
+
+/* 画面幅が小さい場合のフォントサイズ調整 */
+@media (max-width: 768px) {
+  .pokemon-card {
+    font-size: 0.875rem; /* 小さい画面ではフォントサイズを少し小さくする */
+  }
+}
+
+
+table th:nth-child(9), /* 価格編集 */
+table td:nth-child(9)/* 価格編集 */ {
+  width: 120px; /* 例：80px */
+}
