@@ -71,8 +71,9 @@
     <header class="header" id="header">
       <div class="header_container">
        <div class="header_container_small">
-        <a class="head_A">
-         <img src="./images/icon/index_header-ball.gif" alt="ゆらゆら">
+        <a class="head_A" style="display: flex;">
+          <img src="./images/icon/index_header-ball.gif" alt="ゆらゆら">
+          <img src="./images/assets/index_logo.png" style="width: 95%;"alt="ゆらゆら">
         </a>
         <button type="button" class="head_C">
          <span class="fa fa-bars" title="MEMU"></span><span class="sr-only">MEMU</span>

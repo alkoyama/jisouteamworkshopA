@@ -30,6 +30,8 @@
         <input type="submit" value="Create Account">
     </form>
 
+    <br><a href="index_7thA.php">ストアフロントへ戻る</a>
+
     <?php
         //  This part will process the form submission (replace with your logic)
 

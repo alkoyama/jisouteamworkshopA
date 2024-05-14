@@ -34,8 +34,9 @@
     <header class="header" id="header">
       <div class="header_container">
        <div class="header_container_small">
-        <a class="head_A">
-         <img src="./images/icon/index_header-ball.gif" alt="ゆらゆら">
+       <a class="head_A" style="display: flex;">
+          <img src="./images/icon/index_header-ball.gif" alt="ゆらゆら">
+          <img src="./images/assets/index_logo.png" style="width: 90%;"alt="ゆらゆら">
         </a>
         <button type="button" class="head_C">
          <span class="fa fa-bars" title="MEMU"></span><span class="sr-only">MEMU</span>
@@ -50,7 +51,7 @@
     
     } else {
      // User is not logged in, redirect to login page or display a login prompt
-     echo "ログインしてください。</p>";
+     // echo "ログインしてください。</p>";
      }
     ?>
          <li><a href="./index_7tha.php" class="header_shop"><span title="SHOP"><img src="./images/icon/index_header-shop.png" alt="shop"></span></a></li>
@@ -83,6 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $row = $result->fetch_assoc();
     $_SESSION["loggedIn"] = true;  // Store login status in session
     $_SESSION["CID"] = $CID;  // Store user CID in session
+    $_SESSION["Name"] = $row["Name"];  // Store user Name in session
 
     echo "ログイン完了<br><br>";
     $linkUrl = "index_7thA.php";
