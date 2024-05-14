@@ -79,8 +79,8 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="./css/order_7thA.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>受注管理画面</title>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         function confirmDelete(OID) {
@@ -116,6 +116,12 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
     <h1>受注管理画面</h1>
     <div class="container">
         <table border="1">
+        <a href="http://localhost/jisouteamworkshopA/Integration_Hub_7th.php" class="back-btn">
+                <button id="back-to-admin" class="btn">
+                    <i class="fa fa-cog" aria-hidden="true"></i>
+                </button>
+                <div id="hover-message" class="hidden">管理画面へ</div>
+            </a>
             <tr>
                 <th>受注ID</th>
                 <th>注 文 日 時</th>
@@ -183,6 +189,15 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
             // モーダルを非表示にする
             $('#orderDetailsModal').css('display', 'none');
         }
+
+        // 管理画面へ戻る
+        document.getElementById('back-to-admin').addEventListener('mouseover', function() {
+                document.getElementById('hover-message').style.display = 'block';
+            });
+
+            document.getElementById('back-to-admin').addEventListener('mouseout', function() {
+                document.getElementById('hover-message').style.display = 'none';
+            });
     </script>
     <div class="pagination">
         <?php
@@ -193,7 +208,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['OID'])
             // echo "<a class='$active_class' href='admin.php?page=$i'>$i</a>";
             echo "<a class='$active_class' href='order_7thA.php?page=$i'>$i</a>";
         }
-
         ?>
     </div>
     <!-- <video id="myVideo" autoplay loop muted playsinline style="width: 50%; height: 30%; position: fixed; top:680px; bottom: 0; left: 0; z-index: -1;">

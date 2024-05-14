@@ -101,10 +101,10 @@ echo "</script>";
     <title>在庫商品一覧</title>
     <link rel="stylesheet" href="./css/order_7thA.css">
     <link rel="stylesheet" href="./css/stock_management_7thA.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        
+       
     </style>
 </head>
 
@@ -113,7 +113,7 @@ echo "</script>";
     <div class="container">
         <!-- 通知メッセージを表示するためのエリア -->
         <div id="notification" class="notification"></div>
-        
+
 
         <!-- フィルターとソート -->
         <div class="filter-sort-section">
@@ -164,6 +164,14 @@ echo "</script>";
                 <button class="btn btn-warning" onclick="sortData('Inventory', 'desc')">在庫の多い順</button>
             </div>
             <button class="btn btn-danger" id="reset-button" onclick="resetFilters()">リセット</button>
+            <a href="http://localhost/jisouteamworkshopA/Integration_Hub_7th.php" class="back-btn">
+                <button id="back-to-admin" class="btn">
+                    <i class="fa fa-cog" aria-hidden="true"></i>
+                </button>
+                <div id="hover-message" class="hidden">管理画面へ</div>
+            </a>
+
+
         </div>
 
         <div class="container_st">
@@ -271,7 +279,6 @@ echo "</script>";
                     document.querySelector('.no-more-data').style.display = 'none';
                 }
             }
-
 
             // 初期表示
             displayData(pokemonData);
@@ -455,9 +462,11 @@ echo "</script>";
                 var offsetTop = 10; // 適切な位置に調整
                 if (scrollTop > offsetTop) {
                     filterSortSection.css('position', 'fixed');
-                    filterSortSection.css('top', '30px'); // 適切な位置に調整
+                    filterSortSection.css('top', '30px'); // 固定位置の調整
+                    filterSortSection.css('height', 'calc(100% - 30px)'); // 固定時の高さ調整
                 } else {
                     filterSortSection.css('position', 'static');
+                    filterSortSection.css('height', 'auto'); // デフォルトの高さに戻す
                 }
             });
 
@@ -500,25 +509,33 @@ echo "</script>";
                 }, 3000); // 3秒間表示した後、非表示にする
             }
 
+            // 最新の情報を取得
             document.getElementById("refresh").addEventListener("click", function() {
-  // データベースとの通信をシミュレートする
-  var success = Math.random() < 0.5; // 成功率50%を仮定する
+                // データベースとの通信をシミュレートする
+                var success = Math.random() < 0.5; // 成功率50%を仮定する
 
-  var notification = document.getElementById("update-notification");
+                var notification = document.getElementById("update-notification");
 
-  if (success) {
-    notification.textContent = "最新の情報を取得しました。";
-    notification.classList.remove("update-error");
-    notification.classList.add("update-success");
-  } else {
-    notification.textContent = "情報の取得に失敗しました。もう一度試してください。";
-    notification.classList.remove("update-success");
-    notification.classList.add("update-error");
-  }
+                if (success) {
+                    notification.textContent = "最新の情報を取得しました。";
+                    notification.classList.remove("update-error");
+                    notification.classList.add("update-success");
+                } else {
+                    notification.textContent = "情報の取得に失敗しました。もう一度試してください。";
+                    notification.classList.remove("update-success");
+                    notification.classList.add("update-error");
+                }
 
-  notification.classList.remove("hidden");
-});
+                notification.classList.remove("hidden");
+            });
+            // 管理画面へ戻る
+            document.getElementById('back-to-admin').addEventListener('mouseover', function() {
+                document.getElementById('hover-message').style.display = 'block';
+            });
 
+            document.getElementById('back-to-admin').addEventListener('mouseout', function() {
+                document.getElementById('hover-message').style.display = 'none';
+            });
         </script>
 
 

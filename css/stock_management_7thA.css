@@ -1,15 +1,16 @@
 
-table th:nth-child(9), /* 価格編集 */
-table td:nth-child(9)/* 価格編集 */ {
-  width: 120px; /* 例：80px */
-}
-
-/* CSS for the left side */
+/* CSS 左側検索とソート */
 .filter-sort-section {
   float: left;
   width: 30%;
   /* Adjust the width as needed */
   flex-direction: column;
+  height: 800px; /* 高さを増やす例: 400px */
+  overflow-y: auto; /* コンテンツがセクションの高さを超える場合、スクロールバーを表示 */
+}
+/* 例として、検索とソートセクションのアイテム間の余白を増やす */
+.filter-sort-section>* {
+  margin-bottom: 20px; /* アイテム間の余白を増やす例: 20px */
 }
 
 .filter-sort-section>* {
@@ -96,7 +97,7 @@ table td:nth-child(9)/* 価格編集 */ {
   width: auto;
 }
 
-/* CSS for the right side */
+/* CSS 右側　一覧表 */
 .container_st {
   float: right;
   width: 65%;
@@ -105,6 +106,10 @@ table td:nth-child(9)/* 価格編集 */ {
   /* Take up all available space */
 }
 
+table th:nth-child(9), /* 価格編集 */
+table td:nth-child(9)/* 価格編集 */ {
+  width: 120px; /* 例：80px */
+}
 /* Clear floats */
 .row:after {
   content: "";
@@ -389,4 +394,44 @@ th {
 #reset-button {
   display: block;
   margin: 0 auto;
+}
+
+ /* 歯車アイコンの大きさを変更 */
+ #back-to-admin .fa-cog {
+  font-size: 2em;
+  /* 大きさを2emに設定（例） */
+}
+
+/* ホバーメッセージのスタイル */
+#hover-message {
+  display: none;
+  /* デフォルトでは表示しない */
+  position: absolute;
+  background-color: #bad4d1;
+  /* 背景色を青に設定 */
+  color: #000;
+  /* 文字色を白に設定 */
+  padding: 5px 10px;
+  border-radius: 5px;
+  top: 60px;
+  /* 適切な位置に調整 */
+  left: 50%;
+  /* 適切な位置に調整 */
+  transform: translateX(-50%);
+  /* 中央揃え */
+  white-space: nowrap;
+}
+
+.back-btn {
+  position: relative;
+  display: inline-block;
+  float: right;
+  /* 右側に配置 */
+  margin-right: 20px;
+  /* 適切な余白に調整 */
+}
+
+.back-btn:hover #hover-message {
+  display: block;
+  /* ホバー時に表示 */
 }
