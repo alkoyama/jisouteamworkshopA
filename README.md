@@ -8,3 +8,14 @@ loginlogic_7thA.php<br>
 logout_7tha.php<br>
 my_page_7tha<br>
 →また、これらに関するスクリプトページ
+
+<h1>奥崎恭平</h1>
+poke_card.php<br>
+product_register.php<br>
+poke_card_register.php<br>
+payment_7thA.php<br>
+payment_confirmation_7thA.php<br>
+thanks_7thA.phpの処理コード部分<br>
+battle_7thA.php<br>
+poke_card_battle.php<br>
+DB設計（	teamworkshop_7thA.sql）<br>
