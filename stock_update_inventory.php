@@ -14,29 +14,29 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// POSTリクエストからSIDとPriceを取得
+// POSTリクエストからSIDとInventoryを取得
 $SID = $_POST['SID'];
-$newPrice = $_POST['Price'];
+$newInventory = $_POST['Inventory'];
 
-// 価格の更新を反映するSQLクエリを準備
-$sqlPrice = "UPDATE product_stock SET Price = :newPrice WHERE SID = :SID";
+// 在庫の更新を反映するSQLクエリを準備
+$sqlInventory = "UPDATE product_stock SET Inventory = :newInventory WHERE SID = :SID";
 
 // SQL クエリの直前にログを追加
-error_log("Updating price for SID: $SID, new price: $newPrice");
+error_log("Updating inventory for SID: $SID, new inventory: $newInventory");
 
 try {
-    // 価格の更新を実行
-    $stmtPrice = $pdo->prepare($sqlPrice);
-    $stmtPrice->bindParam(':newPrice', $newPrice, PDO::PARAM_STR);
-    $stmtPrice->bindParam(':SID', $SID, PDO::PARAM_STR);
-    $stmtPrice->execute();
+    // 在庫の更新を実行
+    $stmtInventory = $pdo->prepare($sqlInventory);
+    $stmtInventory->bindParam(':newInventory', $newInventory, PDO::PARAM_INT);
+    $stmtInventory->bindParam(':SID', $SID, PDO::PARAM_STR);
+    $stmtInventory->execute();
 
     // 成功したことをクライアントに通知
-    echo "Price updated successfully";
+    echo "Inventory updated successfully";
 } catch (PDOException $e) {
     // エラーが発生した場合はエラーメッセージを出力
     echo "Error: " . $e->getMessage();
     // エラーが発生したことをログに記録
-    error_log("Error updating price for SID: $SID - " . $e->getMessage());
+    error_log("Error updating inventory for SID: $SID - " . $e->getMessage());
 }
 ?>

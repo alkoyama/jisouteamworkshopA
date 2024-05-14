@@ -102,29 +102,136 @@ echo "</script>";
     <link rel="stylesheet" href="./css/order_7thA.css">
     <link rel="stylesheet" href="./css/stock_management_7thA.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
+        h1 {
+            padding-bottom: 50px;
+        }
+
         /* CSS for the left side */
         .filter-sort-section {
             float: left;
-            width: 50%; /* Adjust the width as needed */
+            width: 30%;
+            /* Adjust the width as needed */
             flex-direction: column;
         }
-        .filter-sort-section > * {
+
+        .filter-sort-section>* {
             margin-bottom: 10px;
         }
+
+
+        /* 親要素に flex レイアウトを適用 */
+        #gender-filters,
+        #type-filters,
+        .text-center {
+            display: flex;
+            flex-wrap: wrap;
+            /* 子要素が折り返すようにする */
+            justify-content: center;
+            /* 子要素を中央に配置する */
+        }
+
+        /* 各子要素の幅を調整して、2つごとに折り返す */
+        #gender-filters>label,
+        #type-filters>label,
+        .text-center>button {
+            flex-basis: calc(50% - 10px);
+            /* 幅を計算して設定 */
+            margin: 5px;
+            /* 子要素間の余白を設定 */
+        }
+
+        .btn {
+            padding: 1px;
+            /* 上下の余白10px、左右の余白20px */
+            font-size: 14px;
+            /* フォントサイズを14pxに設定 */
+            width: 50px;
+            /* 幅を150pxに設定 */
+        }
+
         /* CSS for the right side */
         .container_st {
             float: right;
-            width: 50%; /* Adjust the width as needed */
-            flex: 1; /* Take up all available space */
-           
+            width: 65%;
+            /* Adjust the width as needed */
+            flex: 1;
+            /* Take up all available space */
+
         }
-        
+
         /* Clear floats */
         .row:after {
             content: "";
             display: table;
             clear: both;
+        }
+
+        .update-container {
+            float: right;
+            /* 右側に配置 */
+            padding-bottom: 5px;
+        }
+
+
+        /* 価格・在庫編集通知 */
+        .notification {
+            display: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .notification.success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+
+        .notification.error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .price-input,
+        .inventory-input {
+            display: none;
+        }
+
+        /* FontAwesomeのアイコンに適用するスタイル */
+        .fa {
+            font-family: 'Font Awesome 5 Free';
+            /* FontAwesomeのフォントファミリー */
+            font-weight: 900;
+            /* フォントウェイト */
+        }
+
+        /* アイコンのサイズを調整する */
+        .fa {
+            font-size: 1.2em;
+            /* デフォルトのアイコンサイズ */
+        }
+
+        /* さらに細かい調整が必要な場合、各アイコンごとに個別にスタイルを追加 */
+        .fa-pencil-alt {
+            /* 鉛筆アイコンに適用するスタイル */
+        }
+
+        .fa-save {
+            /* 保存アイコンに適用するスタイル */
+        }
+
+        /* 鉛筆アイコンを含むボタンのボーダーを削除 */
+        .edit-price-btn,
+        .edit-inventory-btn {
+            border: none;
+            /* ボーダーを削除 */
+            background: none;
+            /* 背景色を透明にする */
         }
     </style>
 </head>
@@ -132,120 +239,121 @@ echo "</script>";
 <body>
     <h1>商品一覧</h1>
     <div class="container">
-    <!-- フィルターとソート -->
-    <div class="filter-sort-section">
-        <h3 class="text-left">文字列でさがす</h3>
-        <div class="mt-3">
-            <input type="text" id="search-name" class="form-control large-input" placeholder="商品名で検索" />
-        </div>
-        <hr>
-        <h3 class="text-left">genderでさがす</h3>
-        <div class="mt-3" id="gender-filters">
-            <label><input type="checkbox" value="male" onclick="filterByGender('male')"> オスポケモン</label>
-            <label><input type="checkbox" value="female" onclick="filterByGender('female')"> メスポケモン</label>
-            <label><input type="checkbox" value="unknown" onclick="filterByGender('unknown')"> せいべつふめい</label>
-            <label><input type="checkbox" value="egg" onclick="filterByGender('egg')"> タマゴ</label>
-            <label><input type="checkbox" value="item" onclick="filterByGender('item')"> どうぐ</label>
-            <label><input type="checkbox" value="ball" onclick="filterByGender('ball')"> ボール</label>
-        </div>
-        <hr>
-        <h3 class="text-left">ポケモンのタイプでさがす</h3>
-        <div class="mt-3" id="type-filters">
-            <label><input type="checkbox" value="ノーマル" onclick="filterByType('ノーマル')"> ノーマル</label>
-            <label><input type="checkbox" value="ほのお" onclick="filterByType('ほのお')"> ほのお</label>
-            <label><input type="checkbox" value="みず" onclick="filterByType('みず')"> みず</label>
-            <label><input type="checkbox" value="でんき" onclick="filterByType('でんき')"> でんき</label>
-            <label><input type="checkbox" value="くさ" onclick="filterByType('くさ')"> くさ</label>
-            <label><input type="checkbox" value="こおり" onclick="filterByType('こおり')"> こおり</label>
-            <label><input type="checkbox" value="かくとう" onclick="filterByType('かくとう')"> かくとう</label>
-            <label><input type="checkbox" value="どく" onclick="filterByType('どく')"> どく</label>
-            <label><input type="checkbox" value="じめん" onclick="filterByType('じめん')"> じめん</label>
-            <label><input type="checkbox" value="ひこう" onclick="filterByType('ひこう')"> ひこう</label>
-            <label><input type="checkbox" value="エスパー" onclick="filterByType('エスパー')"> エスパー</label>
-            <label><input type="checkbox" value="むし" onclick="filterByType('むし')"> むし</label>
-            <label><input type="checkbox" value="いわ" onclick="filterByType('いわ')"> いわ</label>
-            <label><input type="checkbox" value="ゴースト" onclick="filterByType('ゴースト')"> ゴースト</label>
-            <label><input type="checkbox" value="ドラゴン" onclick="filterByType('ドラゴン')"> ドラゴン</label>
-            <label><input type="checkbox" value="あく" onclick="filterByType('あく')"> あく</label>
-            <label><input type="checkbox" value="はがね" onclick="filterByType('はがね')"> はがね</label>
-            <label><input type="checkbox" value="フェアリー" onclick="filterByType('フェアリー')"> フェアリー</label>
-        </div>
-        <hr>
-        <h3 class="text-left">ソートする</h3>
-        <div class="text-center mt-3">
-            <button class="btn btn-primary" onclick="sortData('Name', 'asc')">アイウエオ順</button>
-            <button class="btn btn-primary" onclick="sortData('Name', 'desc')">アイウエオ逆順</button>
-            <button class="btn btn-secondary" onclick="sortData('Price', 'asc')">価格の安い順</button>
-            <button class="btn btn-secondary" onclick="sortData('Price', 'desc')">価格の高い順</button>
-            <button class="btn btn-warning" onclick="sortData('Inventory', 'asc')">在庫の少ない順</button>
-            <button class="btn btn-warning" onclick="sortData('Inventory', 'desc')">在庫の多い順</button>
-        </div>
-    </div>
+        <!-- 通知メッセージを表示するためのエリア -->
+        <div id="notification" class="notification"></div>
 
-    <div class="container_st">
-        <div class="row">
-            <div class="update-container">
-                <div id="last-updated"></div>
-                <button id="refresh" type="button" onclick="refreshData()">最新の情報を取得</button>
-
+        <!-- フィルターとソート -->
+        <div class="filter-sort-section">
+            <h3 class="text-left">文字列でさがす</h3>
+            <div class="mt-3">
+                <input type="text" id="search-name" class="form-control large-input" placeholder="商品名で検索" />
+            </div>
+            <hr>
+            <h3 class="text-left">genderでさがす</h3>
+            <div class="mt-3" id="gender-filters">
+                <label><input type="checkbox" value="male" onclick="filterByGender('male')"> オスポケモン</label>
+                <label><input type="checkbox" value="female" onclick="filterByGender('female')"> メスポケモン</label>
+                <label><input type="checkbox" value="unknown" onclick="filterByGender('unknown')"> せいべつふめい</label>
+                <label><input type="checkbox" value="egg" onclick="filterByGender('egg')"> タマゴ</label>
+                <label><input type="checkbox" value="item" onclick="filterByGender('item')"> どうぐ</label>
+                <label><input type="checkbox" value="ball" onclick="filterByGender('ball')"> ボール</label>
+            </div>
+            <hr>
+            <h3 class="text-left">ポケモンのタイプでさがす</h3>
+            <div class="mt-3" id="type-filters">
+                <label><input type="checkbox" value="ノーマル" onclick="filterByType('ノーマル')"> ノーマル</label>
+                <label><input type="checkbox" value="ほのお" onclick="filterByType('ほのお')"> ほのお</label>
+                <label><input type="checkbox" value="みず" onclick="filterByType('みず')"> みず</label>
+                <label><input type="checkbox" value="でんき" onclick="filterByType('でんき')"> でんき</label>
+                <label><input type="checkbox" value="くさ" onclick="filterByType('くさ')"> くさ</label>
+                <label><input type="checkbox" value="こおり" onclick="filterByType('こおり')"> こおり</label>
+                <label><input type="checkbox" value="かくとう" onclick="filterByType('かくとう')"> かくとう</label>
+                <label><input type="checkbox" value="どく" onclick="filterByType('どく')"> どく</label>
+                <label><input type="checkbox" value="じめん" onclick="filterByType('じめん')"> じめん</label>
+                <label><input type="checkbox" value="ひこう" onclick="filterByType('ひこう')"> ひこう</label>
+                <label><input type="checkbox" value="エスパー" onclick="filterByType('エスパー')"> エスパー</label>
+                <label><input type="checkbox" value="むし" onclick="filterByType('むし')"> むし</label>
+                <label><input type="checkbox" value="いわ" onclick="filterByType('いわ')"> いわ</label>
+                <label><input type="checkbox" value="ゴースト" onclick="filterByType('ゴースト')"> ゴースト</label>
+                <label><input type="checkbox" value="ドラゴン" onclick="filterByType('ドラゴン')"> ドラゴン</label>
+                <label><input type="checkbox" value="あく" onclick="filterByType('あく')"> あく</label>
+                <label><input type="checkbox" value="はがね" onclick="filterByType('はがね')"> はがね</label>
+                <label><input type="checkbox" value="フェアリー" onclick="filterByType('フェアリー')"> フェアリー</label>
+            </div>
+            <hr>
+            <h3 class="text-left">ソートする</h3>
+            <div class="text-center mt-3">
+                <button class="btn btn-primary" onclick="sortData('Name', 'asc')">アイウエオ順</button>
+                <button class="btn btn-primary" onclick="sortData('Name', 'desc')">アイウエオ逆順</button>
+                <button class="btn btn-secondary" onclick="sortData('Price', 'asc')">価格の安い順</button>
+                <button class="btn btn-secondary" onclick="sortData('Price', 'desc')">価格の高い順</button>
+                <button class="btn btn-warning" onclick="sortData('Inventory', 'asc')">在庫の少ない順</button>
+                <button class="btn btn-warning" onclick="sortData('Inventory', 'desc')">在庫の多い順</button>
             </div>
         </div>
-        <table border="1" id="product-table">
-            <thead>
-                <tr>
-                    <th>SID</th>
-                    <th>PID</th>
-                    <th>商品名</th>
-                    <th>画 像</th>
-                    <th>タイプ1</th>
-                    <th>タイプ2</th>
-                    <th>分 類</th>
-                    <th>価 格</th>
-                    <th>価格編集</th>
-                    <th>在 庫</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- データがここに追加されます -->
-            </tbody>
+
+        <div class="container_st">
+            <div class="row">
+                <div class="update-container">
+                    <div id="last-updated"></div>
+                    <button id="refresh" type="button" onclick="refreshData()">最新の情報を取得</button>
+                </div>
+            </div>
+            <table border="1" id="product-table">
+                <thead>
+                    <tr>
+                        <th>SID</th>
+                        <th>PID</th>
+                        <th>商品名</th>
+                        <th>画 像</th>
+                        <th>タイプ1</th>
+                        <th>タイプ2</th>
+                        <th>分 類</th>
+                        <th>価 格</th>
+                        <th>在 庫</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- データがここに追加されます -->
+                </tbody>
 
 
-        </table>
-    
+            </table>
 
-    <div class="button-center">
-        <button id="load-more" onclick="loadMoreProducts()">さらに読み込む</button>
-    </div>
-    <div class="no-more-data">これ以上のデータはありません</div>
-    <div class="bottom-margin"></div>
-    </div>
-    
-    <script>
-        var displayedData = 10; // 初期表示するデータ数
-        var increment = 10; // 追加で表示するデータ数
 
-    
-// データを表示する関数
-function displayData(data) {
-    var tableBody = document.querySelector('#product-table tbody');
-    tableBody.innerHTML = ''; // テーブルの内容をクリア
+            <div class="button-center">
+                <button id="load-more" onclick="loadMoreProducts()">さらに読み込む</button>
+            </div>
+            <div class="no-more-data">これ以上のデータはありません</div>
+            <div class="bottom-margin"></div>
+        </div>
 
-    var searchValue = document.getElementById('search-name').value.toLowerCase();
-    var genderFilters = Array.from(document.querySelectorAll('#gender-filters input:checked')).map(function(checkbox) {
-        return checkbox.value;
-    });
-    var typeFilters = Array.from(document.querySelectorAll('#type-filters input:checked')).map(function(checkbox) {
-        return checkbox.value;
-    });
+        <script>
+            var displayedData = 10; // 初期表示するデータ数
+            var increment = 10; // 追加で表示するデータ数
 
-    
-data.filter(function(item) {
-    return item.Name.toLowerCase().includes(searchValue) &&
-        (genderFilters.length === 0 || genderFilters.includes(item.Gender)) &&
-        (typeFilters.length === 0 || (item.Type1 !== null && typeFilters.includes(item.Type1)) || (item.Type2 !== null && typeFilters.includes(item.Type2)));
-}).slice(0, displayedData).forEach(function(item) {
-    var row = document.createElement('tr');
-    row.innerHTML = `
+
+            // データを表示する関数
+            function displayData(data) {
+                var tableBody = document.querySelector('#product-table tbody');
+                tableBody.innerHTML = ''; // テーブルの内容をクリア
+
+                var searchValue = document.getElementById('search-name').value.toLowerCase();
+                var genderFilters = Array.from(document.querySelectorAll('#gender-filters input:checked')).map(function(checkbox) {
+                    return checkbox.value;
+                });
+                var typeFilters = Array.from(document.querySelectorAll('#type-filters input:checked')).map(function(checkbox) {
+                    return checkbox.value;
+                });
+
+
+                data.filter(function(item) {
+                    return item.Name.toLowerCase().includes(searchValue) &&
+                        (genderFilters.length === 0 || genderFilters.includes(item.Gender)) &&
+                        (typeFilters.length === 0 || (item.Type1 !== null && typeFilters.includes(item.Type1)) || (item.Type2 !== null && typeFilters.includes(item.Type2)));
+                }).slice(0, displayedData).forEach(function(item) {
+                    var row = document.createElement('tr');
+                    row.innerHTML = `
     <td>${item.SID}</td>
     <td>${item.PID}</td>
     <td>${item.Name}</td>
@@ -254,138 +362,224 @@ data.filter(function(item) {
 <td>${item.Type2 || ''}</td> <!-- タイプが null の場合は空白表示 -->
     <td>${item.Gender}</td>
     
-    <td>
-<span class="price-display">${item.Price}</span>
-<input type="number" class="price-input" style="display: none;" value="${item.Price}">
-</td>
+    <!-- 価格のセル -->
 <td>
-<button class="edit-price-btn" onclick="togglePriceEdit(this)">編集</button>
-<button class="save-price-btn" style="display: none;" onclick="savePrice(this)">保存</button>
+    <span class="price-display">${item.Price}</span>
+    <input type="text" class="price-input" style="display: none;">
+    <button class="edit-price-btn" onclick="togglePriceEdit(this)">
+        <i class="fas fa-pencil-alt"></i> <!-- 編集アイコン -->
+    </button>
+    <button class="save-price-btn" onclick="savePrice(this)" style="display: none;">
+        <i class="fas fa-save"></i> <!-- 保存アイコン -->
+    </button>
 </td>
 
-    <td>${item.Inventory}</td>
+<!-- 在庫のセル -->
+<td>
+    <span class="inventory-display">${item.Inventory}</span>
+    <input type="text" class="inventory-input" style="display: none;">
+    <button class="edit-inventory-btn" onclick="toggleInventoryEdit(this)">
+        <i class="fas fa-pencil-alt"></i> <!-- 編集アイコン -->
+    </button>
+    <button class="save-inventory-btn" onclick="saveInventory(this)" style="display: none;">
+        <i class="fas fa-save"></i> <!-- 保存アイコン -->
+    </button>
+</td>
+
+
 `;
-    tableBody.appendChild(row);
-});
+                    tableBody.appendChild(row);
+                });
 
 
 
 
-    // データを全て表示したらさらに読み込むボタンを非表示にする
-    if (displayedData >= data.length) {
-        document.getElementById('load-more').style.display = 'none';
-        document.querySelector('.no-more-data').style.display = 'block';
-    } else {
-        document.getElementById('load-more').style.display = 'block';
-        document.querySelector('.no-more-data').style.display = 'none';
-    }
-}
-
-
-        // 初期表示
-        displayData(pokemonData);
-
-        // さらに読み込むボタンが押された時の処理
-        function loadMoreProducts() {
-            displayedData += increment;
-            displayData(pokemonData);
-        }
-
-        // フィルターが変更された時の処理
-        function applyFilters() {
-            displayedData = 10;
-            displayData(pokemonData);
-        }
-
-        // フィルターの変更イベントを追加
-        document.getElementById('search-name').addEventListener('input', applyFilters);
-        document.querySelectorAll('#gender-filters input[type="checkbox"]').forEach(function(checkbox) {
-            checkbox.addEventListener('change', applyFilters);
-        });
-        document.querySelectorAll('#type-filters input[type="checkbox"]').forEach(function(checkbox) {
-            checkbox.addEventListener('change', applyFilters);
-        });
-
-        // 最新の情報を取得する
-        function refreshData() {
-            // サーバーから最新のデータを取得するためにページをリロードする
-            location.reload();
-        }
-
-        // 時間の表示ページのロード時
-        $(document).ready(function() {
-            const currentTime = new Date();
-            const formattedTime = currentTime.toLocaleString(); // 現在時刻を表示
-            $('#last-updated').text('最終更新: ' + formattedTime);
-
-            loadMoreProducts(); // 初期商品を読み込み
-        });
-
-
-/////////////////////////////////////
-
-        // 価格の編集
-        // 金額の編集をトグルし、商品IDを保存する関数
-        function togglePriceEdit(button) {
-            var row = button.parentNode.parentNode;
-            var SID = row.querySelector('td:first-child').textContent;
-            console.log(SID); // SID の値を取得した後にログに出力
-            var priceDisplay = row.querySelector('.price-display');
-            var priceInput = row.querySelector('.price-input');
-            var editBtn = row.querySelector('.edit-price-btn');
-            var saveBtn = row.querySelector('.save-price-btn');
-
-            // 表示と入力フィールドを切り替える
-            priceDisplay.style.display = 'none';
-            priceInput.style.display = 'inline-block';
-            editBtn.style.display = 'none';
-            saveBtn.style.display = 'inline-block';
-
-            // 保存ボタンに商品IDをデータ属性としてセット
-            saveBtn.dataset.sid = SID;
-        }
-
-        // 金額を保存する関数
-        function savePrice(button) {
-            var SID = button.dataset.sid;
-            var row = button.parentNode.parentNode;
-            var priceDisplay = row.querySelector('.price-display');
-            var priceInput = row.querySelector('.price-input');
-            var editBtn = row.querySelector('.edit-price-btn');
-            var saveBtn = row.querySelector('.save-price-btn');
-
-            // 入力された金額を取得し、表示を更新する
-            var newPrice = priceInput.value;
-            priceDisplay.textContent = newPrice;
-
-            // 表示と入力フィールドを切り替える
-            priceDisplay.style.display = 'inline-block';
-            priceInput.style.display = 'none';
-            editBtn.style.display = 'inline-block';
-            saveBtn.style.display = 'none';
-
-            // 保存した価格をデータベースに反映するためにAjaxリクエストを送信する
-            var formData = new FormData();
-            formData.append('SID', SID); // SIDを追加
-            formData.append('Price', newPrice);
-
-            // Ajaxリクエストを送信
-            fetch('stock_update_price.php', {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                // データを全て表示したらさらに読み込むボタンを非表示にする
+                if (displayedData >= data.length) {
+                    document.getElementById('load-more').style.display = 'none';
+                    document.querySelector('.no-more-data').style.display = 'block';
+                } else {
+                    document.getElementById('load-more').style.display = 'block';
+                    document.querySelector('.no-more-data').style.display = 'none';
                 }
-                return response.text();
-            }).then(data => {
-                console.log(data);
-                // サーバーからの応答をログに出力
-            }).catch(error => {
-                console.error('There was a problem with your fetch operation:', error);
+            }
+
+
+            // 初期表示
+            displayData(pokemonData);
+
+            // さらに読み込むボタンが押された時の処理
+            function loadMoreProducts() {
+                displayedData += increment;
+                displayData(pokemonData);
+            }
+
+            // フィルターが変更された時の処理
+            function applyFilters() {
+                displayedData = 10;
+                displayData(pokemonData);
+            }
+
+            // フィルターの変更イベントを追加
+            document.getElementById('search-name').addEventListener('input', applyFilters);
+            document.querySelectorAll('#gender-filters input[type="checkbox"]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', applyFilters);
             });
-        }
-    </script>
+            document.querySelectorAll('#type-filters input[type="checkbox"]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', applyFilters);
+            });
+
+            // 最新の情報を取得する
+            function refreshData() {
+                // サーバーから最新のデータを取得するためにページをリロードする
+                location.reload();
+            }
+
+            // 時間の表示ページのロード時
+            $(document).ready(function() {
+                const currentTime = new Date();
+                const formattedTime = currentTime.toLocaleString(); // 現在時刻を表示
+                $('#last-updated').text('最終更新: ' + formattedTime);
+
+                loadMoreProducts(); // 初期商品を読み込み
+            });
+
+
+            /////////////////////////////////////
+
+            // 価格の編集
+            // 価格の編集をトグルする関数
+            function togglePriceEdit(button) {
+                var row = button.parentNode.parentNode;
+                var SID = row.querySelector('td:first-child').textContent;
+                var priceDisplay = row.querySelector('.price-display');
+                var priceInput = row.querySelector('.price-input');
+                var editBtn = row.querySelector('.edit-price-btn');
+                var saveBtn = row.querySelector('.save-price-btn');
+
+                // 表示と入力フィールドを切り替える
+                priceDisplay.style.display = 'none';
+                priceInput.style.display = 'inline-block';
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-block';
+
+                // 保存ボタンに商品IDをデータ属性としてセット
+                saveBtn.dataset.sid = SID;
+            }
+
+            // 価格を保存する関数
+            function savePrice(button) {
+                var SID = button.dataset.sid;
+                var row = button.parentNode.parentNode;
+                var priceDisplay = row.querySelector('.price-display');
+                var priceInput = row.querySelector('.price-input');
+                var editBtn = row.querySelector('.edit-price-btn');
+                var saveBtn = row.querySelector('.save-price-btn');
+
+                // 入力された価格を取得し、表示を更新する
+                var newPrice = priceInput.value;
+                priceDisplay.textContent = newPrice;
+
+                // 表示と入力フィールドを切り替える
+                priceDisplay.style.display = 'inline-block';
+                priceInput.style.display = 'none';
+                editBtn.style.display = 'inline-block';
+                saveBtn.style.display = 'none';
+
+                // 保存した価格をデータベースに反映するためのAjaxリクエストを送信する
+                var formData = new FormData();
+                formData.append('SID', SID);
+                formData.append('Price', newPrice);
+
+                // Ajaxリクエスト
+                $.ajax({
+                    url: 'stock_update_price.php',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(data) {
+                        showNotification('価格の変更を登録しました', 'success');
+                        console.log(data);
+                    },
+                    error: function(error) {
+                        showNotification('Error updating price', 'error');
+                        console.error('There was a problem with your fetch operation:', error);
+                    }
+                });
+            }
+
+            // 在庫の編集をトグルする関数
+            function toggleInventoryEdit(button) {
+                var row = button.parentNode.parentNode;
+                var SID = row.querySelector('td:first-child').textContent;
+                var inventoryDisplay = row.querySelector('.inventory-display');
+                var inventoryInput = row.querySelector('.inventory-input');
+                var editBtn = row.querySelector('.edit-inventory-btn');
+                var saveBtn = row.querySelector('.save-inventory-btn');
+
+                // 表示と入力フィールドを切り替える
+                inventoryDisplay.style.display = 'none';
+                inventoryInput.style.display = 'inline-block';
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-block';
+
+                // 保存ボタンに商品IDをデータ属性としてセット
+                saveBtn.dataset.sid = SID;
+            }
+
+            // 在庫を保存する関数
+            function saveInventory(button) {
+                var SID = button.dataset.sid;
+                var row = button.parentNode.parentNode;
+                var inventoryDisplay = row.querySelector('.inventory-display');
+                var inventoryInput = row.querySelector('.inventory-input');
+                var editBtn = row.querySelector('.edit-inventory-btn');
+                var saveBtn = row.querySelector('.save-inventory-btn');
+
+                // 入力された在庫を取得し、表示を更新する
+                var newInventory = inventoryInput.value;
+                inventoryDisplay.textContent = newInventory;
+
+                // 表示と入力フィールドを切り替える
+                inventoryDisplay.style.display = 'inline-block';
+                inventoryInput.style.display = 'none';
+                editBtn.style.display = 'inline-block';
+                saveBtn.style.display = 'none';
+
+                // 保存した在庫をデータベースに反映するためのAjaxリクエストを送信する
+                var formData = new FormData();
+                formData.append('SID', SID);
+                formData.append('Inventory', newInventory);
+
+                // Ajaxリクエスト
+                $.ajax({
+                    url: 'stock_update_inventory.php',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(data) {
+                        showNotification('在庫数の変更が出来ました', 'success');
+                    },
+                    error: function(error) {
+                        showNotification('Error updating inventory', 'error');
+                        console.error('There was a problem with your fetch operation:', error);
+                    }
+                });
+            }
+
+            // 通知メッセージを表示する関数
+            function showNotification(message, type) {
+                var notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = 'notification ' + type;
+                notification.style.display = 'block';
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                }, 3000); // 3秒後に通知を非表示にする
+            }
+        </script>
 
 
 </body>
