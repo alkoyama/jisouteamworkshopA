@@ -104,143 +104,16 @@ echo "</script>";
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        h1 {
-            padding-bottom: 50px;
-        }
-
-        /* CSS for the left side */
-        .filter-sort-section {
-            float: left;
-            width: 30%;
-            /* Adjust the width as needed */
-            flex-direction: column;
-        }
-
-        .filter-sort-section>* {
-            margin-bottom: 10px;
-        }
-
-
-        /* 親要素に flex レイアウトを適用 */
-        #gender-filters,
-        #type-filters,
-        .text-center {
-            display: flex;
-            flex-wrap: wrap;
-            /* 子要素が折り返すようにする */
-            justify-content: center;
-            /* 子要素を中央に配置する */
-        }
-
-        /* 各子要素の幅を調整して、2つごとに折り返す */
-        #gender-filters>label,
-        #type-filters>label,
-        .text-center>button {
-            flex-basis: calc(50% - 10px);
-            /* 幅を計算して設定 */
-            margin: 5px;
-            /* 子要素間の余白を設定 */
-        }
-
-        .btn {
-            padding: 1px;
-            /* 上下の余白10px、左右の余白20px */
-            font-size: 14px;
-            /* フォントサイズを14pxに設定 */
-            width: 50px;
-            /* 幅を150pxに設定 */
-        }
-
-        /* CSS for the right side */
-        .container_st {
-            float: right;
-            width: 65%;
-            /* Adjust the width as needed */
-            flex: 1;
-            /* Take up all available space */
-
-        }
-
-        /* Clear floats */
-        .row:after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-
-        .update-container {
-            float: right;
-            /* 右側に配置 */
-            padding-bottom: 5px;
-        }
-
-
-        /* 価格・在庫編集通知 */
-        .notification {
-            display: none;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-        }
-
-        .notification.success {
-            background-color: #dff0d8;
-            color: #3c763d;
-        }
-
-        .notification.error {
-            background-color: #f2dede;
-            color: #a94442;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .price-input,
-        .inventory-input {
-            display: none;
-        }
-
-        /* FontAwesomeのアイコンに適用するスタイル */
-        .fa {
-            font-family: 'Font Awesome 5 Free';
-            /* FontAwesomeのフォントファミリー */
-            font-weight: 900;
-            /* フォントウェイト */
-        }
-
-        /* アイコンのサイズを調整する */
-        .fa {
-            font-size: 1.2em;
-            /* デフォルトのアイコンサイズ */
-        }
-
-        /* さらに細かい調整が必要な場合、各アイコンごとに個別にスタイルを追加 */
-        .fa-pencil-alt {
-            /* 鉛筆アイコンに適用するスタイル */
-        }
-
-        .fa-save {
-            /* 保存アイコンに適用するスタイル */
-        }
-
-        /* 鉛筆アイコンを含むボタンのボーダーを削除 */
-        .edit-price-btn,
-        .edit-inventory-btn {
-            border: none;
-            /* ボーダーを削除 */
-            background: none;
-            /* 背景色を透明にする */
-        }
+        
     </style>
 </head>
 
 <body>
-    <h1>商品一覧</h1>
+    <h1>商品在庫管理</h1>
     <div class="container">
         <!-- 通知メッセージを表示するためのエリア -->
         <div id="notification" class="notification"></div>
+        
 
         <!-- フィルターとソート -->
         <div class="filter-sort-section">
@@ -290,6 +163,7 @@ echo "</script>";
                 <button class="btn btn-warning" onclick="sortData('Inventory', 'asc')">在庫の少ない順</button>
                 <button class="btn btn-warning" onclick="sortData('Inventory', 'desc')">在庫の多い順</button>
             </div>
+            <button class="btn btn-danger" id="reset-button" onclick="resetFilters()">リセット</button>
         </div>
 
         <div class="container_st">
@@ -297,6 +171,7 @@ echo "</script>";
                 <div class="update-container">
                     <div id="last-updated"></div>
                     <button id="refresh" type="button" onclick="refreshData()">最新の情報を取得</button>
+                    <div id="update-notification" class="notification hidden"></div>
                 </div>
             </div>
             <table border="1" id="product-table">
@@ -316,10 +191,7 @@ echo "</script>";
                 <tbody>
                     <!-- データがここに追加されます -->
                 </tbody>
-
-
             </table>
-
 
             <div class="button-center">
                 <button id="load-more" onclick="loadMoreProducts()">さらに読み込む</button>
@@ -346,56 +218,52 @@ echo "</script>";
                     return checkbox.value;
                 });
 
-
-                data.filter(function(item) {
+                var filteredData = data.filter(function(item) {
                     return item.Name.toLowerCase().includes(searchValue) &&
                         (genderFilters.length === 0 || genderFilters.includes(item.Gender)) &&
                         (typeFilters.length === 0 || (item.Type1 !== null && typeFilters.includes(item.Type1)) || (item.Type2 !== null && typeFilters.includes(item.Type2)));
-                }).slice(0, displayedData).forEach(function(item) {
+                });
+
+                filteredData.slice(0, displayedData).forEach(function(item) {
                     var row = document.createElement('tr');
                     row.innerHTML = `
-    <td>${item.SID}</td>
-    <td>${item.PID}</td>
-    <td>${item.Name}</td>
-    <td><img src="${item.Image_path}" alt="商品画像" width="100" height="100"></td>
-    <td>${item.Type1 || ''}</td> <!-- タイプが null の場合は空白表示 -->
-<td>${item.Type2 || ''}</td> <!-- タイプが null の場合は空白表示 -->
-    <td>${item.Gender}</td>
-    
-    <!-- 価格のセル -->
-<td>
-    <span class="price-display">${item.Price}</span>
-    <input type="text" class="price-input" style="display: none;">
-    <button class="edit-price-btn" onclick="togglePriceEdit(this)">
-        <i class="fas fa-pencil-alt"></i> <!-- 編集アイコン -->
-    </button>
-    <button class="save-price-btn" onclick="savePrice(this)" style="display: none;">
-        <i class="fas fa-save"></i> <!-- 保存アイコン -->
-    </button>
-</td>
+            <td>${item.SID}</td>
+            <td>${item.PID}</td>
+            <td>${item.Name}</td>
+            <td><img src="${item.Image_path}" alt="商品画像" width="100" height="100"></td>
+            <td>${item.Type1 || ''}</td> <!-- タイプが null の場合は空白表示 -->
+            <td>${item.Type2 || ''}</td> <!-- タイプが null の場合は空白表示 -->
+            <td>${item.Gender}</td>
+            
+            <!-- 価格のセル -->
+            <td>
+                <span class="price-display">${item.Price}</span>
+                <input type="text" class="price-input" style="display: none;">
+                <button class="edit-price-btn" onclick="togglePriceEdit(this)">
+                    <i class="fas fa-pencil-alt"></i> <!-- 編集アイコン -->
+                </button>
+                <button class="save-price-btn" onclick="savePrice(this)" style="display: none;">
+                    <i class="fas fa-save"></i> <!-- 保存アイコン -->
+                </button>
+            </td>
 
-<!-- 在庫のセル -->
-<td>
-    <span class="inventory-display">${item.Inventory}</span>
-    <input type="text" class="inventory-input" style="display: none;">
-    <button class="edit-inventory-btn" onclick="toggleInventoryEdit(this)">
-        <i class="fas fa-pencil-alt"></i> <!-- 編集アイコン -->
-    </button>
-    <button class="save-inventory-btn" onclick="saveInventory(this)" style="display: none;">
-        <i class="fas fa-save"></i> <!-- 保存アイコン -->
-    </button>
-</td>
-
-
-`;
+            <!-- 在庫のセル -->
+            <td>
+                <span class="inventory-display">${item.Inventory}</span>
+                <input type="text" class="inventory-input" style="display: none;">
+                <button class="edit-inventory-btn" onclick="toggleInventoryEdit(this)">
+                    <i class="fas fa-pencil-alt"></i> <!-- 編集アイコン -->
+                </button>
+                <button class="save-inventory-btn" onclick="saveInventory(this)" style="display: none;">
+                    <i class="fas fa-save"></i> <!-- 保存アイコン -->
+                </button>
+            </td>
+        `;
                     tableBody.appendChild(row);
                 });
 
-
-
-
                 // データを全て表示したらさらに読み込むボタンを非表示にする
-                if (displayedData >= data.length) {
+                if (filteredData.length <= displayedData) {
                     document.getElementById('load-more').style.display = 'none';
                     document.querySelector('.no-more-data').style.display = 'block';
                 } else {
@@ -568,7 +436,6 @@ echo "</script>";
                     }
                 });
             }
-
             // 通知メッセージを表示する関数
             function showNotification(message, type) {
                 var notification = document.getElementById('notification');
@@ -579,6 +446,79 @@ echo "</script>";
                     notification.style.display = 'none';
                 }, 3000); // 3秒後に通知を非表示にする
             }
+
+
+            // 左側検索とソート固定
+            $(window).on('scroll', function() {
+                var scrollTop = $(window).scrollTop();
+                var filterSortSection = $('.filter-sort-section');
+                var offsetTop = 10; // 適切な位置に調整
+                if (scrollTop > offsetTop) {
+                    filterSortSection.css('position', 'fixed');
+                    filterSortSection.css('top', '30px'); // 適切な位置に調整
+                } else {
+                    filterSortSection.css('position', 'static');
+                }
+            });
+
+            // リセットボタンがクリックされた時の処理
+            document.getElementById('reset-button').addEventListener('click', function() {
+                // 検索ボックスの値をクリア
+                document.getElementById('search-name').value = '';
+
+                // ジェンダーフィルターをクリア
+                document.querySelectorAll('#gender-filters input[type="checkbox"]').forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+
+                // タイプフィルターをクリア
+                document.querySelectorAll('#type-filters input[type="checkbox"]').forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+
+                // データを再表示
+                displayedData = 10; // 表示するデータ数を初期値にリセット
+                displayData(pokemonData);
+            });
+            // 最新情報を取得する関数
+            function refreshData() {
+                // ここに最新情報を取得する処理を追加する
+
+                // 通知を表示する
+                displayNotification("最新情報を取得しました。");
+            }
+
+            // 通知を表示する関数
+            function displayNotification(message) {
+                var notificationElement = document.getElementById('notification');
+                notificationElement.innerHTML = message;
+                notificationElement.style.display = 'block';
+
+                // 一定時間後に通知を非表示にする
+                setTimeout(function() {
+                    notificationElement.style.display = 'none';
+                }, 3000); // 3秒間表示した後、非表示にする
+            }
+
+            document.getElementById("refresh").addEventListener("click", function() {
+  // データベースとの通信をシミュレートする
+  var success = Math.random() < 0.5; // 成功率50%を仮定する
+
+  var notification = document.getElementById("update-notification");
+
+  if (success) {
+    notification.textContent = "最新の情報を取得しました。";
+    notification.classList.remove("update-error");
+    notification.classList.add("update-success");
+  } else {
+    notification.textContent = "情報の取得に失敗しました。もう一度試してください。";
+    notification.classList.remove("update-success");
+    notification.classList.add("update-error");
+  }
+
+  notification.classList.remove("hidden");
+});
+
         </script>
 
 
