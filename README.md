@@ -7,4 +7,4 @@ login_7thA.php<br>
 loginlogic_7thA.php<br>
 logout_7tha.php<br>
 my_page_7tha<br>
-<p>→また、これらに関するスクリプトページ</p>
+→また、これらに関するスクリプトページ
