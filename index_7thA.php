@@ -6,14 +6,68 @@
      <link rel="stylesheet" href="./css/style.css">
      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.css">
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Aoboshi+One&display=swap" rel="stylesheet">
      <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
      <script src="https://use.fontawesome.com/926fe18a63.js"></script>
+     <script type="text/javascript" src="./js/index_admin_7thA.js"></script>
      <title>index</title>
    </head>
    <body>
+  <div class="login-container">
+    <?php
+    session_start();
+
+    $dsn = 'mysql:host=localhost;dbname=teamworkshop_7thA;charset=utf8mb4';
+    $username = 'root';
+    $password = '';
+
+    try {
+      $pdo = new PDO($dsn, $username, $password);
+      $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+      if (isset($_POST['login'])) {
+        $login_value = $_POST['login_value'];
+        $pass = $_POST['Password'];
+
+        // Check if login value is CID or Name
+        $stmt = $pdo->prepare('SELECT CID, Name FROM customer_management WHERE (CID = ? OR Name = ?) AND Password = ?');
+        $stmt->execute([$login_value, $login_value, $pass]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+          $_SESSION['loggedIn'] = true;
+          $_SESSION['CID'] = $user['CID'];
+          $_SESSION['Name'] = $user['Name'];
+        } else {
+          echo '<p>ログインに失敗しました。</p>';
+        }
+      }
+
+      if (isset($_POST['logout'])) {
+        session_destroy();
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit();
+      }
+
+      if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] === true) {
+        echo '<p>ようこそ, ' . htmlspecialchars($_SESSION['Name']) . ' さん</p>';
+        echo '<form method="post"><button type="submit" name="logout">ログアウト</button></form>';
+      } else {
+        echo '<form method="post">';
+        echo '<input type="text" name="login_value" placeholder="CIDまたはName" required>';
+        echo '<input type="password" name="Password" placeholder="Password" required>';
+        echo '<button type="submit" name="login">ログイン</button>';
+        echo '</form>';
+      }
+      // ログイン中かどうかを確認
+      if (!isset($_SESSION['loggedIn']) || $_SESSION['loggedIn'] !== true) {
+        // ログインしていない場合は表示
+        echo '<p>新規会員の方は <a href="signup_7thA.php">こちら</a></p>';
+      }
+    } catch (PDOException $e) {
+      echo 'Connection failed: ' . $e->getMessage();
+    }
+    ?>
+  </div>
     <header class="header" id="header">
       <div class="header_container">
        <div class="header_container_small">
@@ -26,19 +80,10 @@
        </div>
        <nav class="head_B">
         <ul>
-                 <?php
-             session_start();
-             if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"] === true) {
-              echo "<p>ID: " . $_SESSION["CID"] . "</p>";
-    
-    } else {
-     // User is not logged in, redirect to login page or display a login prompt
-     echo "ログインしてください。</p>";
-     }
-    ?>
-         <li><a href="./" class="header_shop"><span title="SHOP"><img src="./images/icon/index_header-shop.png" alt="shop"></span></a></li>
-         <li><a href="./" class="header_mypage"><span title="MY PAGE"><img src="./images/icon/index_header-mypage.png" alt="shop"></span></a></li>
+         <li><a href="./index_7thA.php" class="header_shop"><span title="SHOP"><img src="./images/icon/index_header-shop.png" alt="shop"></span></a></li>
+         <li><a href="./my_page_7thA.php" class="header_mypage"><span title="MY PAGE"><img src="./images/icon/index_header-mypage.png" alt="shop"></span></a></li>
          <li><a href="./" class="header_contact"><span title="CONTACT"><img src="./images/icon/index_header-contact.png" alt="shop"></span></a></li>
+         <li><a href="./battle_7thA.php" class="header_battle"><span title="BATTLE"><img src="./images/icon/go-battle.png" alt="shop"></span></a></li>
         </ul>
        </nav>
       </div>
@@ -63,9 +108,10 @@
        <div class="footer_menu">
           <nav>
            <ul class="foot_B">
-             <li><a href="./">Shop</a></li>
-             <li><a href="./">My Page</a></li>
+             <li><a href="./index_7thA.php">Shop</a></li>
+             <li><a href="./my_page_7thA.php">My Page</a></li>
              <li><a href="./">Contact</a></li>
+             <li><a href="./Integration_Hub_7th.php" class="admin-link">管理者ページ</a></li>
            </ul>
           </nav>
          <div class="foot_C"><p class="copyright">&copy; JS7th_teamA 2024</p></div>
