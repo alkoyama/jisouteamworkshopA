@@ -33,8 +33,8 @@
      echo "ログインしてください。</p>";
      }
     ?>
-         <li><a href="./" class="header_shop"><span title="SHOP"><img src="./images/icon/index_header-shop.png" alt="shop"></span></a></li>
-         <li><a href="./" class="header_mypage"><span title="MY PAGE"><img src="./images/icon/index_header-mypage.png" alt="shop"></span></a></li>
+         <li><a href="./index_7tha.php" class="header_shop"><span title="SHOP"><img src="./images/icon/index_header-shop.png" alt="shop"></span></a></li>
+         <li><a href="./my_page_7tha.php" class="header_mypage"><span title="MY PAGE"><img src="./images/icon/index_header-mypage.png" alt="shop"></span></a></li>
          <li><a href="./" class="header_contact"><span title="CONTACT"><img src="./images/icon/index_header-contact.png" alt="shop"></span></a></li>
         </ul>
        </nav>
@@ -60,8 +60,8 @@
        <div class="footer_menu">
           <nav>
            <ul class="foot_B">
-             <li><a href="./">Shop</a></li>
-             <li><a href="./">My Page</a></li>
+             <li><a href="./index_7tha.php">Shop</a></li>
+             <li><a href="./my_page_7tha.php">My Page</a></li>
              <li><a href="./">Contact</a></li>
            </ul>
           </nav>
