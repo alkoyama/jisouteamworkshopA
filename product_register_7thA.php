@@ -153,8 +153,13 @@ try {
     <meta charset="UTF-8">
     <title>商品登録ページ</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://rawgit.com/RickStrahl/jquery-resizable/master/src/jquery-resizable.js"></script>
     <script>
-    $(document).ready(function() {
+        $(document).ready(function() {
+            $("#column1").resizable({
+            handleSelector: "#splitter1",
+            resizeHeight: false,
+        });
         // フォーム送信時の処理
         $('#product_form').on('submit', function(event) {
             event.preventDefault(); // デフォルトのフォーム送信を防止
@@ -261,6 +266,9 @@ try {
     });
     </script>
     <style>
+        body {
+            height: 100%;
+        }
         .styled-button {
             background-color: #4CAF50;
             color: white;
@@ -280,20 +288,32 @@ try {
             background-color: #45a049;
         }
         /* Flexboxを使って画面を左右に分割 */
-        .split-container {
-            display: flex; /* フレックスボックスを有効化 */
-            height: 100vh; /* ビューポートの高さに合わせる */
+        .horizontal {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            height: 97vh;
+            justify-content: center;
         }
-        
+
         .left-panel {
-            flex: 1; /* 左側を広く */
-            padding: 20px; /* パディング */
-            border-right: 2px solid #ccc; /* 区切り線 */
+            flex: 0 1 auto;
+            min-width: 30%;
+            display: flex; /* Use flexbox */
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center-align items horizontally */
         }
-        
+
         .right-panel {
-            flex: 2; /* 右側も同じ比率 */
-            padding: 20px; /* パディング */
+            flex: 1 1 auto;
+            min-width: 30%;
+        }
+
+        .splitter {
+            flex: 0 0 auto;
+            width: 10px;
+            background: url(https://raw.githubusercontent.com/RickStrahl/jquery-resizable/master/assets/vsizegrip.png) center center no-repeat #c1d0ea;
+            cursor: col-resize;
         }
 
         /* iframeのスタイル */
@@ -306,9 +326,9 @@ try {
 </head>
 <body>
 
-<div class="split-container">
+<div class="horizontal">
     <!-- 左側のパネル -->
-    <div class="left-panel">
+    <div id="column1" class="left-panel">
         <h1>商品登録ページ</h1>
         <p>※カードのラジオボタンをチェックすると情報を引用できます。</p>
         <p>　なお、同名同分類の重複登録は不可です。</p><br>
@@ -400,9 +420,9 @@ try {
             <input type="hidden" id="existingPID" name="existingPID" value="">
         </form>
     </div>
-
+    <div class="splitter" id="splitter1"></div>
     <!-- 右側のパネル（iframeでpoke_card_register.phpを表示） -->
-    <div class="right-panel">
+    <div id="column2" class="right-panel">
         <iframe src="poke_card_register.php"></iframe> <!-- iframeでpoke_card_register.phpを表示 -->
     </div>
 </div>

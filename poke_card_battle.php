@@ -97,7 +97,7 @@
         #gender-filters {
             display: flex; /* ラベルをフレックスボックスで均等配置 */
             flex-wrap: wrap; /* ラベルを折り返す */
-            justify-content: space-between; /* 均等に配置 */
+            justify-content: space-evenly; /* 均等に配置 */
         }
 
         #gender-filters label {
@@ -132,9 +132,6 @@
         <label><input type="checkbox" value="male"> オスポケモン</label>
         <label><input type="checkbox" value="female"> メスポケモン</label>
         <label><input type="checkbox" value="unknown"> せいべつふめい</label>
-        <label><input type="checkbox" value="egg"> タマゴ</label>
-        <label><input type="checkbox" value="item"> どうぐ</label>
-        <label><input type="checkbox" value="ball"> ボール</label>
     </div>
     <hr> <!-- タイプフィルターとの間に横線を追加 -->
 
@@ -208,8 +205,8 @@ $sql = 'SELECT
             product_stock.SID,
             product_stock.PID,
             poke_info.Name,
-            poke_type1.type_name AS Type1,  -- poke_type1を参照
-            poke_type2.type_name AS Type2,  -- poke_type2を参照
+            poke_type1.type_name AS Type1,
+            poke_type2.type_name AS Type2,
             product_stock.Gender,
             product_stock.Price,
             product_stock.Inventory,
@@ -223,7 +220,10 @@ $sql = 'SELECT
         LEFT JOIN 
             poke_type AS poke_type1 ON poke_type1.TID = poke_info.Type1
         LEFT JOIN 
-            poke_type AS poke_type2 ON poke_type2.TID = poke_info.Type2';
+            poke_type AS poke_type2 ON poke_type2.TID = poke_info.Type2
+        WHERE
+            product_stock.Gender IN ("male", "female", "unknown")';
+
 
         // クエリを実行
         $statement = $pdo->prepare($sql);
@@ -444,6 +444,50 @@ function displayPokemon(pokemonArray) {
 
 
 $(document).ready(function() {
+
+    // ラジオボタンの変更イベント
+    $('#pokemon-container').on('change', 'input[name="product_select"]', function() {
+        // すでに選択されている商品があれば選択を解除
+        $('input[name="product_select"]').not(this).prop('checked', false);
+
+        // 選択された商品のSIDを取得
+        var selectedSID = $(this).val();
+
+        // 選択された商品のデータをフィルターして取得
+        var selectedPokemon = filteredPokemon.find(function(pokemon) {
+            return pokemon.SID == selectedSID;
+        });
+
+        // 親ドキュメントのleft-panelを取得
+        var leftPanel = window.parent.document.getElementById('column1');
+
+        // 親ドキュメントのleft-panel内のHTMLを空にする
+        $(leftPanel).find('.pokemon-card').empty();
+
+        // 選択されたポケモンのカードを親ドキュメントのleft-panelに表示する
+        var pokemonCardHTML = `
+            <div class="pokemon-card" style="background-color: rgba(255, 255, 255, .7); display: flex; position: absolute; bottom: 50px; padding: 20px; border-radius: 10px;">
+                <img class="pokemon-image" src="${selectedPokemon.Image_path}" alt="${selectedPokemon.Name}">
+                <div class="pokemon-details" style="margin-left: 50px;">
+                    <p><strong>${selectedPokemon.Name}</strong></p>
+                    <p><strong>ねだん:</strong> ${selectedPokemon.Price}</p>
+                    <p><strong>在庫:</strong> <span>${selectedPokemon.Inventory}</span></p>
+                </div>
+            </div>
+        `;
+        $(leftPanel).append(pokemonCardHTML);
+        // [バトル開始！]ボタンのHTMLを生成する
+        var battleButtonHTML = `
+            <button id="battleButton" style="width: 200px; height: 60px; font-size: 18px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">バトル開始！</button>
+        `;
+
+        // [バトル開始！]ボタンをleft-panelに追加する
+        $(leftPanel).append(battleButtonHTML);
+
+
+    });
+    
+
     // デフォルトでSIDの数字部分を使用して降順にソート
     filteredPokemon.sort((a, b) => {
         const sidA = parseInt(a.SID.replace(/[^0-9]/g, '')); // SIDの数字部分を抽出して整数化
@@ -475,51 +519,6 @@ $(document).ready(function() {
         "はがね": "T17HGN",
         "フェアリー": "T18FRY"
     };
-
-        // ラジオボタンの変更イベント
-        $('#pokemon-container').on('change', 'input[name="product_select"]', function() {
-        var selectedSID = $(this).val(); // チェックされた SID を取得
-        var selectedProduct = filteredPokemon.find(pokemon => pokemon.SID === selectedSID);
-
-        if (selectedProduct) {
-            var productName = selectedProduct.Name;
-            var gender = selectedProduct.Gender;
-
-            var type1Value = typeMapping[selectedProduct.Type1] || null;
-            var type2Value = typeMapping[selectedProduct.Type2] || null;
-
-            var imagePath = selectedProduct.Image_path; // 画像パスを取得
-            var pid = selectedProduct.PID; // PID を取得
-
-            // 親ドキュメントのフィールドを更新
-            $('#product_name', parent.document).val(productName); // 商品名
-            $('#gender', parent.document).val(gender); // ジェンダー
-            $('#type1-select', parent.document).val(type1Value); // タイプ1
-            $('#type2-select', parent.document).val(type2Value); // タイプ2
-            
-            // PIDを隠しフィールドにセット
-            $('#existingPID', parent.document).val(pid);
-
-            // 画像プレビューをリセット
-            resetImagePreview(parent.document);
-
-            // 画像プレビューに画像をセット
-            $('#image_preview', parent.document).attr('src', imagePath); // 画像プレビューにセット
-            $('#image_preview_container', parent.document).show(); // プレビューを表示
-        
-            // タイプの表示/非表示を制御
-            updateTypeVisibility(gender, parent.document);
-        }
-    });
-
-    // 画像プレビューをリセットする関数
-    function resetImagePreview(parentDoc) {
-        var $parent = $(parentDoc);
-        $parent.find('#product_image').val(""); // ファイル選択をリセット
-        $parent.find('#file_name_input').val(""); // ファイル名をリセット
-        $parent.find('#file_name_label, #file_name_input, #image_preview_container').hide(); // プレビューを非表示
-        $parent.find('#image_preview').attr('src', ""); // 画像プレビューをクリア
-    }
 
     // 名前の昇順・降順
     $('#sort-name-asc').on('click', function() {
@@ -553,18 +552,6 @@ $(document).ready(function() {
         applyFilters(); 
     });
 });
-
-    // 親ドキュメントでタイプの表示/非表示を制御する関数
-    function updateTypeVisibility(gender, parentDoc) {
-        var $parent = $(parentDoc);
-
-        if (gender === 'egg' || gender === 'item' || gender === 'ball') {
-            $parent.find('#type1, #type2').hide();
-            $parent.find('#type1-select, #type2-select').val(null); // 値をクリア
-        } else {
-            $parent.find('#type1, #type2').show(); // 表示
-        }
-    }
 </script>
 
 </body>
