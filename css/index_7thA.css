@@ -6,7 +6,6 @@
   /* 他のフォント形式もサポートする場合は、ここに追加します */
 }
 body {
-  font-family: 'KeiFont', sans-serif;
   background-image: url(../images/background/index_background.png);
 }
 /******************************
