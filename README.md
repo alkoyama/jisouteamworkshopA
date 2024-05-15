@@ -19,3 +19,11 @@ thanks_7thA.phpの処理コード部分<br>
 battle_7thA.php<br>
 poke_card_battle.php<br>
 DB設計（	teamworkshop_7thA.sql）<br>
+
+<h1>平山登紀子</h1>
+order_7thA.php<br>
+order_detail_7thA.php<br>
+stock_management_7thA.php<br>
+stock_update_inventory.php<br>
+stock_update_price.php<br>
+
