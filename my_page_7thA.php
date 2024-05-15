@@ -30,9 +30,8 @@
     <header class="header" id="header">
       <div class="header_container">
        <div class="header_container_small">
-       <a class="head_A" style="display: flex;">
-          <img src="./images/icon/index_header-ball.gif" alt="ゆらゆら">
-          <img src="./images/assets/index_logo.png" style="width: 90%;"alt="ゆらゆら">
+        <a class="head_A">
+         <img src="./images/icon/index_header-ball.gif" alt="ゆらゆら">
         </a>
         <button type="button" class="head_C">
          <span class="fa fa-bars" title="MEMU"></span><span class="sr-only">MEMU</span>
@@ -44,7 +43,7 @@
     <?php
     session_start();
     if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"] === true) {
-    // echo "<p>ID: " . $_SESSION["CID"] . "</p>";
+    echo "<p>ID: " . $_SESSION["CID"] . "</p>";
     
     } else {
      // User is not logged in, redirect to login page or display a login prompt
@@ -54,7 +53,6 @@
          <li><a href="./index_7tha.php" class="header_shop"><span title="SHOP"><img src="./images/icon/index_header-shop.png" alt="shop"></span></a></li>
          <li><a href="./my_page_7tha.php" class="header_mypage"><span title="MY PAGE"><img src="./images/icon/index_header-mypage.png" alt="shop"></span>
          <li><a href="./" class="header_contact"><span title="CONTACT"><img src="./images/icon/index_header-contact.png" alt="shop"></span></a></li>
-         <li><a href="./battle_7thA.php" class="header_battle"><span title="BATTLE"><img src="./images/icon/index_go-battle.png" alt="shop"></span></a></li>
         </ul>
        </nav>
       </div>
